@@ -2,7 +2,6 @@ import { UserDataSource } from "@/features/users/infrastucture/data-source/user/
 import { UserModel } from "@/features/users/domain/entities/user/user-model";
 import { CreateUserRequest } from "@/features/users/domain/params/request-params/create-user-request-param";
 import { UserResponse } from "@/features/users/infrastucture/model/user/user-response";
-import { apiClient } from "@/shared/utils/api-client/api-client";
 import { GetUserPathParam } from "@/features/users/domain/params/path-params/get-user-path-param";
 import { UpdateUserPathParam } from "@/features/users/domain/params/path-params/update-user-path-param";
 import { DeleteUserPathParam } from "@/features/users/domain/params/path-params/delete-user-path-param";
@@ -11,20 +10,32 @@ import { GetAllUsersQueryParam } from "@/features/users/domain/params/query-para
 import { CreateUserQueryParam } from "@/features/users/domain/params/query-params/create-user-query-param";
 import { UpdateUserQueryParam } from "@/features/users/domain/params/query-params/update-user-query-param";
 import { DeleteUserQueryParam } from "@/features/users/domain/params/query-params/delete-user-query-param";
+import axios, { AxiosInstance, AxiosError } from "axios";
 
 export class RemoteUserDataSource implements UserDataSource {
+  private axiosInstance: AxiosInstance;
+
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
   async findById(
     pathParams: GetUserPathParam,
     queryParams?: GetUserQueryParam
   ): Promise<UserModel | null> {
     try {
-      const query = this.buildQueryString(queryParams);
-      const response = await apiClient.get<UserResponse>(
-        `/users/${pathParams.id}${query}`
+      const response = await this.axiosInstance.get<UserResponse>(
+        `/users/${pathParams.id}`,
+        { params: queryParams }
       );
-      return this.mapResponseToModel(response);
+      return this.mapResponseToModel(response.data);
     } catch (error) {
-      if (error instanceof Error && error.message.includes("404")) {
+      if (this.isNotFoundError(error)) {
         return null;
       }
       throw error;
@@ -32,18 +43,22 @@ export class RemoteUserDataSource implements UserDataSource {
   }
 
   async findAll(queryParams?: GetAllUsersQueryParam): Promise<UserModel[]> {
-    const query = this.buildQueryString(queryParams);
-    const response = await apiClient.get<UserResponse[]>(`/users${query}`);
-    return response.map(this.mapResponseToModel);
+    const response = await this.axiosInstance.get<UserResponse[]>("/users", {
+      params: queryParams,
+    });
+    return response.data.map(this.mapResponseToModel);
   }
 
   async create(
     data: CreateUserRequest,
     queryParams?: CreateUserQueryParam
   ): Promise<UserModel> {
-    const query = this.buildQueryString(queryParams);
-    const response = await apiClient.post<UserResponse>(`/users${query}`, data);
-    return this.mapResponseToModel(response);
+    const response = await this.axiosInstance.post<UserResponse>(
+      "/users",
+      data,
+      { params: queryParams }
+    );
+    return this.mapResponseToModel(response.data);
   }
 
   async update(
@@ -51,30 +66,31 @@ export class RemoteUserDataSource implements UserDataSource {
     data: Partial<UserModel>,
     queryParams?: UpdateUserQueryParam
   ): Promise<UserModel> {
-    const query = this.buildQueryString(queryParams);
-    const response = await apiClient.put<UserResponse>(
-      `/users/${pathParams.id}${query}`,
-      data
+    const response = await this.axiosInstance.put<UserResponse>(
+      `/users/${pathParams.id}`,
+      data,
+      { params: queryParams }
     );
-    return this.mapResponseToModel(response);
+    return this.mapResponseToModel(response.data);
   }
 
   async delete(
     pathParams: DeleteUserPathParam,
     queryParams?: DeleteUserQueryParam
   ): Promise<void> {
-    const query = this.buildQueryString(queryParams);
-    await apiClient.delete(`/users/${pathParams.id}${query}`);
+    await this.axiosInstance.delete(`/users/${pathParams.id}`, {
+      params: queryParams,
+    });
   }
 
   async findByEmail(email: string): Promise<UserModel | null> {
     try {
-      const response = await apiClient.get<UserResponse>(
+      const response = await this.axiosInstance.get<UserResponse>(
         `/users/email/${email}`
       );
-      return this.mapResponseToModel(response);
+      return this.mapResponseToModel(response.data);
     } catch (error) {
-      if (error instanceof Error && error.message.includes("404")) {
+      if (this.isNotFoundError(error)) {
         return null;
       }
       throw error;
@@ -96,18 +112,7 @@ export class RemoteUserDataSource implements UserDataSource {
     };
   }
 
-  private buildQueryString(params?: Record<string, any>): string {
-    if (!params) return "";
-
-    const searchParams = new URLSearchParams();
-
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, String(value));
-      }
-    });
-
-    const queryString = searchParams.toString();
-    return queryString ? `?${queryString}` : "";
+  private isNotFoundError(error: unknown): boolean {
+    return error instanceof AxiosError && error.response?.status === 404;
   }
 }

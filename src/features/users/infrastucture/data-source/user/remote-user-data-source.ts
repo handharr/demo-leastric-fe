@@ -1,6 +1,6 @@
 import { UserDataSource } from "@/features/users/infrastucture/data-source/user/user-data-source";
 import { UserModel } from "@/features/users/domain/entities/user/user-model";
-import { CreateUserRequest } from "@/features/users/domain/params/request-params/create-user-request-param";
+import { CreateUserRequestParam } from "@/features/users/domain/params/request-params/create-user-request-param";
 import { UserResponse } from "@/features/users/infrastucture/model/user/user-response";
 import { GetUserPathParam } from "@/features/users/domain/params/path-params/get-user-path-param";
 import { UpdateUserPathParam } from "@/features/users/domain/params/path-params/update-user-path-param";
@@ -50,7 +50,7 @@ export class RemoteUserDataSource implements UserDataSource {
   }
 
   async create(
-    data: CreateUserRequest,
+    data: CreateUserRequestParam,
     queryParams?: CreateUserQueryParam
   ): Promise<UserModel> {
     const response = await this.axiosInstance.post<UserResponse>(

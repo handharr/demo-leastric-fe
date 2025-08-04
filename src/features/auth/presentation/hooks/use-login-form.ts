@@ -50,10 +50,12 @@ export function useLoginForm(
         if (result.code === "VALIDATION_ERROR") {
           // Parse validation errors from details
           try {
-            const validationErrors = JSON.parse(result.details || "{}");
+            const validationErrors = JSON.parse(result.details || "");
+            console.error("set Validation errors:", validationErrors);
             setErrors(validationErrors);
           } catch {
             // Fallback if parsing fails
+            console.error("Failed to parse validation errors:", result);
             setErrors({
               email: result.message,
               password: result.message,

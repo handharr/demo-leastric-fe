@@ -25,7 +25,11 @@ export class LoginUseCase {
 
     if (LoginValidator.hasErrors(validationErrors)) {
       console.error("Validation errors:", validationErrors);
-      return createErrorModel("VALIDATION_ERROR", "Form validation failed");
+      return createErrorModel(
+        "VALIDATION_ERROR",
+        "Form validation failed",
+        JSON.stringify(validationErrors) // Pass validation errors as JSON string
+      );
     }
 
     try {

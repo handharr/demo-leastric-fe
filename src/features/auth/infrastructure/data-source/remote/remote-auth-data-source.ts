@@ -3,10 +3,9 @@ import { AuthDataSource } from "@/features/auth/infrastructure/data-source/inter
 import { LoginResponse } from "@/features/auth/infrastructure/model/login/login-response";
 import { RefreshTokenResponse } from "@/features/auth/infrastructure/model/login/refresh-token-response";
 import { ValidateTokenResponse } from "@/features/auth/infrastructure/model/login/validate-token-response";
-import {
-  BaseErrorModel,
-  createErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { AxiosErrorHandler } from "@/shared/utils/error-handler/axios-error-handler";
+import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 
 export class RemoteAuthDataSource implements AuthDataSource {
   private readonly baseURL: string;
@@ -40,8 +39,8 @@ export class RemoteAuthDataSource implements AuthDataSource {
 
       return response.data;
     } catch (error) {
-      return this.handleError(
-        error as AxiosError,
+      return AxiosErrorHandler.handleErrorResponse<BaseErrorResponse>(
+        error as AxiosError<BaseErrorResponse>,
         "LOGIN_ERROR",
         "Failed to login"
       );
@@ -68,8 +67,8 @@ export class RemoteAuthDataSource implements AuthDataSource {
       console.error("Logout error:", error);
       // Even if API call fails, clear local tokens
       this.clearLocalTokens();
-      return this.handleError(
-        error as AxiosError,
+      return AxiosErrorHandler.handleErrorResponse<BaseErrorResponse>(
+        error as AxiosError<BaseErrorResponse>,
         "LOGOUT_ERROR",
         "Failed to logout"
       );
@@ -95,8 +94,8 @@ export class RemoteAuthDataSource implements AuthDataSource {
 
       return response.data;
     } catch (error) {
-      return this.handleError(
-        error as AxiosError,
+      return AxiosErrorHandler.handleErrorResponse<BaseErrorResponse>(
+        error as AxiosError<BaseErrorResponse>,
         "REFRESH_TOKEN_ERROR",
         "Failed to refresh token"
       );
@@ -122,35 +121,11 @@ export class RemoteAuthDataSource implements AuthDataSource {
 
       return response.data;
     } catch (error) {
-      return this.handleError(
-        error as AxiosError,
+      return AxiosErrorHandler.handleErrorResponse<BaseErrorResponse>(
+        error as AxiosError<BaseErrorResponse>,
         "VALIDATE_TOKEN_ERROR",
         "Failed to validate token"
       );
-    }
-  }
-
-  private handleError(
-    error: AxiosError,
-    code: string,
-    defaultMessage: string
-  ): BaseErrorModel {
-    if (error.response) {
-      // Server responded with error status
-      const statusCode = error.response.status;
-      const serverMessage = (error.response.data as string) || defaultMessage;
-
-      return createErrorModel(code, serverMessage, error.message, statusCode);
-    } else if (error.request) {
-      // Network error
-      return createErrorModel(
-        "NETWORK_ERROR",
-        "Network connection failed",
-        error.message
-      );
-    } else {
-      // Other error
-      return createErrorModel(code, defaultMessage, error.message);
     }
   }
 

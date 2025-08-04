@@ -28,9 +28,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="flex min-h-screen">
-          <aside className="w-64 bg-gray-800 text-white p-4">
-            Sidebar Content
-          </aside>
           <main className="flex-1 bg-gray-100 p-6">{children}</main>
         </div>
       </body>

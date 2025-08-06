@@ -6,6 +6,8 @@ import { ValidateTokenResponse } from "@/features/auth/infrastructure/model/logi
 import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import { AxiosErrorHandler } from "@/shared/utils/error-handler/axios-error-handler";
 import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { ResetPasswordResponse } from "@/features/auth/infrastructure/model/reset-password/reset-password-response";
+import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-password-data";
 
 export class RemoteAuthDataSource implements AuthDataSource {
   private readonly baseURL: string;
@@ -125,6 +127,33 @@ export class RemoteAuthDataSource implements AuthDataSource {
         error as AxiosError<BaseErrorResponse>,
         "VALIDATE_TOKEN_ERROR",
         "Failed to validate token"
+      );
+    }
+  }
+
+  async resetPassword(
+    params: ResetPasswordData
+  ): Promise<ResetPasswordResponse | BaseErrorModel> {
+    try {
+      const response: AxiosResponse<ResetPasswordResponse> = await axios.post(
+        `${this.baseURL}/auth/reset-password`,
+        {
+          newPassword: params.newPassword,
+        },
+        {
+          timeout: this.timeout,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      return AxiosErrorHandler.handleErrorResponse<BaseErrorResponse>(
+        error as AxiosError<BaseErrorResponse>,
+        "RESET_PASSWORD_ERROR",
+        "Failed to reset password"
       );
     }
   }

@@ -1,4 +1,4 @@
-import { LoginValidator } from "@/features/auth/domain/validation/login-validator";
+import { LoginValidator } from "@/features/auth/presentation/validation/login-validator";
 import { LoginResultModel } from "@/features/auth/domain/entities/login-result-model";
 import { LoginFormData } from "@/features/auth/domain/params/data/login-form-data";
 import { AuthRepository } from "@/features/auth/domain/repositories/auth-repository";

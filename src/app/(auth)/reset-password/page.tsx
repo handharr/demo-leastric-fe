@@ -18,7 +18,11 @@ export default function ResetPasswordPage() {
     getPasswordRequirements,
   } = useResetPasswordForm();
 
-  const passwordRequirements = getPasswordRequirements(formData.newPassword);
+  const passwordRequirements = useMemo(
+    () => getPasswordRequirements(formData.newPassword),
+    [formData.newPassword, getPasswordRequirements]
+  );
+
   const isFormValid =
     formData.newPassword &&
     formData.confirmPassword &&

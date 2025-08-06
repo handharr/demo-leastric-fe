@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ResetPasswordPageModel } from "@/features/auth/presentation/page-model/reset-password-page-model";
 import { ResetPasswordValidationErrors } from "@/features/auth/domain/entities/reset-password-validation-errors";
 import { ResetPasswordUseCase } from "@/features/auth/domain/use-cases/reset-password-use-case";
@@ -33,74 +33,88 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const resetPasswordUseCase = new ResetPasswordUseCase(
-    new AuthRepositoryImpl(new RemoteAuthDataSource())
+  const resetPasswordUseCase = useMemo(
+    () =>
+      new ResetPasswordUseCase(
+        new AuthRepositoryImpl(new RemoteAuthDataSource())
+      ),
+    [] // Empty dependency array = create only once
   );
 
-  const updateField = (field: keyof ResetPasswordPageModel, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const updateField = useCallback(
+    (field: keyof ResetPasswordPageModel, value: string) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
 
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  const clearError = (field: keyof ResetPasswordValidationErrors) => {
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
-  };
-
-  const getPasswordRequirements = (password: string) => {
-    return ResetPasswordValidator.getPasswordRequirements(password);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrors({});
-
-    try {
-      // Client-side validation
-      const validationErrors = ResetPasswordValidator.validate(formData);
-
-      if (ResetPasswordValidator.hasErrors(validationErrors)) {
-        setErrors(validationErrors);
-        return;
+      // Clear error when user starts typing
+      if (errors[field]) {
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
       }
+    },
+    [errors] // Recreate only when errors change
+  );
 
-      const result = await resetPasswordUseCase.execute({
-        newPassword: formData.newPassword,
-      });
+  const clearError = useCallback(
+    (field: keyof ResetPasswordValidationErrors) => {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    },
+    [] // No dependencies = same function reference always
+  );
 
-      if (isErrorModel(result)) {
-        if (result.code === "VALIDATION_ERROR") {
-          try {
-            const serverErrors = JSON.parse(result.details || "");
-            setErrors(serverErrors);
-          } catch {
+  const getPasswordRequirements = useCallback(
+    (password: string) => {
+      return ResetPasswordValidator.getPasswordRequirements(password);
+    },
+    [] // Pure function = no dependencies needed
+  );
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setErrors({});
+
+      try {
+        const validationErrors = ResetPasswordValidator.validate(formData);
+
+        if (ResetPasswordValidator.hasErrors(validationErrors)) {
+          setErrors(validationErrors);
+          return;
+        }
+
+        const result = await resetPasswordUseCase.execute({
+          newPassword: formData.newPassword,
+        });
+
+        if (isErrorModel(result)) {
+          if (result.code === "VALIDATION_ERROR") {
+            try {
+              const serverErrors = JSON.parse(result.details || "");
+              setErrors(serverErrors);
+            } catch {
+              setErrors({
+                newPassword: result.message,
+              });
+            }
+          } else {
             setErrors({
               newPassword: result.message,
             });
           }
         } else {
-          setErrors({
-            newPassword: result.message,
-          });
+          setIsSuccess(true);
+          console.log("Password reset successful:", result);
         }
-      } else {
-        // Success
-        setIsSuccess(true);
-        console.log("Password reset successful:", result);
+      } catch (error) {
+        console.error("Reset password error:", error);
+        setErrors({
+          newPassword: "An unexpected error occurred",
+        });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Reset password error:", error);
-      setErrors({
-        newPassword: "An unexpected error occurred",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [formData, resetPasswordUseCase] // Recreate when formData or useCase changes
+  );
 
   return {
     formData,

@@ -88,7 +88,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="w-full max-w-md space-y-8">
       {/* Logo */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-center space-x-2">
         <div className="w-8 h-8 bg-green-600 rounded-sm flex items-center justify-center">
           <span className="text-white font-bold text-sm">⚡</span>
         </div>
@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
       </div>
 
       {/* Reset Password Form */}
-      <div className="space-y-6">
+      <div className="space-y-10">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Set new password</h2>
           <p className="text-gray-600 mt-2">
@@ -124,7 +124,7 @@ export default function ResetPasswordPage() {
                   "w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 pr-10",
                   errors.newPassword
                     ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                    : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                    : "border-gray-300 focus:ring-leastric-secondary focus:border-leastric-secondary"
                 )}
                 required
               />
@@ -151,7 +151,7 @@ export default function ResetPasswordPage() {
                   className={cn(
                     "w-4 h-4 rounded-full flex items-center justify-center",
                     passwordRequirements.minLength
-                      ? "bg-green-600"
+                      ? "bg-leastric-secondary"
                       : "bg-gray-300"
                   )}
                 >
@@ -163,7 +163,7 @@ export default function ResetPasswordPage() {
                   className={cn(
                     "text-sm",
                     passwordRequirements.minLength
-                      ? "text-green-600"
+                      ? "text-leastric-secondary"
                       : "text-gray-500"
                   )}
                 >
@@ -176,7 +176,7 @@ export default function ResetPasswordPage() {
                   className={cn(
                     "w-4 h-4 rounded-full flex items-center justify-center",
                     passwordRequirements.hasCapital
-                      ? "bg-green-600"
+                      ? "bg-leastric-secondary"
                       : "bg-gray-300"
                   )}
                 >
@@ -188,7 +188,7 @@ export default function ResetPasswordPage() {
                   className={cn(
                     "text-sm",
                     passwordRequirements.hasCapital
-                      ? "text-green-600"
+                      ? "text-leastric-secondary"
                       : "text-gray-500"
                   )}
                 >
@@ -201,7 +201,7 @@ export default function ResetPasswordPage() {
                   className={cn(
                     "w-4 h-4 rounded-full flex items-center justify-center",
                     passwordRequirements.hasNumber
-                      ? "bg-green-600"
+                      ? "bg-leastric-secondary"
                       : "bg-gray-300"
                   )}
                 >
@@ -213,7 +213,7 @@ export default function ResetPasswordPage() {
                   className={cn(
                     "text-sm",
                     passwordRequirements.hasNumber
-                      ? "text-green-600"
+                      ? "text-leastric-secondary"
                       : "text-gray-500"
                   )}
                 >
@@ -226,7 +226,7 @@ export default function ResetPasswordPage() {
                   className={cn(
                     "w-4 h-4 rounded-full flex items-center justify-center",
                     passwordRequirements.hasSpecial
-                      ? "bg-green-600"
+                      ? "bg-leastric-secondary"
                       : "bg-gray-300"
                   )}
                 >
@@ -238,7 +238,7 @@ export default function ResetPasswordPage() {
                   className={cn(
                     "text-sm",
                     passwordRequirements.hasSpecial
-                      ? "text-green-600"
+                      ? "text-leastric-secondary"
                       : "text-gray-500"
                   )}
                 >
@@ -267,7 +267,7 @@ export default function ResetPasswordPage() {
                   "w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 pr-10",
                   errors.confirmPassword
                     ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                    : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                    : "border-gray-300 focus:ring-leastric-secondary focus:border-leastric-secondary"
                 )}
                 required
               />
@@ -293,10 +293,10 @@ export default function ResetPasswordPage() {
             type="submit"
             disabled={isLoading || !isFormValid}
             className={cn(
-              "w-full py-2 px-4 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
+              "w-full py-2 px-4 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-leastric-primary focus:ring-offset-2",
               isLoading || !isFormValid
                 ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                : "bg-green-600 text-white hover:bg-green-700"
+                : "bg-leastric-primary text-white hover:bg-leastric-secondary"
             )}
           >
             {isLoading ? "Setting password..." : "Continue"}

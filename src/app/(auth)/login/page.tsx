@@ -13,7 +13,7 @@ export default function LoginPage() {
     <>
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-center space-x-2">
           <div className="w-8 h-8 bg-green-600 rounded-sm flex items-center justify-center">
             <span className="text-white font-bold text-sm">⚡</span>
           </div>
@@ -103,7 +103,7 @@ export default function LoginPage() {
                 "w-full py-2 px-4 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
                 isLoading
                   ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                  : "bg-green-600 text-white hover:bg-green-700"
+                  : "bg-leastric-primary text-white hover:bg-green-700"
               )}
             >
               {isLoading ? "Logging in..." : "Login"}
@@ -113,7 +113,7 @@ export default function LoginPage() {
             <div className="text-center">
               <a
                 href="#"
-                className="text-sm text-green-600 hover:text-green-700 hover:underline"
+                className="text-sm text-leastric-primary hover:text-leastric-primary/80 hover:underline"
               >
                 Forgot Password?
               </a>

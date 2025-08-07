@@ -5,7 +5,7 @@ export default function ForgotPasswordPage() {
     <div className="w-full max-w-md space-y-8">
       {/* Logo */}
       <div className="flex items-center space-x-2">
-        <div className="w-8 h-8 bg-green-600 rounded-sm flex items-center justify-center">
+        <div className="w-8 h-8 bg-leastric-primary rounded-sm flex items-center justify-center">
           <span className="text-white font-bold text-sm">⚡</span>
         </div>
         <span className="text-xl font-bold text-gray-900">LEASTRIC</span>
@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        <button className="w-full bg-green-600 text-white py-3 px-4 rounded-md font-medium hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+        <button className="w-full bg-leastric-primary text-white py-3 px-4 rounded-md font-medium hover:bg-leastric-secondary transition duration-200 focus:outline-none focus:ring-2 focus:ring-leastric-primary focus:ring-offset-2">
           Contact Our Administrator
         </button>
       </div>

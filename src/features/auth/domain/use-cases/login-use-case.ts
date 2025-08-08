@@ -1,5 +1,4 @@
 import { LoginValidator } from "@/features/auth/presentation/validation/login-validator";
-import { LoginResultModel } from "@/features/auth/domain/entities/login-result-model";
 import { LoginFormData } from "@/features/auth/domain/params/data/login-form-data";
 import { AuthRepository } from "@/features/auth/domain/repositories/auth-repository";
 import { AuthRepositoryImpl } from "@/features/auth/infrastructure/repositories-implementation/auth-repository-impl";
@@ -9,6 +8,7 @@ import {
   isErrorModel,
   createErrorModel,
 } from "@/shared/domain/entities/base-error-model";
+import { UserModel } from "@/features/auth/domain/entities/user-model";
 
 export class LoginUseCase {
   constructor(
@@ -17,9 +17,7 @@ export class LoginUseCase {
     )
   ) {}
 
-  async execute(
-    formData: LoginFormData
-  ): Promise<LoginResultModel | BaseErrorModel> {
+  async execute(formData: LoginFormData): Promise<UserModel | BaseErrorModel> {
     // Client-side validation
     const validationErrors = LoginValidator.validate(formData);
 

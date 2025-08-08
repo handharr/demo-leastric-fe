@@ -1,10 +1,28 @@
-export interface LoginResponse {
-  success?: boolean;
-  token?: string;
+export interface LoginResponseData {
   user?: {
-    id?: string;
+    id?: number;
     email?: string;
     name?: string;
+    phoneNumber?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
   };
-  message?: string;
+  tokens?: {
+    access_token?: string;
+    refresh_token?: string;
+  };
+}
+export interface LoginResponse {
+  user?: {
+    id?: number;
+    email?: string;
+    name?: string;
+    phoneNumber?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  tokens?: {
+    access_token?: string;
+    refresh_token?: string;
+  };
 }

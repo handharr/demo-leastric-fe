@@ -8,6 +8,7 @@ import { AxiosErrorHandler } from "@/shared/utils/error-handler/axios-error-hand
 import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 import { ResetPasswordResponse } from "@/features/auth/infrastructure/model/reset-password/reset-password-response";
 import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-password-data";
+import { BaseResponse } from "@/shared/infrastructure/model/base-response";
 
 export class RemoteAuthDataSource implements AuthDataSource {
   private readonly baseURL: string;
@@ -23,21 +24,22 @@ export class RemoteAuthDataSource implements AuthDataSource {
   async login(
     email: string,
     password: string
-  ): Promise<LoginResponse | BaseErrorModel> {
+  ): Promise<BaseResponse<LoginResponse> | BaseErrorModel> {
     try {
-      const response: AxiosResponse<LoginResponse> = await axios.post(
-        `${this.baseURL}/auth/login`,
-        {
-          email,
-          password,
-        },
-        {
-          timeout: this.timeout,
-          headers: {
-            "Content-Type": "application/json",
+      const response: AxiosResponse<BaseResponse<LoginResponse>> =
+        await axios.post(
+          `${this.baseURL}/auth/login`,
+          {
+            email,
+            password,
           },
-        }
-      );
+          {
+            timeout: this.timeout,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
       return response.data;
     } catch (error) {

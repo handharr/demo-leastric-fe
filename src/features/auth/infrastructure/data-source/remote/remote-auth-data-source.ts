@@ -55,7 +55,7 @@ export class RemoteAuthDataSource implements AuthDataSource {
   }): Promise<BaseResponse<LoginResponse> | BaseErrorResponse> {
     try {
       const response: AxiosResponse<BaseResponse<LoginResponse>> =
-        await this.axiosInstance.post("/auth/login", {
+        await this.axiosInstance.post("/v1/login", {
           email,
           password,
         });

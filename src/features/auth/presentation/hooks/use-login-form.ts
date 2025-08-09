@@ -58,22 +58,26 @@ export function useLoginForm(
           if (result.type === "VALIDATION") {
             // Parse validation errors from details
             try {
-              const validationErrors = JSON.parse(result.details || "");
-              console.error("set Validation errors:", validationErrors);
+              const emailError = result.validationErrors?.email;
+              const passwordError = result.validationErrors?.password;
+              const otherError = result.validationErrors?.other;
+              const validationErrors: LoginValidationErrors = {
+                email: emailError,
+                password: passwordError,
+                other: otherError,
+              };
               setErrors(validationErrors);
             } catch {
               // Fallback if parsing fails
               console.error("Failed to parse validation errors:", result);
               setErrors({
-                email: result.message,
-                password: result.message,
+                other: result.message,
               });
             }
           } else {
             // Handle other errors (network, server, etc.)
             setErrors({
-              email: result.message,
-              password: result.message,
+              other: result.message,
             });
           }
         } else {

@@ -9,6 +9,7 @@ import {
   createErrorModel,
 } from "@/shared/domain/entities/base-error-model";
 import { UserModel } from "@/features/auth/domain/entities/user-model";
+import { mapValidationErrorsToRecord } from "@/shared/utils/helpers/validation-helpers";
 
 export class LoginUseCase {
   constructor(
@@ -23,15 +24,16 @@ export class LoginUseCase {
 
     if (LoginValidator.hasErrors(validationErrors)) {
       console.error("Validation errors:", validationErrors);
-      return createErrorModel(
-        "VALIDATION_ERROR",
-        "Form validation failed",
-        JSON.stringify(validationErrors) // Pass validation errors as JSON string
-      );
+
+      return createErrorModel({
+        message: "Validation failed",
+        validationErrors: mapValidationErrorsToRecord(validationErrors),
+        type: "VALIDATION",
+      });
     }
 
     try {
-      const result = await this.authRepository.login(formData);
+      const result = await this.authRepository.login({ data: formData });
 
       if (isErrorModel(result)) {
         return result;
@@ -40,11 +42,11 @@ export class LoginUseCase {
       return result;
     } catch (error) {
       console.error("Login failed:", error);
-      return createErrorModel(
-        "UNEXPECTED_ERROR",
-        "An unexpected error occurred during login",
-        error instanceof Error ? error.message : "Unknown error"
-      );
+      return createErrorModel({
+        message: "Login failed",
+        details: error instanceof Error ? error.message : "Unknown error",
+        type: "UNEXPECTED",
+      });
     }
   }
 }

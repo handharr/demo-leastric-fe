@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { storage } from "@/shared/utils/helpers/storage-helper";
 
 export function handleErrorResponse(
   error: AxiosError<BaseErrorResponse>,
@@ -33,19 +34,13 @@ export function handleErrorResponse(
 export function getAuthToken(): string {
   if (typeof window === "undefined") return "";
 
-  const token =
-    localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
-
+  const token = storage.getAuthToken();
   return token ? `Bearer ${token}` : "";
 }
 
 export function clearLocalTokens(): void {
   if (typeof window === "undefined") return;
 
-  const keysToRemove = ["authToken", "refreshToken"];
-
-  keysToRemove.forEach((key) => {
-    localStorage.removeItem(key);
-    sessionStorage.removeItem(key);
-  });
+  storage.clearAuthData();
+  storage.clearAuthData({ options: { useSessionStorage: true } });
 }

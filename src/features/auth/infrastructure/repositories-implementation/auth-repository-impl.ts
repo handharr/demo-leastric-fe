@@ -12,6 +12,8 @@ import {
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { UserModel } from "@/features/auth/domain/entities/user-model";
 import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { storage } from "@/shared/utils/helpers/storage-helper";
+import { clearLocalTokens } from "@/shared/utils/helpers/network-helper";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(private dataSource: AuthDataSource) {}
@@ -43,10 +45,14 @@ export class AuthRepositoryImpl implements AuthRepository {
       result.data?.tokens?.access_token &&
       result.data?.tokens?.refresh_token
     ) {
-      // Store token in localStorage/sessionStorage
+      // Store tokens using the new storage system with named parameters
       if (typeof window !== "undefined") {
-        localStorage.setItem("authToken", result.data.tokens.access_token);
-        localStorage.setItem("refreshToken", result.data.tokens.refresh_token);
+        storage.setAuthToken({
+          token: result.data.tokens.access_token,
+        });
+        storage.setRefreshToken({
+          token: result.data.tokens.refresh_token,
+        });
       }
 
       return {
@@ -77,20 +83,14 @@ export class AuthRepositoryImpl implements AuthRepository {
 
       // Still clear local tokens even if API call fails
       if (typeof window !== "undefined") {
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("refreshToken");
-        sessionStorage.removeItem("authToken");
-        sessionStorage.removeItem("refreshToken");
+        clearLocalTokens();
       }
       return errorModel;
     }
 
     // Clear local tokens on successful logout
     if (typeof window !== "undefined") {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("refreshToken");
-      sessionStorage.removeItem("authToken");
-      sessionStorage.removeItem("refreshToken");
+      clearLocalTokens();
     }
   }
 
@@ -116,7 +116,7 @@ export class AuthRepositoryImpl implements AuthRepository {
     if (result.success && result.token) {
       // Update stored token
       if (typeof window !== "undefined") {
-        localStorage.setItem("authToken", result.token);
+        storage.setAuthToken({ token: result.token });
       }
 
       return {

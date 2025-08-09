@@ -19,8 +19,8 @@ export class RemoteAuthDataSource implements AuthDataSource {
   private readonly axiosInstance;
 
   constructor(
-    baseURL: string = process.env.NEXT_PUBLIC_API_BASE_URL ||
-      "http://localhost:3001/api"
+    baseURL: string = process.env.PUBLIC_API_BASE_URL ||
+      "http://localhost:3000/api"
   ) {
     this.baseURL = baseURL;
 

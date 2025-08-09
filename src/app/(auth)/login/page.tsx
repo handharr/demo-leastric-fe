@@ -15,7 +15,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="flex items-center justify-center space-x-2">
-          <div className="w-8 h-8 bg-green-600 rounded-sm flex items-center justify-center">
+          <div className="w-8 h-8 bg-leastric-primary rounded-sm flex items-center justify-center">
             <span className="text-white font-bold text-sm">⚡</span>
           </div>
           <span className="text-xl font-bold text-gray-900">LEASTRIC</span>
@@ -113,7 +113,7 @@ export default function LoginPage() {
             {/* Forgot Password Link */}
             <div className="text-center">
               <a
-                href="#"
+                href="/forgot-password"
                 className="text-sm text-leastric-primary hover:text-leastric-primary/80 hover:underline"
               >
                 Forgot Password?

@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useLoginForm } from "@/features/auth/presentation/hooks/use-login-form";
 import { cn } from "@/lib/utils";
+import { ErrorMessage } from "@/shared/presentation/components/error-message";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const { formData, errors, isLoading, updateField, handleSubmit } =
+  const { formData, errors, isLoading, updateField, handleSubmit, clearError } =
     useLoginForm();
 
   return (
@@ -118,6 +119,15 @@ export default function LoginPage() {
                 Forgot Password?
               </a>
             </div>
+
+            {/* Error Message */}
+            {errors.other && (
+              <ErrorMessage
+                message={errors.other}
+                dismissible={true}
+                onDismiss={() => clearError("other")}
+              />
+            )}
           </form>
         </div>
       </div>

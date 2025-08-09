@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useResetPasswordForm } from "@/features/auth/presentation/hooks/use-reset-password-form";
 import { cn } from "@/lib/utils";
+import { ErrorMessage } from "@/shared/presentation/components/error-message";
 
 export default function ResetPasswordPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -16,6 +17,7 @@ export default function ResetPasswordPage() {
     updateField,
     handleSubmit,
     getPasswordRequirements,
+    clearError,
   } = useResetPasswordForm();
 
   const passwordRequirements = useMemo(
@@ -301,6 +303,15 @@ export default function ResetPasswordPage() {
           >
             {isLoading ? "Setting password..." : "Continue"}
           </button>
+
+          {/* Error Message */}
+          {errors.other && (
+            <ErrorMessage
+              message={errors.other}
+              dismissible={true}
+              onDismiss={() => clearError("other")}
+            />
+          )}
         </form>
       </div>
     </div>

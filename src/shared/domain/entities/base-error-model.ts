@@ -1,23 +1,48 @@
+import { ErrorType, validErrorTypes } from "@/shared/domain/enum/base-enum";
+import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 export interface BaseErrorModel {
-  isError: true;
-  code: string;
+  type: ErrorType;
   message: string;
   details?: string;
   statusCode?: number;
+  validationErrors?: Record<string, string>;
 }
 
-export function createErrorModel(
-  code: string,
-  message: string,
-  details?: string,
-  statusCode?: number
-): BaseErrorModel {
+// Map BaseErrorResponse to BaseErrorModel
+export function mapErrorResponseToModel({
+  response,
+}: {
+  response: BaseErrorResponse;
+}): BaseErrorModel {
+  return createErrorModel({
+    message: optional(response.message).orEmpty(),
+    details: optional(response.details).orEmpty(),
+    statusCode: optional(response.statusCode).orZero(),
+    type: response.type || "UNEXPECTED",
+    validationErrors: response.validationErrors,
+  });
+}
+
+export function createErrorModel({
+  message,
+  details,
+  statusCode,
+  type = "UNEXPECTED",
+  validationErrors,
+}: {
+  message: string;
+  details?: string;
+  statusCode?: number;
+  type?: ErrorType;
+  validationErrors?: Record<string, string>;
+}): BaseErrorModel {
   return {
-    isError: true,
-    code,
+    type,
     message,
     details,
     statusCode,
+    validationErrors,
   };
 }
 
@@ -27,7 +52,92 @@ export function isErrorModel<T>(
   return (
     typeof response === "object" &&
     response !== null &&
-    "isError" in response &&
-    (response as BaseErrorModel).isError === true
+    "type" in response &&
+    "message" in response &&
+    typeof (response as BaseErrorModel).message === "string" &&
+    typeof (response as BaseErrorModel).type === "string" &&
+    validErrorTypes.includes((response as BaseErrorModel).type as ErrorType)
   );
+}
+
+// Helper functions to check error types
+export function isValidationError({
+  error,
+}: {
+  error: BaseErrorModel;
+}): boolean {
+  return error.type === "VALIDATION";
+}
+
+export function isNetworkError({ error }: { error: BaseErrorModel }): boolean {
+  return error.type === "NETWORK";
+}
+
+export function isServerError({ error }: { error: BaseErrorModel }): boolean {
+  return error.type === "SERVER";
+}
+
+export function isAuthenticationError({
+  error,
+}: {
+  error: BaseErrorModel;
+}): boolean {
+  return error.type === "AUTHENTICATION";
+}
+
+export function handleErrorResponse({
+  error,
+  defaultMessage,
+}: {
+  error: BaseErrorResponse; // More flexible error type to handle different error structures
+  defaultMessage: string;
+}): BaseErrorModel {
+  const statusCode = optional(error.statusCode).orDefault(500);
+
+  const errorType = determineErrorType({
+    statusCode,
+    errorData: error,
+  });
+
+  return createErrorModel({
+    message: error.message || defaultMessage,
+    details: error.details,
+    statusCode,
+    type: errorType,
+    validationErrors: error.validationErrors,
+  });
+}
+
+/**
+ * Determine error type based on HTTP status code and response data
+ */
+export function determineErrorType({
+  statusCode,
+  errorData,
+}: {
+  statusCode: number;
+  errorData?: BaseErrorResponse;
+}): ErrorType {
+  // Check if response explicitly defines error type
+  if (errorData?.type && validErrorTypes.includes(errorData.type)) {
+    return errorData.type as ErrorType;
+  }
+
+  // Categorize based on HTTP status codes
+  switch (true) {
+    case statusCode >= 400 && statusCode < 500:
+      if (statusCode === 401 || statusCode === 403) {
+        return "AUTHENTICATION";
+      }
+      if (statusCode === 422 || errorData?.validationErrors) {
+        return "VALIDATION";
+      }
+      return "CLIENT";
+
+    case statusCode >= 500:
+      return "SERVER";
+
+    default:
+      return "UNEXPECTED";
+  }
 }

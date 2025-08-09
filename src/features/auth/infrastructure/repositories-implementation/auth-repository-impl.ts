@@ -8,26 +8,35 @@ import {
   BaseErrorModel,
   isErrorModel,
   createErrorModel,
+  mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { UserModel } from "@/features/auth/domain/entities/user-model";
+import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(private dataSource: AuthDataSource) {}
 
-  async login(data: LoginFormData): Promise<UserModel | BaseErrorModel> {
+  async login({
+    data,
+  }: {
+    data: LoginFormData;
+  }): Promise<UserModel | BaseErrorModel> {
     if (!data.email || !data.password) {
-      return createErrorModel(
-        "VALIDATION_ERROR",
-        "Email and password are required",
-        "Missing required fields"
-      );
+      return createErrorModel({
+        message: "Email and password are required",
+        details: "Missing required fields",
+        type: "VALIDATION",
+      });
     }
 
-    const result = await this.dataSource.login(data.email, data.password);
+    const result = await this.dataSource.login({
+      email: data.email,
+      password: data.password,
+    });
 
-    if (isErrorModel(result)) {
-      return result;
+    if (isErrorResponse(result)) {
+      return mapErrorResponseToModel({ response: result });
     }
 
     if (
@@ -50,11 +59,13 @@ export class AuthRepositoryImpl implements AuthRepository {
         updatedAt: optional(result.data.user?.updatedAt).orEmpty(),
       } as UserModel;
     } else {
-      return createErrorModel(
-        "LOGIN_FAILED",
-        "Invalid credentials",
-        optional(result.flash?.message).orDefault("Authentication failed")
-      );
+      return createErrorModel({
+        message: "Invalid credentials",
+        details: optional(result.flash?.message).orDefault(
+          "Authentication failed"
+        ),
+        type: "AUTHENTICATION",
+      });
     }
   }
 
@@ -77,18 +88,20 @@ export class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  async refreshToken(
-    token: string
-  ): Promise<LoginResultModel | BaseErrorModel> {
+  async refreshToken({
+    token,
+  }: {
+    token: string;
+  }): Promise<LoginResultModel | BaseErrorModel> {
     if (!token) {
-      return createErrorModel(
-        "VALIDATION_ERROR",
-        "Token is required",
-        "Missing token parameter"
-      );
+      return createErrorModel({
+        message: "Token is required",
+        details: "Missing token parameter",
+        type: "VALIDATION",
+      });
     }
 
-    const result = await this.dataSource.refreshToken(token);
+    const result = await this.dataSource.refreshToken({ token });
 
     if (isErrorModel(result)) {
       return result;
@@ -105,20 +118,20 @@ export class AuthRepositoryImpl implements AuthRepository {
         token: result.token,
       } as LoginResultModel;
     } else {
-      return createErrorModel(
-        "REFRESH_FAILED",
-        "Token refresh failed",
-        result.message || "Failed to refresh authentication token"
-      );
+      return createErrorModel({
+        message: "Token refresh failed",
+        details: result.message || "Failed to refresh authentication token",
+        type: "AUTHENTICATION",
+      });
     }
   }
 
-  async validateToken(token: string): Promise<boolean> {
+  async validateToken({ token }: { token: string }): Promise<boolean> {
     if (!token) {
       return false;
     }
 
-    const result = await this.dataSource.validateToken(token);
+    const result = await this.dataSource.validateToken({ token });
 
     if (isErrorModel(result)) {
       return false;
@@ -127,10 +140,12 @@ export class AuthRepositoryImpl implements AuthRepository {
     return optional(result.valid).orFalse();
   }
 
-  async resetPassword(
-    params: ResetPasswordData
-  ): Promise<ResetPasswordModel | BaseErrorModel> {
-    const result = await this.dataSource.resetPassword(params);
+  async resetPassword({
+    params,
+  }: {
+    params: ResetPasswordData;
+  }): Promise<ResetPasswordModel | BaseErrorModel> {
+    const result = await this.dataSource.resetPassword({ params });
 
     if (isErrorModel(result)) {
       return result;

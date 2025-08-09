@@ -19,8 +19,6 @@ export function mapErrorResponseToModel({
     message: optional(response.message).orEmpty(),
     details: optional(response.details).orEmpty(),
     statusCode: optional(response.statusCode).orZero(),
-    type: response.type || "UNEXPECTED",
-    validationErrors: response.validationErrors,
   });
 }
 
@@ -96,7 +94,6 @@ export function handleErrorResponse({
 
   const errorType = determineErrorType({
     statusCode,
-    errorData: error,
   });
 
   return createErrorModel({
@@ -104,7 +101,6 @@ export function handleErrorResponse({
     details: error.details,
     statusCode,
     type: errorType,
-    validationErrors: error.validationErrors,
   });
 }
 
@@ -113,23 +109,16 @@ export function handleErrorResponse({
  */
 export function determineErrorType({
   statusCode,
-  errorData,
 }: {
   statusCode: number;
-  errorData?: BaseErrorResponse;
 }): ErrorType {
-  // Check if response explicitly defines error type
-  if (errorData?.type && validErrorTypes.includes(errorData.type)) {
-    return errorData.type as ErrorType;
-  }
-
   // Categorize based on HTTP status codes
   switch (true) {
     case statusCode >= 400 && statusCode < 500:
       if (statusCode === 401 || statusCode === 403) {
         return "AUTHENTICATION";
       }
-      if (statusCode === 422 || errorData?.validationErrors) {
+      if (statusCode === 422) {
         return "VALIDATION";
       }
       return "CLIENT";

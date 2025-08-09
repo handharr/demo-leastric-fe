@@ -6,7 +6,6 @@ import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-pass
 import { ResetPasswordModel } from "@/features/auth/domain/entities/reset-password-model";
 import {
   BaseErrorModel,
-  isErrorModel,
   createErrorModel,
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
@@ -72,19 +71,26 @@ export class AuthRepositoryImpl implements AuthRepository {
   async logout(): Promise<void | BaseErrorModel> {
     const result = await this.dataSource.logout();
 
-    if (isErrorModel(result)) {
+    if (isErrorResponse(result)) {
+      // Convert BaseErrorResponse to BaseErrorModel
+      const errorModel = mapErrorResponseToModel({ response: result });
+
       // Still clear local tokens even if API call fails
       if (typeof window !== "undefined") {
         localStorage.removeItem("authToken");
+        localStorage.removeItem("refreshToken");
         sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("refreshToken");
       }
-      return result;
+      return errorModel;
     }
 
     // Clear local tokens on successful logout
     if (typeof window !== "undefined") {
       localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
       sessionStorage.removeItem("authToken");
+      sessionStorage.removeItem("refreshToken");
     }
   }
 
@@ -103,8 +109,8 @@ export class AuthRepositoryImpl implements AuthRepository {
 
     const result = await this.dataSource.refreshToken({ token });
 
-    if (isErrorModel(result)) {
-      return result;
+    if (isErrorResponse(result)) {
+      return mapErrorResponseToModel({ response: result });
     }
 
     if (result.success && result.token) {
@@ -116,6 +122,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       return {
         success: true,
         token: result.token,
+        errors: undefined,
       } as LoginResultModel;
     } else {
       return createErrorModel({
@@ -133,7 +140,7 @@ export class AuthRepositoryImpl implements AuthRepository {
 
     const result = await this.dataSource.validateToken({ token });
 
-    if (isErrorModel(result)) {
+    if (isErrorResponse(result)) {
       return false;
     }
 
@@ -145,10 +152,18 @@ export class AuthRepositoryImpl implements AuthRepository {
   }: {
     params: ResetPasswordData;
   }): Promise<ResetPasswordModel | BaseErrorModel> {
+    if (!params.newPassword) {
+      return createErrorModel({
+        message: "New password is required",
+        details: "Missing newPassword parameter",
+        type: "VALIDATION",
+      });
+    }
+
     const result = await this.dataSource.resetPassword({ params });
 
-    if (isErrorModel(result)) {
-      return result;
+    if (isErrorResponse(result)) {
+      return mapErrorResponseToModel({ response: result });
     }
 
     return {

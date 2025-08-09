@@ -86,7 +86,7 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
         });
 
         if (isErrorModel(result)) {
-          if (result.code === "VALIDATION_ERROR") {
+          if (result.type === "VALIDATION") {
             try {
               const serverErrors = JSON.parse(result.details || "");
               setErrors(serverErrors);

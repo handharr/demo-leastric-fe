@@ -88,16 +88,23 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
         if (isErrorModel(result)) {
           if (result.type === "VALIDATION") {
             try {
-              const serverErrors = JSON.parse(result.details || "");
-              setErrors(serverErrors);
+              const newPasswordErrors = result.validationErrors?.newPassword;
+              const confirmPasswordErrors =
+                result.validationErrors?.confirmPassword;
+              const otherErrors = result.validationErrors?.other;
+              setErrors({
+                newPassword: newPasswordErrors,
+                confirmPassword: confirmPasswordErrors,
+                other: otherErrors,
+              });
             } catch {
               setErrors({
-                newPassword: result.message,
+                other: result.message,
               });
             }
           } else {
             setErrors({
-              newPassword: result.message,
+              other: result.message,
             });
           }
         } else {

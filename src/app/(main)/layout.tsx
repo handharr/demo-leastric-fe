@@ -18,7 +18,7 @@ export default function Layout({
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:translate-x-0 
         fixed lg:static 
-        w-[224px] 
+        w-60 
         bg-white 
         border-r border-[#dedede] 
         flex flex-col 
@@ -57,6 +57,12 @@ export default function Layout({
           {/* Dashboard - Active */}
           <div className="bg-[#dff6e9] relative flex items-center gap-2 p-2 rounded-lg mb-1 w-full">
             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#2a6335] rounded-r" />
+            <Image
+              src="/resources/icons/menu/category.svg"
+              alt="Dashboard"
+              width={20}
+              height={20}
+            />
             <span className="font-semibold text-[#2a6335] text-sm flex-1">
               Dashboard
             </span>

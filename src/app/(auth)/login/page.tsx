@@ -5,6 +5,7 @@ import { useLoginForm } from "@/features/auth/presentation/hooks/use-login-form"
 import { cn } from "@/lib/utils";
 import { ErrorMessage } from "@/shared/presentation/components/error-message";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,11 +21,14 @@ export default function LoginPage() {
     <>
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
-        <div className="flex items-center justify-center space-x-2">
-          <div className="w-8 h-8 bg-leastric-primary rounded-sm flex items-center justify-center">
-            <span className="text-white font-bold text-sm">⚡</span>
-          </div>
-          <span className="text-xl font-bold text-gray-900">LEASTRIC</span>
+        <div className="flex items-center justify-center">
+          <Image
+            src="/resources/images/logo/leastric-logo.svg"
+            alt="Leastric"
+            width={160}
+            height={40}
+            className="h-10 w-auto"
+          />
         </div>
 
         {/* Login Form */}
@@ -92,9 +96,17 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
-                  <span className="text-gray-400 hover:text-gray-600">
-                    {showPassword ? "🙈" : "👁️"}
-                  </span>
+                  <Image
+                    src={
+                      showPassword
+                        ? "/resources/icons/security/eye-closed.svg"
+                        : "/resources/icons/security/eye-open.svg"
+                    }
+                    alt={showPassword ? "Hide password" : "Show password"}
+                    width={20}
+                    height={20}
+                    className="text-gray-400 hover:text-gray-600"
+                  />
                 </button>
               </div>
               {errors.password && (

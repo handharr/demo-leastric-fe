@@ -3,7 +3,6 @@ import { LoginFormData } from "@/features/auth/domain/params/data/login-form-dat
 import { LoginValidationErrors } from "@/features/auth/domain/entities/login-validation-errors";
 import { LoginUseCase } from "@/features/auth/domain/use-cases/login-use-case";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
-import router from "next/router";
 
 export interface UseLoginFormReturn {
   formData: LoginFormData;
@@ -15,7 +14,8 @@ export interface UseLoginFormReturn {
 }
 
 export function useLoginForm(
-  loginUseCase: LoginUseCase = new LoginUseCase()
+  loginUseCase: LoginUseCase = new LoginUseCase(),
+  onLoginSuccess?: () => void
 ): UseLoginFormReturn {
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
@@ -83,20 +83,19 @@ export function useLoginForm(
         } else {
           // Handle successful login (redirect, etc.)
           console.log("Login successful:", result);
-          // You can add redirect logic here or emit an event
-          router.push("/dashboard");
+          // Call the callback instead of router.push
+          onLoginSuccess?.();
         }
       } catch (error) {
         console.error("Login error:", error);
         setErrors({
-          email: "An unexpected error occurred",
-          password: "An unexpected error occurred",
+          other: "An unexpected error occurred. Please try again later.",
         });
       } finally {
         setIsLoading(false);
       }
     },
-    [formData, loginUseCase]
+    [formData, loginUseCase, onLoginSuccess]
   );
 
   const returnValue = useMemo(

@@ -4,11 +4,17 @@ import { useState } from "react";
 import { useLoginForm } from "@/features/auth/presentation/hooks/use-login-form";
 import { cn } from "@/lib/utils";
 import { ErrorMessage } from "@/shared/presentation/components/error-message";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const { formData, errors, isLoading, updateField, handleSubmit, clearError } =
-    useLoginForm();
+    useLoginForm(
+      undefined, // use default LoginUseCase
+      () => router.push("/") // callback for successful login
+    );
 
   return (
     <>

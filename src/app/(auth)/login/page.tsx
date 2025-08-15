@@ -14,7 +14,7 @@ export default function LoginPage() {
   const { formData, errors, isLoading, updateField, handleSubmit, clearError } =
     useLoginForm(
       undefined, // use default LoginUseCase
-      () => router.push("/") // callback for successful login
+      () => router.push("/summary") // callback for successful login
     );
 
   return (

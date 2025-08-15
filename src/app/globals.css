@@ -39,6 +39,15 @@
   --color-card: var(--card);
   --color-leastric-primary: #2a6335;
   --color-leastric-secondary: #16a953;
+  --color-background-subtle: #fafafa;
+  --color-background-brand-subtle: #dff6e9;
+  --color-background-brand: #2a6335;
+  --color-text-positive: #16a953;
+  --color-background-critical-subtle: #fce9e9;
+  --color-text-negative: #db1919;
+  --color-text-headline: #333333;
+  --color-text-subhead: #6c6c6c;
+  --color-default-border: #dedede;
 
   /* Radius */
   --radius-sm: calc(var(--radius) - 4px);

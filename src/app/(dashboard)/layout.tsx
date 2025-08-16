@@ -108,11 +108,14 @@ export default function Layout({
   // Memoized class strings for performance
   const sidebarClasses = useMemo(
     () => `
-    ${sidebarOpen ? "translate-x-0 w-20 lg:w-60" : "-translate-x-full w-24"} 
-    lg:translate-x-0 
+    ${
+      sidebarOpen
+        ? "translate-x-0 w-20 lg:w-60"
+        : "-translate-x-full lg:translate-x-0 w-20"
+    } 
     fixed lg:static 
     bg-white 
-    border-r border-[#dedede] 
+    border-r border-color-default-border 
     flex flex-col 
     h-full 
     shrink-0 
@@ -151,7 +154,7 @@ export default function Layout({
       {/* Sidebar */}
       <aside className={sidebarClasses}>
         {/* Logo Section */}
-        <header className="h-16 bg-white border-b border-[#dedede] flex items-center px-2 lg:px-4 shrink-0">
+        <header className="h-16 bg-white border-b border-color-default-border flex items-center p-2 lg:p-3 shrink-0">
           <div className="flex items-center justify-between w-full">
             <Image
               src="/resources/images/logo/leastric-logo-small.svg"

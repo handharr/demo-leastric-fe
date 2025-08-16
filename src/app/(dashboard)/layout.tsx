@@ -4,37 +4,44 @@ import Image from "next/image";
 import { useState } from "react";
 import SidebarMenuItem from "@/shared/presentation/components/sidebar-menu-item";
 import { SidebarMenuItemProps } from "@/shared/presentation/types/ui";
+import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { useRouter } from "next/navigation";
 
 // Menu items data
 const MENU_ITEMS: SidebarMenuItemProps[] = [
   {
-    label: "Dashboard",
-    isActive: true,
-    iconSource: "/resources/icons/system/dashboard",
+    label: "Summary",
+    isActive: undefined,
+    iconSource: "/resources/icons/analytic/dashboard",
+    isSidebarOpen: undefined,
   },
   {
     label: "Report",
     isActive: false,
     onClick: () => {},
-    iconSource: "/resources/icons/system/report",
+    iconSource: "/resources/icons/analytic/chart-bar-vertical",
+    isSidebarOpen: undefined,
   },
   {
     label: "Device",
-    isActive: false,
+    isActive: undefined,
     onClick: () => {},
-    iconSource: "/resources/icons/system/device",
+    iconSource: "/resources/icons/device/device",
+    isSidebarOpen: undefined,
   },
   {
     label: "Appliance",
     isActive: false,
     onClick: () => {},
-    iconSource: "/resources/icons/system/appliance",
+    iconSource: "/resources/icons/device/electronic",
+    isSidebarOpen: undefined,
   },
   {
     label: "Setting",
     isActive: false,
     onClick: () => {},
     iconSource: "/resources/icons/system/setting",
+    isSidebarOpen: undefined,
   },
 ];
 
@@ -44,16 +51,21 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const router = useRouter();
+  const [activeMenu, setActiveMenu] = useState<SidebarMenuItemProps | null>(
+    MENU_ITEMS[0]
+  );
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-neutral-50">
       {/* Sidebar - Responsive */}
       <div
         className={`
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+        ${
+          sidebarOpen ? "translate-x-0 w-20 lg:w-60" : "-translate-x-full w-24"
+        } 
         lg:translate-x-0 
         fixed lg:static 
-        w-60 
         bg-white 
         border-r border-[#dedede] 
         flex flex-col 
@@ -64,18 +76,27 @@ export default function Layout({
       `}
       >
         {/* Logo Section */}
-        <div className="h-16 bg-white border-b border-[#dedede] flex items-center px-4 shrink-0">
+        <div className="h-16 bg-white border-b border-[#dedede] flex items-center px-2 lg:px-4 shrink-0">
           <div className="flex items-center justify-between w-full">
             <Image
-              src="/resources/images/logo/leastric-logo.svg"
+              src="/resources/images/logo/leastric-logo-small.svg"
               alt="Leastric Logo"
-              width={135}
+              width={20}
               height={30}
-              className="h-[30px] w-[135px]"
+              className="lg:hidden"
+            />
+            <Image
+              src={`/resources/images/logo/leastric-logo${
+                sidebarOpen ? "" : "-small"
+              }.svg`}
+              alt="Leastric Logo"
+              width={sidebarOpen ? 135 : 20}
+              height={30}
+              className="hidden lg:block"
             />
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-1 hover:bg-gray-100 rounded"
+              className="p-1 hover:bg-gray-100 rounded cursor-pointer"
             >
               <Image
                 src="/resources/icons/system/bar-left.svg"
@@ -93,9 +114,13 @@ export default function Layout({
             <SidebarMenuItem
               key={index}
               label={item.label}
-              isActive={item.isActive}
-              onClick={item.onClick}
+              isActive={item.label === optional(activeMenu?.label).orEmpty()}
+              onClick={() => {
+                setActiveMenu(item);
+                router.push(`/${item.label.toLowerCase()}`);
+              }}
               iconSource={item.iconSource}
+              isSidebarOpen={sidebarOpen}
             />
           ))}
         </div>
@@ -115,7 +140,7 @@ export default function Layout({
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/75 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
           />
         )}
 
@@ -164,7 +189,9 @@ export default function Layout({
               <div className="hidden lg:flex items-center gap-2">
                 <span className="text-[#909090] text-sm">Dashboard</span>
                 <span className="text-[#909090]">/</span>
-                <span className="text-[#909090] text-sm">default</span>
+                <span className="text-[#909090] text-sm">
+                  {optional(activeMenu?.label).orEmpty().toLowerCase()}
+                </span>
               </div>
             </div>
           </div>

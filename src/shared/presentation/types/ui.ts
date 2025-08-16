@@ -4,4 +4,5 @@ export interface SidebarMenuItemProps {
   onClick?: () => void;
   iconSource?: string;
   isSidebarOpen?: boolean;
+  route: string;
 }

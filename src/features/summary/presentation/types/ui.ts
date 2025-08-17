@@ -13,11 +13,19 @@ export interface ChartDataPoint {
   usage: number;
 }
 
+export enum EnergyUnit {
+  KWH = "KWh",
+  MWH = "MWh",
+  GWH = "GWh",
+}
+
 export interface UsageChartProps {
   title?: string;
   description?: string;
   className?: string;
   data: ChartDataPoint[];
+  availableUnits?: EnergyUnit[];
+  defaultUnit?: EnergyUnit;
 }
 
 export interface CustomTooltipProps {

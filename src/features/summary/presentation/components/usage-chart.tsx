@@ -11,7 +11,10 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { UsageChartProps } from "@/features/summary/presentation/types/ui";
+import {
+  UsageChartProps,
+  EnergyUnit,
+} from "@/features/summary/presentation/types/ui";
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import { CustomDot } from "@/features/summary/presentation/components/custom-dot-props";
 
@@ -20,10 +23,12 @@ export function UsageChart({
   description = "This is for description",
   className = "",
   data,
+  availableUnits = [EnergyUnit.KWH, EnergyUnit.MWH, EnergyUnit.GWH],
+  defaultUnit = EnergyUnit.KWH,
 }: UsageChartProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedPeriod, setSelectedPeriod] = useState("Daily");
-  const [selectedUnit, setSelectedUnit] = useState("KWh");
+  const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(defaultUnit);
   const [compareEnabled, setCompareEnabled] = useState(false);
 
   return (
@@ -57,12 +62,14 @@ export function UsageChart({
           <div className="relative">
             <select
               value={selectedUnit}
-              onChange={(e) => setSelectedUnit(e.target.value)}
+              onChange={(e) => setSelectedUnit(e.target.value as EnergyUnit)}
               className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
             >
-              <option value="KWh">KWh</option>
-              <option value="MWh">MWh</option>
-              <option value="GWh">GWh</option>
+              {availableUnits.map((unit) => (
+                <option key={unit} value={unit}>
+                  {unit}
+                </option>
+              ))}
             </select>
             <Image
               src="/resources/icons/arrow/chevron-down.svg"

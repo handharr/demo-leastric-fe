@@ -44,10 +44,11 @@ export function UsageChart({
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
+        {/* Left Side - Period and Unit Selectors */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           {/* Period Selector */}
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+          <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full sm:w-auto justify-center sm:justify-start">
             <Image
               src="/resources/icons/time/calendar.svg"
               alt="Calendar"
@@ -59,11 +60,11 @@ export function UsageChart({
           </button>
 
           {/* Unit Selector */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <select
               value={selectedUnit}
               onChange={(e) => setSelectedUnit(e.target.value as EnergyUnit)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+              className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full sm:w-auto"
             >
               {availableUnits.map((unit) => (
                 <option key={unit} value={unit}>
@@ -81,12 +82,14 @@ export function UsageChart({
           </div>
         </div>
 
-        {/* Compare Toggle */}
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-600">Compare vs. last period</span>
+        {/* Right Side - Compare Toggle */}
+        <div className="flex items-center justify-between lg:justify-end gap-3">
+          <span className="text-sm text-gray-600 flex-shrink-0">
+            Compare vs. last period
+          </span>
           <button
             onClick={() => setCompareEnabled(!compareEnabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
               compareEnabled ? "bg-green-600" : "bg-gray-300"
             }`}
           >

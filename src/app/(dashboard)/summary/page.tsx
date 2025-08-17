@@ -1,6 +1,7 @@
 "use client";
 
 import { SummaryCard } from "@/features/summary/presentation/components/summary-card";
+import Image from "next/image";
 
 export default function DashboardPage() {
   return (
@@ -8,6 +9,23 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-800">Summary</h1>
+      </div>
+
+      {/* Filter and Export Section */}
+      <div className="flex items-center justify-between mb-6">
+        <button className="flex items-center gap-2 px-4 py-2.5 border border-default-border rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors font-semibold cursor-pointer">
+          <Image
+            src="resources/icons/system/filter.svg"
+            alt="Filter"
+            width={20}
+            height={20}
+          />
+          Filter
+        </button>
+
+        <button className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer">
+          Export
+        </button>
       </div>
 
       {/* Summary Cards Grid */}

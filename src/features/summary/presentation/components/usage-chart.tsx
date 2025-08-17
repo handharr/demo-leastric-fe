@@ -46,25 +46,25 @@ export function UsageChart({
       {/* Controls */}
       <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
         {/* Left Side - Period and Unit Selectors */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="grid grid-cols-2 gap-3">
           {/* Period Selector */}
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full sm:w-auto justify-center sm:justify-start">
+          <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors justify-center">
             <Image
               src="/resources/icons/time/calendar.svg"
               alt="Calendar"
-              width={16}
-              height={16}
+              width={20}
+              height={20}
               className="opacity-60"
             />
             {selectedPeriod}
           </button>
 
           {/* Unit Selector */}
-          <div className="relative w-full sm:w-auto">
+          <div className="relative w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg">
             <select
               value={selectedUnit}
               onChange={(e) => setSelectedUnit(e.target.value as EnergyUnit)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full sm:w-auto"
+              className="appearance-none bg-white text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full sm:w-auto"
             >
               {availableUnits.map((unit) => (
                 <option key={unit} value={unit}>

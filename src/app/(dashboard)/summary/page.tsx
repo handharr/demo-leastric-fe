@@ -1,9 +1,45 @@
 "use client";
 
 import { SummaryCard } from "@/features/summary/presentation/components/summary-card";
+import { UsageChart } from "@/features/summary/presentation/components/usage-chart";
+import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import Image from "next/image";
 
 export default function DashboardPage() {
+  // Sample data points for the chart
+  const chartData: ChartDataPoint[] = [
+    { day: 1, usage: 100 },
+    { day: 2, usage: 75 },
+    { day: 3, usage: 50 },
+    { day: 4, usage: 25 },
+    { day: 5, usage: 85 },
+    { day: 6, usage: 90 },
+    { day: 7, usage: 70 },
+    { day: 8, usage: 50 },
+    { day: 9, usage: 20 },
+    { day: 10, usage: 80 },
+    { day: 11, usage: 115 },
+    { day: 12, usage: 110 },
+    { day: 13, usage: 60 },
+    { day: 14, usage: 15 },
+    { day: 15, usage: 20 },
+    { day: 16, usage: 95 },
+    { day: 17, usage: 110 },
+    { day: 18, usage: 108 },
+    { day: 19, usage: 105 },
+    { day: 20, usage: 95 },
+    { day: 21, usage: 90 },
+    { day: 22, usage: 100 },
+    { day: 23, usage: 85 },
+    { day: 24, usage: 50 },
+    { day: 25, usage: 80 },
+    { day: 26, usage: 70 },
+    { day: 27, usage: 65 },
+    { day: 28, usage: 75 },
+    { day: 29, usage: 80 },
+    { day: 30, usage: 50 },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
@@ -29,7 +65,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Summary Cards Grid */}
-      <div className="overflow-x-auto pb-4">
+      <div className="overflow-x-auto pb-4 mb-8">
         <div className="flex gap-6 md:grid md:grid-cols-2 xl:grid-cols-4 min-w-max md:min-w-0 md:items-stretch">
           {/* Electricity Usage Card */}
           <div className="flex-shrink-0 w-80 md:w-auto md:flex">
@@ -90,6 +126,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Usage Chart */}
+      <UsageChart data={chartData} />
     </div>
   );
 }

@@ -60,11 +60,11 @@ export function UsageChart({
           </button>
 
           {/* Unit Selector */}
-          <div className="relative w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg">
+          <div className="relative w-full">
             <select
               value={selectedUnit}
               onChange={(e) => setSelectedUnit(e.target.value as EnergyUnit)}
-              className="appearance-none bg-white text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer w-full sm:w-auto"
+              className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 cursor-pointer w-full hover:bg-gray-50"
             >
               {availableUnits.map((unit) => (
                 <option key={unit} value={unit}>

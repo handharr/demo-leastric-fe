@@ -12,7 +12,9 @@ export default function SidebarMenuItem({
   const justifyClass = isSidebarOpen
     ? "justify-center lg:justify-start"
     : "justify-center";
-  const textColor = isActive ? "text-leastric-primary" : "text-text-headline";
+  const textColor = isActive
+    ? "text-leastric-primary"
+    : "text-typography-headline";
   const fontWeight = isActive ? "font-semibold" : "";
 
   // Common content JSX
@@ -37,7 +39,9 @@ export default function SidebarMenuItem({
           alt={label}
           width={16}
           height={16}
-          className={isActive ? "text-leastric-primary" : "text-text-headline"}
+          className={
+            isActive ? "text-leastric-primary" : "text-typography-headline"
+          }
         />
       )}
 

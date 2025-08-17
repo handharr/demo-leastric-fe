@@ -32,8 +32,10 @@ export function UsageChart({
     >
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">{title}</h2>
-        <p className="text-sm text-gray-600">{description}</p>
+        <h2 className="text-lg font-semibold text-typography-headline mb-1">
+          {title}
+        </h2>
+        <p className="text-sm text-typography-subhead">{description}</p>
       </div>
 
       {/* Controls */}
@@ -42,7 +44,7 @@ export function UsageChart({
           {/* Period Selector */}
           <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
             <Image
-              src="/resources/icons/system/calendar.svg"
+              src="/resources/icons/time/calendar.svg"
               alt="Calendar"
               width={16}
               height={16}
@@ -63,7 +65,7 @@ export function UsageChart({
               <option value="GWh">GWh</option>
             </select>
             <Image
-              src="/resources/icons/system/chevron-down.svg"
+              src="/resources/icons/arrow/chevron-down.svg"
               alt="Dropdown"
               width={16}
               height={16}

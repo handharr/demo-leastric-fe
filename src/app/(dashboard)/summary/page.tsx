@@ -44,12 +44,12 @@ export default function DashboardPage() {
     <div className="flex min-h-screen flex-col">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Summary</h1>
+        <h1 className="text-2xl font-bold text-typography-headline">Summary</h1>
       </div>
 
       {/* Filter and Export Section */}
       <div className="flex items-center justify-between mb-6">
-        <button className="flex items-center gap-2 px-4 py-2.5 border border-default-border rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors font-semibold cursor-pointer">
+        <button className="flex items-center gap-2 px-4 py-2.5 border border-default-border rounded-lg text-sm text-typography-headline hover:bg-gray-50 transition-colors font-semibold cursor-pointer">
           <Image
             src="resources/icons/system/filter.svg"
             alt="Filter"
@@ -110,14 +110,18 @@ export default function DashboardPage() {
             >
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Active</span>
-                  <span className="inline-flex items-center justify-center w-6 h-6 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                  <span className="text-sm text-typography-headline">
+                    Active
+                  </span>
+                  <span className="inline-flex items-center justify-center w-6 h-6 bg-background-brand-positive-subtle text-leastric-primary text-xs font-medium rounded-full">
                     1
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Inactive</span>
-                  <span className="inline-flex items-center justify-center w-6 h-6 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                  <span className="text-sm text-typography-headline">
+                    Inactive
+                  </span>
+                  <span className="inline-flex items-center justify-center w-6 h-6 bg-background-critical-subtle text-typography-negative text-xs font-medium rounded-full">
                     1
                   </span>
                 </div>

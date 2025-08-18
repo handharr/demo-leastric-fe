@@ -1,13 +1,31 @@
 "use client";
 
+import { useState } from "react";
 import { SummaryCard } from "@/features/summary/presentation/components/summary-card";
 import { UsageChart } from "@/features/summary/presentation/components/usage-chart";
 import { RealTimeMonitoringChart } from "@/features/summary/presentation/components/real-time-monitoring-chart";
 import { ElectricUsageHistoryTable } from "@/features/summary/presentation/components/electric-usage-history-table";
+import { FilterModal } from "@/features/summary/presentation/components/filter-modal";
 import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import Image from "next/image";
 
+interface FilterState {
+  location: string;
+  subLocation: string;
+  detailLocations: string[];
+  units: string[];
+}
+
 export default function SummaryPage() {
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [activeFilters, setActiveFilters] = useState<FilterState>({
+    location: "all",
+    subLocation: "all",
+    detailLocations: [],
+    units: ["watt"],
+  });
+
   // Sample data points for the chart
   const chartData: ChartDataPoint[] = [
     { day: 1, usage: 100 },
@@ -70,6 +88,22 @@ export default function SummaryPage() {
     { no: 10, date: "10-7-2025", usage: 250, co2: 24.523 },
   ];
 
+  const handleFilterApply = (filters: FilterState) => {
+    setActiveFilters(filters);
+    console.log("Applied filters:", filters);
+    // Apply filters to your data here
+  };
+
+  const handleFilterReset = () => {
+    setActiveFilters({
+      location: "all",
+      subLocation: "all",
+      detailLocations: [],
+      units: ["watt"],
+    });
+    console.log("Filters reset");
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
@@ -79,7 +113,10 @@ export default function SummaryPage() {
 
       {/* Filter and Export Section */}
       <div className="flex items-center justify-between mb-6">
-        <button className="flex items-center gap-2 px-4 py-2.5 border border-default-border rounded-lg text-sm text-typography-headline hover:bg-gray-50 transition-colors font-semibold cursor-pointer">
+        <button
+          onClick={() => setIsFilterModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2.5 border border-default-border rounded-lg text-sm text-typography-headline hover:bg-gray-50 transition-colors font-semibold cursor-pointer"
+        >
           <Image
             src="resources/icons/system/filter.svg"
             alt="Filter"
@@ -181,6 +218,14 @@ export default function SummaryPage() {
           onShowMore={() => console.log("Show more clicked")}
         />
       </div>
+
+      {/* Filter Modal */}
+      <FilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        onApply={handleFilterApply}
+        onReset={handleFilterReset}
+      />
     </div>
   );
 }

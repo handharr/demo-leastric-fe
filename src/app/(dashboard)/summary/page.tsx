@@ -2,6 +2,8 @@
 
 import { SummaryCard } from "@/features/summary/presentation/components/summary-card";
 import { UsageChart } from "@/features/summary/presentation/components/usage-chart";
+import { RealTimeMonitoringChart } from "@/features/summary/presentation/components/real-time-monitoring-chart";
+import { ElectricUsageHistoryTable } from "@/features/summary/presentation/components/electric-usage-history-table";
 import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import Image from "next/image";
 
@@ -38,6 +40,34 @@ export default function SummaryPage() {
     { day: 28, usage: 75 },
     { day: 29, usage: 80 },
     { day: 30, usage: 50 },
+  ];
+
+  // Sample real-time monitoring data
+  const realTimeData = [
+    { time: "-9s", usage: 110 },
+    { time: "-8s", usage: 95 },
+    { time: "-7s", usage: 70 },
+    { time: "-6s", usage: 65 },
+    { time: "-5s", usage: 75 },
+    { time: "-4s", usage: 95 },
+    { time: "-3s", usage: 85 },
+    { time: "-2s", usage: 90 },
+    { time: "-1s", usage: 105 },
+    { time: "0s", usage: 95 },
+  ];
+
+  // Sample electricity usage history data
+  const electricUsageHistory = [
+    { no: 1, date: "1-7-2025", usage: 750, co2: 24.523 },
+    { no: 2, date: "2-7-2025", usage: 120, co2: 24.523 },
+    { no: 3, date: "3-7-2025", usage: 500, co2: 24.523 },
+    { no: 4, date: "4-7-2025", usage: 250, co2: 24.523 },
+    { no: 5, date: "5-7-2025", usage: 195, co2: 24.523 },
+    { no: 6, date: "6-7-2025", usage: 250, co2: 24.523 },
+    { no: 7, date: "7-7-2025", usage: 195, co2: 24.523 },
+    { no: 8, date: "8-7-2025", usage: 250, co2: 24.523 },
+    { no: 9, date: "9-7-2025", usage: 195, co2: 24.523 },
+    { no: 10, date: "10-7-2025", usage: 250, co2: 24.523 },
   ];
 
   return (
@@ -132,7 +162,25 @@ export default function SummaryPage() {
       </div>
 
       {/* Usage Chart */}
-      <UsageChart data={chartData} />
+      <div className="mb-8">
+        <UsageChart data={chartData} />
+      </div>
+
+      {/* Real-Time Monitoring and Usage History */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Real-Time Monitoring Chart */}
+        <RealTimeMonitoringChart
+          data={realTimeData}
+          currentUsage={172.45}
+          refreshInterval={10}
+        />
+
+        {/* Electric Usage History Table */}
+        <ElectricUsageHistoryTable
+          data={electricUsageHistory}
+          onShowMore={() => console.log("Show more clicked")}
+        />
+      </div>
     </div>
   );
 }

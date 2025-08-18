@@ -157,10 +157,10 @@ export function FilterModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden relative">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden mx-auto">
         {/* Header */}
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-typography-headline">
@@ -181,7 +181,7 @@ export function FilterModal({
         </div>
 
         {/* Content */}
-        <div className="flex max-h-[calc(90vh-200px)]">
+        <div className="flex" style={{ maxHeight: "calc(90vh - 200px)" }}>
           {/* Left Panel - Filter Categories */}
           <div className="w-1/2 border-r border-gray-200 overflow-y-auto">
             {/* Location */}

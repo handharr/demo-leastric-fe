@@ -9,17 +9,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-
-interface RealTimeDataPoint {
-  time: string;
-  usage: number;
-}
-
-interface RealTimeMonitoringChartProps {
-  data: RealTimeDataPoint[];
-  currentUsage: number;
-  refreshInterval?: number;
-}
+import { RealTimeMonitoringChartProps } from "@/features/summary/presentation/types/ui";
 
 export function RealTimeMonitoringChart({
   data,

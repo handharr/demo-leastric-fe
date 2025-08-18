@@ -59,3 +59,14 @@ export interface ElectricUsageHistoryTableProps {
   showAll?: boolean;
   onShowMore?: () => void;
 }
+
+export interface RealTimeDataPoint {
+  time: string;
+  usage: number;
+}
+
+export interface RealTimeMonitoringChartProps {
+  data: RealTimeDataPoint[];
+  currentUsage: number;
+  refreshInterval?: number;
+}

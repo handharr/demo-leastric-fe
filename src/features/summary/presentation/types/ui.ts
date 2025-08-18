@@ -46,3 +46,16 @@ export interface CustomDotProps {
   strokeWidth?: number;
   r?: number;
 }
+
+export interface ElectricUsageRecord {
+  no: number;
+  date: string;
+  usage: number;
+  co2: number;
+}
+
+export interface ElectricUsageHistoryTableProps {
+  data: ElectricUsageRecord[];
+  showAll?: boolean;
+  onShowMore?: () => void;
+}

@@ -5,7 +5,7 @@ import { UsageChart } from "@/features/summary/presentation/components/usage-cha
 import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import Image from "next/image";
 
-export default function DashboardPage() {
+export default function SummaryPage() {
   // Sample data points for the chart
   const chartData: ChartDataPoint[] = [
     { day: 1, usage: 100 },

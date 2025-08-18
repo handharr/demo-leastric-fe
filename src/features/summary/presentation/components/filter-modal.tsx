@@ -166,18 +166,6 @@ export function FilterModal({
           <h2 className="text-xl font-semibold text-typography-headline">
             Filter
           </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <Image
-              src="/resources/icons/system/x.svg"
-              alt="Close"
-              width={20}
-              height={20}
-              className="text-gray-400"
-            />
-          </button>
         </div>
 
         {/* Content */}
@@ -201,11 +189,11 @@ export function FilterModal({
                   </p>
                 </div>
                 <Image
-                  src="/resources/icons/system/chevron-right.svg"
+                  src="/resources/icons/arrow/chevron-right.svg"
                   alt="Arrow"
                   width={16}
                   height={16}
-                  className="text-gray-400"
+                  className="text-gray-400 w-[16px] h-[16px]"
                 />
               </div>
             </div>
@@ -227,11 +215,11 @@ export function FilterModal({
                   </p>
                 </div>
                 <Image
-                  src="/resources/icons/system/chevron-right.svg"
+                  src="/resources/icons/arrow/chevron-right.svg"
                   alt="Arrow"
                   width={16}
                   height={16}
-                  className="text-gray-400"
+                  className="text-gray-400 w-[16px] h-[16px]"
                 />
               </div>
             </div>
@@ -253,11 +241,11 @@ export function FilterModal({
                   </p>
                 </div>
                 <Image
-                  src="/resources/icons/system/chevron-right.svg"
+                  src="/resources/icons/arrow/chevron-right.svg"
                   alt="Arrow"
                   width={16}
                   height={16}
-                  className="text-gray-400"
+                  className="text-gray-400 w-[16px] h-[16px]"
                 />
               </div>
             </div>
@@ -277,11 +265,11 @@ export function FilterModal({
                   </p>
                 </div>
                 <Image
-                  src="/resources/icons/system/chevron-right.svg"
+                  src="/resources/icons/arrow/chevron-right.svg"
                   alt="Arrow"
                   width={16}
                   height={16}
-                  className="text-gray-400"
+                  className="text-gray-400 w-[16px] h-[16px]"
                 />
               </div>
             </div>
@@ -309,7 +297,7 @@ export function FilterModal({
                         <span className="text-sm">{location.label}</span>
                         {selectedLocation === location.id && (
                           <Image
-                            src="/resources/icons/system/check.svg"
+                            src="/resources/icons/menu/check.svg"
                             alt="Selected"
                             width={16}
                             height={16}
@@ -343,7 +331,7 @@ export function FilterModal({
                         <span className="text-sm">{subLocation.label}</span>
                         {selectedSubLocation === subLocation.id && (
                           <Image
-                            src="/resources/icons/system/check.svg"
+                            src="/resources/icons/menu/check.svg"
                             alt="Selected"
                             width={16}
                             height={16}
@@ -385,7 +373,7 @@ export function FilterModal({
                           (location.id !== "all" &&
                             selectedDetailLocations.includes(location.id))) && (
                           <Image
-                            src="/resources/icons/system/check.svg"
+                            src="/resources/icons/menu/check.svg"
                             alt="Selected"
                             width={12}
                             height={12}
@@ -429,7 +417,7 @@ export function FilterModal({
                           (unit.id !== "all" &&
                             selectedUnits.includes(unit.id))) && (
                           <Image
-                            src="/resources/icons/system/check.svg"
+                            src="/resources/icons/menu/check.svg"
                             alt="Selected"
                             width={12}
                             height={12}

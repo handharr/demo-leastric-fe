@@ -8,9 +8,9 @@ export function CustomTooltip({
 }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 shadow-lg rounded-lg border border-gray-200">
+      <div className="bg-white p-3 shadow-lg rounded-lg border border-default-border">
         <p className="text-sm text-gray-600">{`Day ${label}`}</p>
-        <p className="text-sm font-semibold text-green-600">
+        <p className="text-sm font-semibold text-leastric-secondary">
           {`${payload[0].value} ${unit}`}
         </p>
       </div>

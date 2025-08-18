@@ -19,14 +19,14 @@ export function RealTimeMonitoringChart({
   return (
     <div className="bg-white rounded-xl border border-default-border p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-typography-headline mb-1">
+        <h3 className="font-semibold text-typography-headline mb-1">
           Real-Time Monitoring
         </h3>
         <p className="text-sm text-typography-secondary mb-4">
           This is for description
         </p>
 
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-row items-center justify-between gap-4">
           <button className="flex items-center gap-2 px-3 py-2 border border-default-border rounded-lg text-sm text-typography-headline bg-white w-fit">
             <div className="w-4 h-4 rounded-full border-2 border-gray-400 flex items-center justify-center">
               <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>

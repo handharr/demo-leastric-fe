@@ -11,9 +11,9 @@ export function ElectricUsageHistoryTable({
 
   return (
     <div className="bg-white rounded-xl border border-default-border p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-start justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-typography-headline mb-1">
+          <h3 className="font-semibold text-typography-headline mb-1">
             Electricity Usage History
           </h3>
           <p className="text-sm text-typography-secondary">
@@ -23,7 +23,7 @@ export function ElectricUsageHistoryTable({
         {!showAll && onShowMore && (
           <button
             onClick={onShowMore}
-            className="text-sm text-leastric-primary hover:text-green-700 font-medium"
+            className="text-sm text-leastric-primary hover:text-green-700 font-semibold"
           >
             Show more
           </button>
@@ -33,7 +33,7 @@ export function ElectricUsageHistoryTable({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-100">
+            <tr className="border-b border-default-border">
               <th className="text-left py-3 px-2 text-sm font-medium text-typography-secondary">
                 No.
               </th>

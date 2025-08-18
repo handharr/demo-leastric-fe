@@ -146,25 +146,47 @@ export function FilterModal({
     return `${selectedUnits.length} units selected`;
   };
 
+  // Handle backdrop click
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden relative">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-typography-headline">
             Filter
           </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <Image
+              src="/resources/icons/system/x.svg"
+              alt="Close"
+              width={20}
+              height={20}
+              className="text-gray-400"
+            />
+          </button>
         </div>
 
         {/* Content */}
-        <div className="flex">
+        <div className="flex max-h-[calc(90vh-200px)]">
           {/* Left Panel - Filter Categories */}
-          <div className="w-1/2 border-r border-gray-200">
+          <div className="w-1/2 border-r border-gray-200 overflow-y-auto">
             {/* Location */}
             <div
-              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
+              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
                 activeSection === "location" ? "bg-gray-50" : ""
               }`}
               onClick={() => setActiveSection("location")}
@@ -190,7 +212,7 @@ export function FilterModal({
 
             {/* Sub-location */}
             <div
-              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
+              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
                 activeSection === "sub-location" ? "bg-gray-50" : ""
               }`}
               onClick={() => setActiveSection("sub-location")}
@@ -216,7 +238,7 @@ export function FilterModal({
 
             {/* Detail location */}
             <div
-              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
+              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
                 activeSection === "detail-location" ? "bg-gray-50" : ""
               }`}
               onClick={() => setActiveSection("detail-location")}
@@ -242,7 +264,7 @@ export function FilterModal({
 
             {/* Unit */}
             <div
-              className={`p-4 cursor-pointer hover:bg-gray-50 ${
+              className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
                 activeSection === "unit" ? "bg-gray-50" : ""
               }`}
               onClick={() => setActiveSection("unit")}
@@ -266,7 +288,7 @@ export function FilterModal({
           </div>
 
           {/* Right Panel - Filter Options */}
-          <div className="w-1/2 min-h-[400px]">
+          <div className="w-1/2 min-h-[400px] overflow-y-auto">
             {activeSection === "location" && (
               <div className="p-4">
                 <h3 className="font-medium text-typography-headline mb-4">
@@ -344,11 +366,11 @@ export function FilterModal({
                   {detailLocations.map((location) => (
                     <div
                       key={location.id}
-                      className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-gray-50"
+                      className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-gray-50 transition-colors"
                       onClick={() => handleDetailLocationToggle(location.id)}
                     >
                       <div
-                        className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                        className={`w-5 h-5 border-2 rounded flex items-center justify-center transition-colors ${
                           location.id === "all"
                             ? selectedDetailLocations.length === 0
                               ? "border-leastric-primary bg-leastric-primary"
@@ -389,11 +411,11 @@ export function FilterModal({
                   {units.map((unit) => (
                     <div
                       key={unit.id}
-                      className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-gray-50"
+                      className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-gray-50 transition-colors"
                       onClick={() => handleUnitToggle(unit.id)}
                     >
                       <div
-                        className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                        className={`w-5 h-5 border-2 rounded flex items-center justify-center transition-colors ${
                           unit.id === "all"
                             ? selectedUnits.length === 0
                               ? "border-leastric-primary bg-leastric-primary"
@@ -435,7 +457,7 @@ export function FilterModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 flex items-center justify-between">
+        <div className="p-6 border-t border-gray-200 flex items-center justify-between bg-white">
           <button
             onClick={handleReset}
             className="text-leastric-primary font-medium hover:text-green-700 transition-colors"

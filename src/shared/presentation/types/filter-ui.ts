@@ -31,3 +31,10 @@ export interface FilterModalFooterProps {
   onClose: () => void;
   onApply: () => void;
 }
+
+export interface FilterChipProps {
+  label?: string;
+  value?: React.ReactNode;
+  onRemove: () => void;
+  className?: string;
+}

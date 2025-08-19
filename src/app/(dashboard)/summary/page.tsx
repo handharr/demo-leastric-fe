@@ -9,6 +9,7 @@ import { FilterModal } from "@/shared/presentation/components/filter/filter-moda
 import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import Image from "next/image";
 import { FilterState } from "@/shared/presentation/types/filter-ui";
+import { FilterChip } from "@/shared/presentation/components/filter/filter-chip";
 import clsx from "clsx";
 
 function isDefaultFilters(filters: FilterState) {
@@ -157,65 +158,44 @@ export default function SummaryPage() {
         <div className="flex flex-wrap gap-3 mb-6">
           {/* Location Chip */}
           {activeFilters.location !== "all" && (
-            <div className="flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm">
-              Location
-              <span className="ml-2">{activeFilters.location}</span>
-              <button
-                className="ml-2 text-gray-400 hover:text-gray-600"
-                onClick={() =>
-                  setActiveFilters((prev) => ({
-                    ...prev,
-                    location: "all",
-                  }))
-                }
-                aria-label="Remove location filter"
-                type="button"
-              >
-                ×
-              </button>
-            </div>
+            <FilterChip
+              value={activeFilters.location}
+              onRemove={() =>
+                setActiveFilters((prev) => ({
+                  ...prev,
+                  location: "all",
+                }))
+              }
+            />
           )}
           {/* SubLocation Chip */}
           {activeFilters.subLocation !== "all" && (
-            <div className="flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm">
-              Sub location
-              <span className="ml-2">{activeFilters.subLocation}</span>
-              <button
-                className="ml-2 text-gray-400 hover:text-gray-600"
-                onClick={() =>
-                  setActiveFilters((prev) => ({
-                    ...prev,
-                    subLocation: "all",
-                  }))
-                }
-                aria-label="Remove sub location filter"
-                type="button"
-              >
-                ×
-              </button>
-            </div>
+            <FilterChip
+              value={activeFilters.subLocation}
+              onRemove={() =>
+                setActiveFilters((prev) => ({
+                  ...prev,
+                  subLocation: "all",
+                }))
+              }
+            />
           )}
           {/* Detail Location Chip */}
           {activeFilters.detailLocations.length > 0 && (
-            <div className="flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm">
-              Detail location
-              <span className="ml-2 inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
-                {activeFilters.detailLocations.length}
-              </span>
-              <button
-                className="ml-2 text-gray-400 hover:text-gray-600"
-                onClick={() =>
-                  setActiveFilters((prev) => ({
-                    ...prev,
-                    detailLocations: [],
-                  }))
-                }
-                aria-label="Remove detail location filter"
-                type="button"
-              >
-                ×
-              </button>
-            </div>
+            <FilterChip
+              label="Detail location"
+              value={
+                <span className="inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
+                  {activeFilters.detailLocations.length}
+                </span>
+              }
+              onRemove={() =>
+                setActiveFilters((prev) => ({
+                  ...prev,
+                  detailLocations: [],
+                }))
+              }
+            />
           )}
           {/* Unit Chip */}
           {activeFilters.units.length > 0 &&
@@ -223,25 +203,20 @@ export default function SummaryPage() {
               activeFilters.units.length === 1 &&
               activeFilters.units[0] === "watt"
             ) && (
-              <div className="flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm">
-                Unit
-                <span className="ml-2 inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
-                  {activeFilters.units.length}
-                </span>
-                <button
-                  className="ml-2 text-gray-400 hover:text-gray-600"
-                  onClick={() =>
-                    setActiveFilters((prev) => ({
-                      ...prev,
-                      units: ["watt"],
-                    }))
-                  }
-                  aria-label="Remove unit filter"
-                  type="button"
-                >
-                  ×
-                </button>
-              </div>
+              <FilterChip
+                label="Unit"
+                value={
+                  <span className="inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
+                    {activeFilters.units.length}
+                  </span>
+                }
+                onRemove={() =>
+                  setActiveFilters((prev) => ({
+                    ...prev,
+                    units: ["watt"],
+                  }))
+                }
+              />
             )}
         </div>
       )}

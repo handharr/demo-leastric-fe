@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import {
   FilterOption,
   FilterModalProps,
 } from "@/shared/presentation/types/filter-ui";
 import { SingleSelectSection } from "@/shared/presentation/components/filter/single-select-section";
 import { MultiSelectSection } from "@/shared/presentation/components/filter/multi-select-section";
+import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
+import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
+import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
 
 export function FilterModal({
   isOpen,
@@ -158,106 +160,37 @@ export function FilterModal({
           {/* Left Panel - Filter Categories */}
           <div className="w-1/2 border-r border-gray-200 overflow-y-auto">
             {/* Location */}
-            <div
-              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
-                activeSection === "location" ? "bg-gray-50" : ""
-              }`}
+            <FilterCategoryItem
+              title="Location"
+              description={getSelectedLocationLabel()}
+              active={activeSection === "location"}
               onClick={() => setActiveSection("location")}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium text-typography-headline">
-                    Location
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {getSelectedLocationLabel()}
-                  </p>
-                </div>
-                <Image
-                  src="/resources/icons/arrow/chevron-right.svg"
-                  alt="Arrow"
-                  width={16}
-                  height={16}
-                  className="text-gray-400 w-[16px] h-[16px]"
-                />
-              </div>
-            </div>
+            />
 
             {/* Sub-location */}
-            <div
-              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
-                activeSection === "sub-location" ? "bg-gray-50" : ""
-              }`}
+            <FilterCategoryItem
+              title="Sub-location"
+              description={getSelectedSubLocationLabel()}
+              active={activeSection === "sub-location"}
               onClick={() => setActiveSection("sub-location")}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium text-typography-headline">
-                    Sub-location
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {getSelectedSubLocationLabel()}
-                  </p>
-                </div>
-                <Image
-                  src="/resources/icons/arrow/chevron-right.svg"
-                  alt="Arrow"
-                  width={16}
-                  height={16}
-                  className="text-gray-400 w-[16px] h-[16px]"
-                />
-              </div>
-            </div>
+            />
 
             {/* Detail location */}
-            <div
-              className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
-                activeSection === "detail-location" ? "bg-gray-50" : ""
-              }`}
+            <FilterCategoryItem
+              title="Detail location"
+              description={getSelectedDetailLocationLabel()}
+              active={activeSection === "detail-location"}
               onClick={() => setActiveSection("detail-location")}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium text-typography-headline">
-                    Detail location
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {getSelectedDetailLocationLabel()}
-                  </p>
-                </div>
-                <Image
-                  src="/resources/icons/arrow/chevron-right.svg"
-                  alt="Arrow"
-                  width={16}
-                  height={16}
-                  className="text-gray-400 w-[16px] h-[16px]"
-                />
-              </div>
-            </div>
+            />
 
             {/* Unit */}
-            <div
-              className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-                activeSection === "unit" ? "bg-gray-50" : ""
-              }`}
+            <FilterCategoryItem
+              title="Unit"
+              description={getSelectedUnitLabel()}
+              active={activeSection === "unit"}
               onClick={() => setActiveSection("unit")}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium text-typography-headline">Unit</h3>
-                  <p className="text-sm text-gray-500">
-                    {getSelectedUnitLabel()}
-                  </p>
-                </div>
-                <Image
-                  src="/resources/icons/arrow/chevron-right.svg"
-                  alt="Arrow"
-                  width={16}
-                  height={16}
-                  className="text-gray-400 w-[16px] h-[16px]"
-                />
-              </div>
-            </div>
+              className="border-b-0"
+            />
           </div>
 
           {/* Right Panel - Filter Options */}
@@ -300,39 +233,16 @@ export function FilterModal({
               />
             )}
 
-            {!activeSection && (
-              <div className="p-4 h-full flex items-center justify-center">
-                <p className="text-gray-500 text-sm">
-                  Select a filter category to configure
-                </p>
-              </div>
-            )}
+            {!activeSection && <FilterNoActiveSection />}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 flex items-center justify-between bg-white">
-          <button
-            onClick={handleReset}
-            className="text-leastric-primary font-medium hover:text-green-700 transition-colors"
-          >
-            Reset
-          </button>
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="px-6 py-2.5 border border-gray-300 rounded-lg text-typography-headline font-medium hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleApply}
-              className="px-6 py-2.5 bg-leastric-primary text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
-            >
-              Apply
-            </button>
-          </div>
-        </div>
+        <FilterModalFooter
+          onReset={handleReset}
+          onClose={onClose}
+          onApply={handleApply}
+        />
       </div>
     </div>
   );

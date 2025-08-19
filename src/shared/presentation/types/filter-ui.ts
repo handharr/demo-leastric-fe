@@ -16,3 +16,17 @@ export interface FilterModalProps {
   onApply: (filters: FilterState) => void;
   onReset: () => void;
 }
+
+export interface FilterCategoryItemProps {
+  title: string;
+  description: string;
+  active: boolean;
+  onClick: () => void;
+  className?: string;
+}
+
+export interface FilterModalFooterProps {
+  onReset: () => void;
+  onClose: () => void;
+  onApply: () => void;
+}

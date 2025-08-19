@@ -357,29 +357,28 @@ export function FilterModal({
                       className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-gray-50 transition-colors"
                       onClick={() => handleDetailLocationToggle(location.id)}
                     >
-                      <div
-                        className={`w-5 h-5 border-2 rounded flex items-center justify-center transition-colors ${
-                          location.id === "all"
-                            ? selectedDetailLocations.length === 0
-                              ? "border-leastric-primary bg-leastric-primary"
-                              : "border-gray-300"
-                            : selectedDetailLocations.includes(location.id)
-                            ? "border-leastric-primary bg-leastric-primary"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        {((location.id === "all" &&
-                          selectedDetailLocations.length === 0) ||
-                          (location.id !== "all" &&
-                            selectedDetailLocations.includes(location.id))) && (
-                          <Image
-                            src="/resources/icons/menu/check.svg"
-                            alt="Selected"
-                            width={12}
-                            height={12}
-                            className="text-white"
-                          />
-                        )}
+                      <div className="w-5 h-5 flex items-center justify-center">
+                        <Image
+                          src={
+                            location.id === "all"
+                              ? selectedDetailLocations.length === 0
+                                ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                                : "/resources/icons/checkbox/checkbox-default.svg"
+                              : selectedDetailLocations.includes(location.id)
+                              ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                              : "/resources/icons/checkbox/checkbox-default.svg"
+                          }
+                          alt={
+                            (location.id === "all" &&
+                              selectedDetailLocations.length === 0) ||
+                            (location.id !== "all" &&
+                              selectedDetailLocations.includes(location.id))
+                              ? "Selected"
+                              : "Not selected"
+                          }
+                          width={20}
+                          height={20}
+                        />
                       </div>
                       <span className="text-sm text-typography-headline">
                         {location.label}
@@ -402,28 +401,27 @@ export function FilterModal({
                       className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-gray-50 transition-colors"
                       onClick={() => handleUnitToggle(unit.id)}
                     >
-                      <div
-                        className={`w-5 h-5 border-2 rounded flex items-center justify-center transition-colors ${
-                          unit.id === "all"
-                            ? selectedUnits.length === 0
-                              ? "border-leastric-primary bg-leastric-primary"
-                              : "border-gray-300"
-                            : selectedUnits.includes(unit.id)
-                            ? "border-leastric-primary bg-leastric-primary"
-                            : "border-gray-300"
-                        }`}
-                      >
-                        {((unit.id === "all" && selectedUnits.length === 0) ||
-                          (unit.id !== "all" &&
-                            selectedUnits.includes(unit.id))) && (
-                          <Image
-                            src="/resources/icons/menu/check.svg"
-                            alt="Selected"
-                            width={12}
-                            height={12}
-                            className="text-white"
-                          />
-                        )}
+                      <div className="w-5 h-5 flex items-center justify-center">
+                        <Image
+                          src={
+                            unit.id === "all"
+                              ? selectedUnits.length === 0
+                                ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                                : "/resources/icons/checkbox/checkbox-default.svg"
+                              : selectedUnits.includes(unit.id)
+                              ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                              : "/resources/icons/checkbox/checkbox-default.svg"
+                          }
+                          alt={
+                            (unit.id === "all" && selectedUnits.length === 0) ||
+                            (unit.id !== "all" &&
+                              selectedUnits.includes(unit.id))
+                              ? "Selected"
+                              : "Not selected"
+                          }
+                          width={20}
+                          height={20}
+                        />
                       </div>
                       <span className="text-sm text-typography-headline">
                         {unit.label}

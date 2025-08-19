@@ -148,23 +148,23 @@ export function FilterModal({
       onClick={handleBackdropClick}
     >
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden mx-auto">
-        {/* Header */}
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-typography-headline">
-            Filter
-          </h2>
-        </div>
-
         {/* Content */}
         <div className="flex" style={{ maxHeight: "calc(90vh - 200px)" }}>
           {/* Left Panel - Filter Categories */}
           <div className="w-1/2 border-r border-gray-200 overflow-y-auto">
+            {/* Header */}
+            <div className="p-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-typography-headline">
+                Filter
+              </h2>
+            </div>
             {/* Location */}
             <FilterCategoryItem
               title="Location"
               description={getSelectedLocationLabel()}
               active={activeSection === "location"}
               onClick={() => setActiveSection("location")}
+              showBottomBorder={false}
             />
 
             {/* Sub-location */}
@@ -173,6 +173,7 @@ export function FilterModal({
               description={getSelectedSubLocationLabel()}
               active={activeSection === "sub-location"}
               onClick={() => setActiveSection("sub-location")}
+              showBottomBorder={false}
             />
 
             {/* Detail location */}
@@ -189,7 +190,7 @@ export function FilterModal({
               description={getSelectedUnitLabel()}
               active={activeSection === "unit"}
               onClick={() => setActiveSection("unit")}
-              className="border-b-0"
+              showBottomBorder={false}
             />
           </div>
 

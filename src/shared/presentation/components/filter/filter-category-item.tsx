@@ -7,12 +7,16 @@ export function FilterCategoryItem({
   active,
   onClick,
   className = "",
+  showBottomBorder = true,
 }: FilterCategoryItemProps) {
   return (
     <div
-      className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
-        active ? "bg-gray-50" : ""
-      } ${className}`}
+      className={`
+        px-6 py-2 cursor-pointer hover:bg-gray-50 transition-colors 
+        ${active && "bg-gray-50"} 
+        ${showBottomBorder && "border-b border-gray-200"} 
+        ${className}
+        `}
       onClick={onClick}
     >
       <div className="flex items-center justify-between">

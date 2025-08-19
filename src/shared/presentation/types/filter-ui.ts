@@ -23,6 +23,7 @@ export interface FilterCategoryItemProps {
   active: boolean;
   onClick: () => void;
   className?: string;
+  showBottomBorder?: boolean;
 }
 
 export interface FilterModalFooterProps {

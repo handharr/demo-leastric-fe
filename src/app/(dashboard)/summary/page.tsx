@@ -8,23 +8,29 @@ import { ElectricUsageHistoryTable } from "@/features/summary/presentation/compo
 import { FilterModal } from "@/shared/presentation/components/filter/filter-modal";
 import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import Image from "next/image";
+import { FilterState } from "@/shared/presentation/types/filter-ui";
+import clsx from "clsx";
 
-interface FilterState {
-  location: string;
-  subLocation: string;
-  detailLocations: string[];
-  units: string[];
+function isDefaultFilters(filters: FilterState) {
+  return (
+    filters.location === "all" &&
+    filters.subLocation === "all" &&
+    filters.detailLocations.length === 0 &&
+    filters.units.length === 1 &&
+    filters.units[0] === "watt"
+  );
 }
 
 export default function SummaryPage() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     location: "all",
     subLocation: "all",
     detailLocations: [],
     units: ["watt"],
   });
+
+  const hasActiveFilters = !isDefaultFilters(activeFilters);
 
   // Sample data points for the chart
   const chartData: ChartDataPoint[] = [
@@ -113,23 +119,132 @@ export default function SummaryPage() {
 
       {/* Filter and Export Section */}
       <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={() => setIsFilterModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 border border-default-border rounded-lg text-sm text-typography-headline hover:bg-gray-50 transition-colors font-semibold cursor-pointer"
-        >
-          <Image
-            src="resources/icons/system/filter.svg"
-            alt="Filter"
-            width={20}
-            height={20}
-          />
-          Filter
-        </button>
-
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            className={clsx(
+              "flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold cursor-pointer transition-colors",
+              hasActiveFilters
+                ? "bg-leastric-primary/10 border-leastric-primary text-leastric-primary"
+                : "border-default-border text-typography-headline hover:bg-gray-50"
+            )}
+          >
+            <Image
+              src="resources/icons/system/filter.svg"
+              alt="Filter"
+              width={20}
+              height={20}
+            />
+            Filter
+          </button>
+          {hasActiveFilters && (
+            <button
+              className="text-leastric-primary font-semibold text-sm hover:underline"
+              onClick={handleFilterReset}
+              type="button"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
         <button className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer">
           Export
         </button>
       </div>
+
+      {/* Active Filters Chips */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-3 mb-6">
+          {/* Location Chip */}
+          {activeFilters.location !== "all" && (
+            <div className="flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm">
+              Location
+              <span className="ml-2">{activeFilters.location}</span>
+              <button
+                className="ml-2 text-gray-400 hover:text-gray-600"
+                onClick={() =>
+                  setActiveFilters((prev) => ({
+                    ...prev,
+                    location: "all",
+                  }))
+                }
+                aria-label="Remove location filter"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+          )}
+          {/* SubLocation Chip */}
+          {activeFilters.subLocation !== "all" && (
+            <div className="flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm">
+              Sub location
+              <span className="ml-2">{activeFilters.subLocation}</span>
+              <button
+                className="ml-2 text-gray-400 hover:text-gray-600"
+                onClick={() =>
+                  setActiveFilters((prev) => ({
+                    ...prev,
+                    subLocation: "all",
+                  }))
+                }
+                aria-label="Remove sub location filter"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+          )}
+          {/* Detail Location Chip */}
+          {activeFilters.detailLocations.length > 0 && (
+            <div className="flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm">
+              Detail location
+              <span className="ml-2 inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
+                {activeFilters.detailLocations.length}
+              </span>
+              <button
+                className="ml-2 text-gray-400 hover:text-gray-600"
+                onClick={() =>
+                  setActiveFilters((prev) => ({
+                    ...prev,
+                    detailLocations: [],
+                  }))
+                }
+                aria-label="Remove detail location filter"
+                type="button"
+              >
+                ×
+              </button>
+            </div>
+          )}
+          {/* Unit Chip */}
+          {activeFilters.units.length > 0 &&
+            !(
+              activeFilters.units.length === 1 &&
+              activeFilters.units[0] === "watt"
+            ) && (
+              <div className="flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm">
+                Unit
+                <span className="ml-2 inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
+                  {activeFilters.units.length}
+                </span>
+                <button
+                  className="ml-2 text-gray-400 hover:text-gray-600"
+                  onClick={() =>
+                    setActiveFilters((prev) => ({
+                      ...prev,
+                      units: ["watt"],
+                    }))
+                  }
+                  aria-label="Remove unit filter"
+                  type="button"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+        </div>
+      )}
 
       {/* Summary Cards Grid */}
       <div className="overflow-x-auto pb-4 mb-8">

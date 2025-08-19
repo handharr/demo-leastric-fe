@@ -1,4 +1,4 @@
-interface FilterState {
+export interface FilterState {
   location: string;
   subLocation: string;
   detailLocations: string[];

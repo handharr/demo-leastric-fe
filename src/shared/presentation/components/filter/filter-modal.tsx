@@ -2,25 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
-
-interface FilterOption {
-  id: string;
-  label: string;
-}
-
-interface FilterState {
-  location: string;
-  subLocation: string;
-  detailLocations: string[];
-  units: string[];
-}
-
-interface FilterModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onApply: (filters: FilterState) => void;
-  onReset: () => void;
-}
+import {
+  FilterOption,
+  FilterModalProps,
+} from "@/shared/presentation/types/filter-ui";
+import { SingleSelectSection } from "@/shared/presentation/components/filter/single-select-section";
+import { MultiSelectSection } from "@/shared/presentation/components/filter/multi-select-section";
 
 export function FilterModal({
   isOpen,
@@ -76,7 +63,6 @@ export function FilterModal({
       setSelectedDetailLocations([]);
       return;
     }
-
     setSelectedDetailLocations((prev) =>
       prev.includes(locationId)
         ? prev.filter((id) => id !== locationId)
@@ -89,7 +75,6 @@ export function FilterModal({
       setSelectedUnits([]);
       return;
     }
-
     setSelectedUnits((prev) =>
       prev.includes(unitId)
         ? prev.filter((id) => id !== unitId)
@@ -278,158 +263,41 @@ export function FilterModal({
           {/* Right Panel - Filter Options */}
           <div className="w-1/2 min-h-[400px] overflow-y-auto">
             {activeSection === "location" && (
-              <div className="p-4">
-                <h3 className="font-medium text-typography-headline mb-4">
-                  Location
-                </h3>
-                <div className="space-y-2">
-                  {locations.map((location) => (
-                    <div
-                      key={location.id}
-                      className={`p-3 rounded cursor-pointer transition-colors ${
-                        selectedLocation === location.id
-                          ? "bg-green-50 text-leastric-primary"
-                          : "hover:bg-gray-50"
-                      }`}
-                      onClick={() => setSelectedLocation(location.id)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">{location.label}</span>
-                        {selectedLocation === location.id && (
-                          <Image
-                            src="/resources/icons/menu/check.svg"
-                            alt="Selected"
-                            width={16}
-                            height={16}
-                            className="text-leastric-primary"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <SingleSelectSection
+                title="Location"
+                options={locations}
+                selectedId={selectedLocation}
+                onSelect={setSelectedLocation}
+              />
             )}
 
             {activeSection === "sub-location" && (
-              <div className="p-4">
-                <h3 className="font-medium text-typography-headline mb-4">
-                  Sub-location
-                </h3>
-                <div className="space-y-2">
-                  {subLocations.map((subLocation) => (
-                    <div
-                      key={subLocation.id}
-                      className={`p-3 rounded cursor-pointer transition-colors ${
-                        selectedSubLocation === subLocation.id
-                          ? "bg-green-50 text-leastric-primary"
-                          : "hover:bg-gray-50"
-                      }`}
-                      onClick={() => setSelectedSubLocation(subLocation.id)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">{subLocation.label}</span>
-                        {selectedSubLocation === subLocation.id && (
-                          <Image
-                            src="/resources/icons/menu/check.svg"
-                            alt="Selected"
-                            width={16}
-                            height={16}
-                            className="text-leastric-primary"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <SingleSelectSection
+                title="Sub-location"
+                options={subLocations}
+                selectedId={selectedSubLocation}
+                onSelect={setSelectedSubLocation}
+              />
             )}
 
             {activeSection === "detail-location" && (
-              <div className="p-4">
-                <h3 className="font-medium text-typography-headline mb-4">
-                  Detail location
-                </h3>
-                <div className="space-y-2">
-                  {detailLocations.map((location) => (
-                    <div
-                      key={location.id}
-                      className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-gray-50 transition-colors"
-                      onClick={() => handleDetailLocationToggle(location.id)}
-                    >
-                      <div className="w-5 h-5 flex items-center justify-center">
-                        <Image
-                          src={
-                            location.id === "all"
-                              ? selectedDetailLocations.length === 0
-                                ? "/resources/icons/checkbox/checkbox-default-selected.svg"
-                                : "/resources/icons/checkbox/checkbox-default.svg"
-                              : selectedDetailLocations.includes(location.id)
-                              ? "/resources/icons/checkbox/checkbox-default-selected.svg"
-                              : "/resources/icons/checkbox/checkbox-default.svg"
-                          }
-                          alt={
-                            (location.id === "all" &&
-                              selectedDetailLocations.length === 0) ||
-                            (location.id !== "all" &&
-                              selectedDetailLocations.includes(location.id))
-                              ? "Selected"
-                              : "Not selected"
-                          }
-                          width={20}
-                          height={20}
-                        />
-                      </div>
-                      <span className="text-sm text-typography-headline">
-                        {location.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <MultiSelectSection
+                title="Detail location"
+                options={detailLocations}
+                selectedIds={selectedDetailLocations}
+                onToggle={handleDetailLocationToggle}
+                allSelected={selectedDetailLocations.length === 0}
+              />
             )}
 
             {activeSection === "unit" && (
-              <div className="p-4">
-                <h3 className="font-medium text-typography-headline mb-4">
-                  Unit
-                </h3>
-                <div className="space-y-2">
-                  {units.map((unit) => (
-                    <div
-                      key={unit.id}
-                      className="flex items-center gap-3 p-3 rounded cursor-pointer hover:bg-gray-50 transition-colors"
-                      onClick={() => handleUnitToggle(unit.id)}
-                    >
-                      <div className="w-5 h-5 flex items-center justify-center">
-                        <Image
-                          src={
-                            unit.id === "all"
-                              ? selectedUnits.length === 0
-                                ? "/resources/icons/checkbox/checkbox-default-selected.svg"
-                                : "/resources/icons/checkbox/checkbox-default.svg"
-                              : selectedUnits.includes(unit.id)
-                              ? "/resources/icons/checkbox/checkbox-default-selected.svg"
-                              : "/resources/icons/checkbox/checkbox-default.svg"
-                          }
-                          alt={
-                            (unit.id === "all" && selectedUnits.length === 0) ||
-                            (unit.id !== "all" &&
-                              selectedUnits.includes(unit.id))
-                              ? "Selected"
-                              : "Not selected"
-                          }
-                          width={20}
-                          height={20}
-                        />
-                      </div>
-                      <span className="text-sm text-typography-headline">
-                        {unit.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <MultiSelectSection
+                title="Unit"
+                options={units}
+                selectedIds={selectedUnits}
+                onToggle={handleUnitToggle}
+                allSelected={selectedUnits.length === 0}
+              />
             )}
 
             {!activeSection && (

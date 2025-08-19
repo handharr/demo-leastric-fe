@@ -5,7 +5,7 @@ import { SummaryCard } from "@/features/summary/presentation/components/summary-
 import { UsageChart } from "@/features/summary/presentation/components/usage-chart";
 import { RealTimeMonitoringChart } from "@/features/summary/presentation/components/real-time-monitoring-chart";
 import { ElectricUsageHistoryTable } from "@/features/summary/presentation/components/electric-usage-history-table";
-import { FilterModal } from "@/features/summary/presentation/components/filter-modal";
+import { FilterModal } from "@/shared/presentation/components/filter/filter-modal";
 import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import Image from "next/image";
 

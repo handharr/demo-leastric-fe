@@ -8,6 +8,7 @@ import {
   YAxis,
   ResponsiveContainer,
   Tooltip,
+  CartesianGrid,
 } from "recharts";
 import { RealTimeMonitoringChartProps } from "@/features/summary/presentation/types/ui";
 
@@ -51,6 +52,7 @@ export function RealTimeMonitoringChart({
             data={data}
             margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
           >
+            <CartesianGrid strokeDasharray="3 3" stroke="#dedede" />
             <XAxis
               dataKey="time"
               axisLine={false}
@@ -71,7 +73,6 @@ export function RealTimeMonitoringChart({
               dataKey="usage"
               stroke="#10B981"
               strokeWidth={2}
-              dot={false}
               activeDot={{ r: 4, fill: "#10B981" }}
             />
           </LineChart>

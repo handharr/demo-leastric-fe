@@ -11,7 +11,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
 }) => (
   <div
     className={clsx(
-      "flex items-center border border-default-border rounded-full px-4 py-1 bg-white text-typography-headline text-sm justify-center",
+      "flex items-center border border-default-border rounded-full px-4 py-2 bg-white text-typography-headline text-sm justify-center",
       className
     )}
   >

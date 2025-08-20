@@ -1,19 +1,12 @@
-export interface FilterState {
-  location: string;
-  subLocation: string;
-  detailLocations: string[];
-  units: string[];
-}
-
 export interface FilterOption {
   id: string;
   label: string;
 }
 
-export interface FilterModalProps {
+export interface FilterModalProps<TFilterState = unknown> {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (filters: FilterState) => void;
+  onApply: (filters: TFilterState) => void;
   onReset: () => void;
 }
 

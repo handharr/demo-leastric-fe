@@ -5,14 +5,16 @@ import { SummaryCard } from "@/features/summary/presentation/components/summary-
 import { UsageChart } from "@/features/summary/presentation/components/usage-chart";
 import { RealTimeMonitoringChart } from "@/features/summary/presentation/components/real-time-monitoring-chart";
 import { ElectricUsageHistoryTable } from "@/features/summary/presentation/components/electric-usage-history-table";
-import { FilterModal } from "@/shared/presentation/components/filter/filter-modal";
+import {
+  SummaryFilterModal,
+  SummaryFilterState,
+} from "@/features/summary/presentation/components/summary-filter-modal";
 import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import Image from "next/image";
-import { FilterState } from "@/shared/presentation/types/filter-ui";
 import { FilterChip } from "@/shared/presentation/components/filter/filter-chip";
 import clsx from "clsx";
 
-function isDefaultFilters(filters: FilterState) {
+function isDefaultFilters(filters: SummaryFilterState) {
   return (
     filters.location === "all" &&
     filters.subLocation === "all" &&
@@ -24,7 +26,7 @@ function isDefaultFilters(filters: FilterState) {
 
 export default function SummaryPage() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<FilterState>({
+  const [activeFilters, setActiveFilters] = useState<SummaryFilterState>({
     location: "all",
     subLocation: "all",
     detailLocations: [],
@@ -95,7 +97,7 @@ export default function SummaryPage() {
     { no: 10, date: "10-7-2025", usage: 250, co2: 24.523 },
   ];
 
-  const handleFilterApply = (filters: FilterState) => {
+  const handleFilterApply = (filters: SummaryFilterState) => {
     setActiveFilters(filters);
     console.log("Applied filters:", filters);
     // Apply filters to your data here
@@ -310,7 +312,7 @@ export default function SummaryPage() {
       </div>
 
       {/* Filter Modal */}
-      <FilterModal
+      <SummaryFilterModal
         isOpen={isFilterModalOpen}
         onClose={() => setIsFilterModalOpen(false)}
         onApply={handleFilterApply}

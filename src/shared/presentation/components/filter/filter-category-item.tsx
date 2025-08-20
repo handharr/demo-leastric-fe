@@ -27,9 +27,9 @@ export function FilterCategoryItem({
         <Image
           src="/resources/icons/arrow/chevron-right.svg"
           alt="Arrow"
-          width={16}
-          height={16}
-          className="text-gray-400 w-[16px] h-[16px]"
+          width={10}
+          height={10}
+          className="text-gray-400 w-[10px] h-[10px]"
         />
       </div>
     </div>

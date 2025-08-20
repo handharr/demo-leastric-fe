@@ -11,12 +11,19 @@ import { FilterCategoryItem } from "@/shared/presentation/components/filter/filt
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
 import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
 
-export function FilterModal({
+export interface SummaryFilterState {
+  location: string;
+  subLocation: string;
+  detailLocations: string[];
+  units: string[];
+}
+
+export function SummaryFilterModal({
   isOpen,
   onClose,
   onApply,
   onReset,
-}: FilterModalProps) {
+}: FilterModalProps<SummaryFilterState>) {
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
   const [selectedSubLocation, setSelectedSubLocation] = useState<string>("all");
   const [selectedDetailLocations, setSelectedDetailLocations] = useState<
@@ -233,7 +240,6 @@ export function FilterModal({
                 allSelected={selectedUnits.length === 0}
               />
             )}
-
             {!activeSection && <FilterNoActiveSection />}
           </div>
         </div>

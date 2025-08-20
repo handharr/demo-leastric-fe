@@ -467,10 +467,14 @@ export class ApiClient {
     // Handle network errors
     if (!error.response) {
       return {
-        message: "Network error. Please check your connection.",
-        error: "NETWORK_ERROR",
-        details: error.message,
-        statusCode: 0,
+        statusCode: 501,
+        method: error.request?.method,
+        path: error.request?.url,
+        meta: {
+          message: "Network error. Please check your connection.",
+          error: "NETWORK_ERROR",
+          statusCode: 501,
+        },
       };
     }
 
@@ -479,10 +483,12 @@ export class ApiClient {
     const statusCode = error.response.status;
 
     return {
-      message: responseData?.message || defaultMessage,
-      error: responseData?.error || "API_ERROR",
-      details: responseData?.details || error.message,
       statusCode,
+      meta: {
+        message: responseData?.meta?.message || defaultMessage,
+        error: responseData?.meta?.error || "API_ERROR",
+        statusCode,
+      },
     };
   }
 }

@@ -1,8 +1,14 @@
+import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 export interface BaseErrorResponse {
-  message?: string;
-  error?: string;
-  details?: string;
   statusCode?: number;
+  timestamp?: string;
+  path?: string;
+  method?: string;
+  meta?: {
+    message?: string;
+    error?: string;
+    statusCode?: number;
+  };
 }
 
 export function isErrorResponse<T>(
@@ -11,11 +17,11 @@ export function isErrorResponse<T>(
   return (
     typeof response === "object" &&
     response !== null &&
-    "message" in response &&
-    typeof (response as BaseErrorResponse).message === "string" &&
-    "statusCode" in response &&
-    typeof (response as BaseErrorResponse).statusCode === "number" &&
-    "details" in response &&
-    typeof (response as BaseErrorResponse).details === "string"
+    typeof (response as BaseErrorResponse).meta?.message === "string" &&
+    typeof (response as BaseErrorResponse).meta?.statusCode === "number" &&
+    (optional((response as BaseErrorResponse).meta?.statusCode).orZero() <
+      200 ||
+      optional((response as BaseErrorResponse).meta?.statusCode).orZero() >=
+        300)
   );
 }

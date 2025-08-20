@@ -16,9 +16,9 @@ export function mapErrorResponseToModel({
   response: BaseErrorResponse;
 }): BaseErrorModel {
   return createErrorModel({
-    message: optional(response.message).orEmpty(),
-    details: optional(response.details).orEmpty(),
-    statusCode: optional(response.statusCode).orZero(),
+    message: optional(response?.meta?.message).orEmpty(),
+    details: optional(response?.meta?.error).orEmpty(),
+    statusCode: optional(response?.meta?.statusCode).orZero(),
   });
 }
 
@@ -97,8 +97,8 @@ export function handleErrorResponse({
   });
 
   return createErrorModel({
-    message: error.message || defaultMessage,
-    details: error.details,
+    message: error.meta?.message || defaultMessage,
+    details: error.meta?.error,
     statusCode,
     type: errorType,
   });

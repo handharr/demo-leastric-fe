@@ -10,6 +10,7 @@ import { MultiSelectSection } from "@/shared/presentation/components/filter/mult
 import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
 import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
+import { FilterModal } from "@/shared/presentation/components/filter/filter-modal";
 
 export interface SummaryFilterState {
   location: string;
@@ -140,117 +141,103 @@ export function SummaryFilterModal({
     return `${selectedUnits.length} units selected`;
   };
 
-  // Handle backdrop click
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+  // Left panel content
+  const leftContent = (
+    <>
+      <div className="p-4 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-typography-headline">
+          Filter
+        </h2>
+      </div>
+      <FilterCategoryItem
+        title="Location"
+        description={getSelectedLocationLabel()}
+        active={activeSection === "location"}
+        onClick={() => setActiveSection("location")}
+        showBottomBorder={false}
+      />
+      <FilterCategoryItem
+        title="Sub-location"
+        description={getSelectedSubLocationLabel()}
+        active={activeSection === "sub-location"}
+        onClick={() => setActiveSection("sub-location")}
+        showBottomBorder={false}
+      />
+      <FilterCategoryItem
+        title="Detail location"
+        description={getSelectedDetailLocationLabel()}
+        active={activeSection === "detail-location"}
+        onClick={() => setActiveSection("detail-location")}
+      />
+      <FilterCategoryItem
+        title="Unit"
+        description={getSelectedUnitLabel()}
+        active={activeSection === "unit"}
+        onClick={() => setActiveSection("unit")}
+        showBottomBorder={false}
+      />
+    </>
+  );
+
+  // Right panel content
+  const rightContent = (
+    <>
+      {activeSection === "location" && (
+        <SingleSelectSection
+          title="Location"
+          options={locations}
+          selectedId={selectedLocation}
+          onSelect={setSelectedLocation}
+        />
+      )}
+      {activeSection === "sub-location" && (
+        <SingleSelectSection
+          title="Sub-location"
+          options={subLocations}
+          selectedId={selectedSubLocation}
+          onSelect={setSelectedSubLocation}
+        />
+      )}
+      {activeSection === "detail-location" && (
+        <MultiSelectSection
+          title="Detail location"
+          options={detailLocations}
+          selectedIds={selectedDetailLocations}
+          onToggle={handleDetailLocationToggle}
+          allSelected={selectedDetailLocations.length === 0}
+        />
+      )}
+      {activeSection === "unit" && (
+        <MultiSelectSection
+          title="Unit"
+          options={units}
+          selectedIds={selectedUnits}
+          onToggle={handleUnitToggle}
+          allSelected={selectedUnits.length === 0}
+        />
+      )}
+      {!activeSection && <FilterNoActiveSection />}
+    </>
+  );
+
+  // Footer content
+  const footer = (
+    <FilterModalFooter
+      onReset={handleReset}
+      onClose={onClose}
+      onApply={handleApply}
+    />
+  );
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-      onClick={handleBackdropClick}
-    >
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden mx-auto">
-        {/* Content */}
-        <div className="flex" style={{ maxHeight: "calc(90vh - 200px)" }}>
-          {/* Left Panel - Filter Categories */}
-          <div className="w-1/2 border-r border-gray-200 overflow-y-auto">
-            {/* Header */}
-            <div className="p-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-typography-headline">
-                Filter
-              </h2>
-            </div>
-            {/* Location */}
-            <FilterCategoryItem
-              title="Location"
-              description={getSelectedLocationLabel()}
-              active={activeSection === "location"}
-              onClick={() => setActiveSection("location")}
-              showBottomBorder={false}
-            />
-
-            {/* Sub-location */}
-            <FilterCategoryItem
-              title="Sub-location"
-              description={getSelectedSubLocationLabel()}
-              active={activeSection === "sub-location"}
-              onClick={() => setActiveSection("sub-location")}
-              showBottomBorder={false}
-            />
-
-            {/* Detail location */}
-            <FilterCategoryItem
-              title="Detail location"
-              description={getSelectedDetailLocationLabel()}
-              active={activeSection === "detail-location"}
-              onClick={() => setActiveSection("detail-location")}
-            />
-
-            {/* Unit */}
-            <FilterCategoryItem
-              title="Unit"
-              description={getSelectedUnitLabel()}
-              active={activeSection === "unit"}
-              onClick={() => setActiveSection("unit")}
-              showBottomBorder={false}
-            />
-          </div>
-
-          {/* Right Panel - Filter Options */}
-          <div className="w-1/2 min-h-[400px] overflow-y-auto">
-            {activeSection === "location" && (
-              <SingleSelectSection
-                title="Location"
-                options={locations}
-                selectedId={selectedLocation}
-                onSelect={setSelectedLocation}
-              />
-            )}
-
-            {activeSection === "sub-location" && (
-              <SingleSelectSection
-                title="Sub-location"
-                options={subLocations}
-                selectedId={selectedSubLocation}
-                onSelect={setSelectedSubLocation}
-              />
-            )}
-
-            {activeSection === "detail-location" && (
-              <MultiSelectSection
-                title="Detail location"
-                options={detailLocations}
-                selectedIds={selectedDetailLocations}
-                onToggle={handleDetailLocationToggle}
-                allSelected={selectedDetailLocations.length === 0}
-              />
-            )}
-
-            {activeSection === "unit" && (
-              <MultiSelectSection
-                title="Unit"
-                options={units}
-                selectedIds={selectedUnits}
-                onToggle={handleUnitToggle}
-                allSelected={selectedUnits.length === 0}
-              />
-            )}
-            {!activeSection && <FilterNoActiveSection />}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <FilterModalFooter
-          onReset={handleReset}
-          onClose={onClose}
-          onApply={handleApply}
-        />
-      </div>
-    </div>
+    <FilterModal
+      isOpen={isOpen}
+      onClose={onClose}
+      leftContent={leftContent}
+      rightContent={rightContent}
+      footer={footer}
+    />
   );
 }

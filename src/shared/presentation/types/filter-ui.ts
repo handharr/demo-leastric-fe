@@ -10,6 +10,14 @@ export interface FilterModalProps<TFilterState = unknown> {
   onReset: () => void;
 }
 
+export interface FilterProps {
+  isOpen: boolean;
+  onClose: () => void;
+  leftContent: React.ReactNode;
+  rightContent: React.ReactNode;
+  footer: React.ReactNode;
+}
+
 export interface FilterCategoryItemProps {
   title: string;
   description: string;

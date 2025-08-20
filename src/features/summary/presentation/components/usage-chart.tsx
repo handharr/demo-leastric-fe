@@ -17,6 +17,7 @@ import {
 } from "@/features/summary/presentation/types/ui";
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import { CustomDot } from "@/features/summary/presentation/components/custom-dot-props";
+import { EmptyData } from "@/shared/presentation/components/empty-data";
 
 export function UsageChart({
   title = "This Month's Est. Usage",
@@ -31,6 +32,147 @@ export function UsageChart({
   const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(defaultUnit);
   const [compareEnabled, setCompareEnabled] = useState(false);
 
+  const isEmpty = !data || data.length === 0;
+
+  const controlsSection = (
+    <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
+      {/* Left Side - Period and Unit Selectors */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Period Selector */}
+        <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors justify-center">
+          <Image
+            src="/resources/icons/time/calendar.svg"
+            alt="Calendar"
+            width={20}
+            height={20}
+            className="opacity-60"
+          />
+          {selectedPeriod}
+        </button>
+
+        {/* Unit Selector */}
+        <div className="relative w-full">
+          <select
+            value={selectedUnit}
+            onChange={(e) => setSelectedUnit(e.target.value as EnergyUnit)}
+            className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 cursor-pointer w-full hover:bg-gray-50"
+          >
+            {availableUnits.map((unit) => (
+              <option key={unit} value={unit}>
+                {unit}
+              </option>
+            ))}
+          </select>
+          <Image
+            src="/resources/icons/arrow/chevron-down.svg"
+            alt="Dropdown"
+            width={16}
+            height={16}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none opacity-60"
+          />
+        </div>
+      </div>
+
+      {/* Right Side - Compare Toggle */}
+      <div className="flex items-center justify-between lg:justify-end gap-3">
+        <span className="text-sm text-gray-600 flex-shrink-0">
+          Compare vs. last period
+        </span>
+        <button
+          onClick={() => setCompareEnabled(!compareEnabled)}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+            compareEnabled ? "bg-green-600" : "bg-gray-300"
+          }`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              compareEnabled ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </button>
+      </div>
+    </div>
+  );
+
+  const chartSection = (
+    <div className="h-64 mb-4">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={data}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid
+            strokeDasharray="none"
+            stroke="#f3f4f6"
+            horizontal={true}
+            vertical={false}
+          />
+          <XAxis
+            dataKey="day"
+            axisLine={false}
+            tickLine={false}
+            tick={{
+              fontSize: 12,
+              fill: "#6b7280",
+            }}
+            tickFormatter={(value) => value.toString()}
+            domain={[1, 30]}
+            type="number"
+            scale="linear"
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tick={{
+              fontSize: 12,
+              fill: "#6b7280",
+            }}
+            domain={[0, 150]}
+            tickCount={4}
+          />
+          <Tooltip
+            content={(props) => (
+              <CustomTooltip {...props} unit={selectedUnit} />
+            )}
+          />
+          <Line
+            type="monotone"
+            dataKey="usage"
+            stroke="#059669"
+            strokeWidth={2}
+            dot={<CustomDot />}
+            activeDot={{
+              r: 5,
+              fill: "#059669",
+              stroke: "#059669",
+              strokeWidth: 2,
+            }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+
+  const legendSection = (
+    <div className="flex items-center gap-2">
+      <div className="w-3 h-3 bg-green-600 rounded-sm"></div>
+      <span className="text-sm text-gray-600">This month</span>
+    </div>
+  );
+
+  const sections = (
+    <>
+      {controlsSection}
+      {chartSection}
+      {legendSection}
+    </>
+  );
+
   return (
     <div
       className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}
@@ -43,133 +185,7 @@ export function UsageChart({
         <p className="text-sm text-typography-subhead">{description}</p>
       </div>
 
-      {/* Controls */}
-      <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
-        {/* Left Side - Period and Unit Selectors */}
-        <div className="grid grid-cols-2 gap-3">
-          {/* Period Selector */}
-          <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors justify-center">
-            <Image
-              src="/resources/icons/time/calendar.svg"
-              alt="Calendar"
-              width={20}
-              height={20}
-              className="opacity-60"
-            />
-            {selectedPeriod}
-          </button>
-
-          {/* Unit Selector */}
-          <div className="relative w-full">
-            <select
-              value={selectedUnit}
-              onChange={(e) => setSelectedUnit(e.target.value as EnergyUnit)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 cursor-pointer w-full hover:bg-gray-50"
-            >
-              {availableUnits.map((unit) => (
-                <option key={unit} value={unit}>
-                  {unit}
-                </option>
-              ))}
-            </select>
-            <Image
-              src="/resources/icons/arrow/chevron-down.svg"
-              alt="Dropdown"
-              width={16}
-              height={16}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none opacity-60"
-            />
-          </div>
-        </div>
-
-        {/* Right Side - Compare Toggle */}
-        <div className="flex items-center justify-between lg:justify-end gap-3">
-          <span className="text-sm text-gray-600 flex-shrink-0">
-            Compare vs. last period
-          </span>
-          <button
-            onClick={() => setCompareEnabled(!compareEnabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
-              compareEnabled ? "bg-green-600" : "bg-gray-300"
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                compareEnabled ? "translate-x-6" : "translate-x-1"
-              }`}
-            />
-          </button>
-        </div>
-      </div>
-
-      {/* Chart */}
-      <div className="h-64 mb-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid
-              strokeDasharray="none"
-              stroke="#f3f4f6"
-              horizontal={true}
-              vertical={false}
-            />
-            <XAxis
-              dataKey="day"
-              axisLine={false}
-              tickLine={false}
-              tick={{
-                fontSize: 12,
-                fill: "#6b7280",
-              }}
-              tickFormatter={(value) => value.toString()}
-              domain={[1, 30]}
-              type="number"
-              scale="linear"
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{
-                fontSize: 12,
-                fill: "#6b7280",
-              }}
-              domain={[0, 150]}
-              tickCount={4}
-            />
-            <Tooltip
-              content={(props) => (
-                <CustomTooltip {...props} unit={selectedUnit} />
-              )}
-            />
-            <Line
-              type="monotone"
-              dataKey="usage"
-              stroke="#059669"
-              strokeWidth={2}
-              dot={<CustomDot />}
-              activeDot={{
-                r: 5,
-                fill: "#059669",
-                stroke: "#059669",
-                strokeWidth: 2,
-              }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Legend */}
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-green-600 rounded-sm"></div>
-        <span className="text-sm text-gray-600">This month</span>
-      </div>
+      {isEmpty ? <EmptyData /> : sections}
     </div>
   );
 }

@@ -29,5 +29,5 @@ export interface DeviceRepository {
     pathParam,
   }: {
     pathParam: GetDevicePathParams;
-  }): Promise<boolean | BaseErrorModel>;
+  }): Promise<string | BaseErrorModel>;
 }

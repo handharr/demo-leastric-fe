@@ -7,7 +7,7 @@ import {
 } from "@/features/device/domain/params/data-params";
 
 export interface DeviceRepository {
-  getDeviceById({
+  getDevice({
     pathParam,
   }: {
     pathParam: GetDevicePathParams;

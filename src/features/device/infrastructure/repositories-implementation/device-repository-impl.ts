@@ -17,7 +17,7 @@ import { DeviceDataSource } from "@/features/device/infrastructure/data-source/i
 export class DeviceRepositoryImpl implements DeviceRepository {
   constructor(private dataSource: DeviceDataSource) {}
 
-  async getDeviceById({
+  async getDevice({
     pathParam,
   }: {
     pathParam: GetDevicePathParams;

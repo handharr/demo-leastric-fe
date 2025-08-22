@@ -1,6 +1,19 @@
 import Image from "next/image";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 
+export const getMultiSelectLabel = (
+  options: FilterOption[],
+  selectedIds: string[],
+  allLabel: string,
+  itemLabel: string
+) => {
+  if (selectedIds.length === 0) return allLabel;
+  if (selectedIds.length === 1) {
+    return options.find((o) => o.id === selectedIds[0])?.label || allLabel;
+  }
+  return `${selectedIds.length} ${itemLabel} selected`;
+};
+
 export function MultiSelectSection({
   title,
   options,

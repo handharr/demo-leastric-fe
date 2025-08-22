@@ -64,11 +64,11 @@ export function RealTimeMonitoringChart({
           />
           <Tooltip content={<CustomTooltip />} />
           <Line
-            type="monotone"
+            type="linear"
             dataKey="usage"
-            stroke="#10B981"
+            stroke="#2a6335"
             strokeWidth={2}
-            activeDot={{ r: 4, fill: "#10B981" }}
+            activeDot={{ r: 4, fill: "#2a6335" }}
           />
         </LineChart>
       </ResponsiveContainer>

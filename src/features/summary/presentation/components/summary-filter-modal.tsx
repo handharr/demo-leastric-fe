@@ -5,8 +5,14 @@ import {
   FilterOption,
   FilterModalProps,
 } from "@/shared/presentation/types/filter-ui";
-import { SingleSelectSection } from "@/shared/presentation/components/filter/single-select-section";
-import { MultiSelectSection } from "@/shared/presentation/components/filter/multi-select-section";
+import {
+  SingleSelectSection,
+  getSingleSelectLabel,
+} from "@/shared/presentation/components/filter/single-select-section";
+import {
+  MultiSelectSection,
+  getMultiSelectLabel,
+} from "@/shared/presentation/components/filter/multi-select-section";
 import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
 import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
@@ -53,25 +59,6 @@ const units: FilterOption[] = [
   { id: "volt", label: "Volt" },
 ];
 
-const getSingleSelectLabel = (
-  options: FilterOption[],
-  selectedId: string,
-  allLabel: string
-) => options.find((o) => o.id === selectedId)?.label || allLabel;
-
-const getMultiSelectLabel = (
-  options: FilterOption[],
-  selectedIds: string[],
-  allLabel: string,
-  itemLabel: string
-) => {
-  if (selectedIds.length === 0) return allLabel;
-  if (selectedIds.length === 1) {
-    return options.find((o) => o.id === selectedIds[0])?.label || allLabel;
-  }
-  return `${selectedIds.length} ${itemLabel} selected`;
-};
-
 export function SummaryFilterModal({
   isOpen,
   onClose,
@@ -113,14 +100,15 @@ export function SummaryFilterModal({
   }, [filter, onApply, onClose]);
 
   const handleReset = useCallback(() => {
-    setFilter({
+    const resetValue = {
       location: "all",
       subLocation: "all",
       detailLocations: [],
       units: ["watt"],
-    });
+    };
+    setFilter(resetValue);
     setActiveSection(null);
-    onReset();
+    onReset(resetValue);
   }, [onReset]);
 
   if (!isOpen) return null;

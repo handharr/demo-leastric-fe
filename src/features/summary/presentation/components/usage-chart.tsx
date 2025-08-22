@@ -141,15 +141,15 @@ export function UsageChart({
             )}
           />
           <Line
-            type="monotone"
+            type="linear"
             dataKey="usage"
-            stroke="#059669"
+            stroke="#2a6335"
             strokeWidth={2}
             dot={<CustomDot />}
             activeDot={{
               r: 5,
-              fill: "#059669",
-              stroke: "#059669",
+              fill: "#2a6335",
+              stroke: "#2a6335",
               strokeWidth: 2,
             }}
           />

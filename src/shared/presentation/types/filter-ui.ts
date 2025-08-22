@@ -7,7 +7,7 @@ export interface FilterModalProps<TFilterState = unknown> {
   isOpen: boolean;
   onClose: () => void;
   onApply: (filters: TFilterState) => void;
-  onReset: () => void;
+  onReset: (filters: TFilterState) => void;
 }
 
 export interface FilterProps {

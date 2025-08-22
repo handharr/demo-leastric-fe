@@ -14,16 +14,18 @@ export function SummaryCard({
   return (
     <div
       className={cn(
-        "bg-white rounded-lg border border-default-border p-6 shadow-sm flex flex-col h-full",
+        "bg-white rounded-lg border border-default-border p-4 shadow-sm flex flex-col h-full",
         className
       )}
     >
       {/* Top Section - Title and Description */}
       <div className="flex-shrink-0">
-        <h3 className="text-lg font-medium text-typography-headline mb-2">
+        <h3 className="text-lg font-medium text-typography-headline mb-px[4]">
           {title}
         </h3>
-        <p className="text-sm text-typography-subhead mb-4">{description}</p>
+        <p className="text-sm text-typography-subhead mb-px[8]">
+          {description}
+        </p>
       </div>
 
       {/* Bottom Section - Value and Additional Content */}

@@ -1,6 +1,12 @@
 import Image from "next/image";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 
+export const getSingleSelectLabel = (
+  options: FilterOption[],
+  selectedId: string,
+  allLabel: string
+) => options.find((o) => o.id === selectedId)?.label || allLabel;
+
 export function SingleSelectSection({
   title,
   options,

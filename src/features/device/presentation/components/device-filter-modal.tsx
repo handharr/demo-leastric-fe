@@ -5,7 +5,10 @@ import {
   FilterOption,
   FilterModalProps,
 } from "@/shared/presentation/types/filter-ui";
-import { SingleSelectSection } from "@/shared/presentation/components/filter/single-select-section";
+import {
+  SingleSelectSection,
+  getSingleSelectLabel,
+} from "@/shared/presentation/components/filter/single-select-section";
 import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
 import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
@@ -26,12 +29,6 @@ const locations: FilterOption[] = [
   { id: "location-d", label: "Location D" },
   { id: "location-e", label: "Location E" },
 ];
-
-const getSingleSelectLabel = (
-  options: FilterOption[],
-  selectedId: string,
-  allLabel: string
-) => options.find((o) => o.id === selectedId)?.label || allLabel;
 
 export function DeviceFilterModal({
   isOpen,
@@ -60,14 +57,15 @@ export function DeviceFilterModal({
   }, [filter, onApply, onClose]);
 
   const handleReset = useCallback(() => {
-    setFilter({
+    const resetValue = {
       location: "all",
       subLocation: "all",
       detailLocations: [],
       units: ["watt"],
-    });
+    };
+    setFilter(resetValue);
     setActiveSection(null);
-    onReset();
+    onReset(resetValue);
   }, [onReset]);
 
   if (!isOpen) return null;

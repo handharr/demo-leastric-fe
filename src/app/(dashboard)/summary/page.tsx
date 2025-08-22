@@ -67,12 +67,12 @@ export default function SummaryPage() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-[16px]">
         <h1 className="text-2xl font-bold text-typography-headline">Summary</h1>
       </div>
 
       {/* Filter and Export Section */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-[16px]">
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsFilterModalOpen(true)}
@@ -175,8 +175,8 @@ export default function SummaryPage() {
       )}
 
       {/* Summary Cards Grid */}
-      <div className="overflow-x-auto pb-4 mb-8">
-        <div className="flex gap-6 md:grid md:grid-cols-2 xl:grid-cols-4 min-w-max md:min-w-0 md:items-stretch">
+      <div className="overflow-x-auto pb-4 mb-[16px]">
+        <div className="flex gap-[16px] md:grid md:grid-cols-2 xl:grid-cols-4 min-w-max md:min-w-0 md:items-stretch">
           {/* Electricity Usage Card */}
           <div className="flex-shrink-0 w-80 md:w-auto md:flex">
             <SummaryCard
@@ -242,12 +242,12 @@ export default function SummaryPage() {
       </div>
 
       {/* Usage Chart */}
-      <div className="mb-8">
+      <div className="mb-[16px]">
         <UsageChart data={chartData} />
       </div>
 
       {/* Real-Time Monitoring and Usage History */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[16px]">
         {/* Real-Time Monitoring Chart */}
         <RealTimeMonitoringChart
           data={realTimeData}

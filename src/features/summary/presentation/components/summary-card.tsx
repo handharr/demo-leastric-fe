@@ -20,10 +20,10 @@ export function SummaryCard({
     >
       {/* Top Section - Title and Description */}
       <div className="flex-shrink-0">
-        <h3 className="text-lg font-medium text-typography-headline mb-px[4]">
+        <h3 className="text-lg font-medium text-typography-headline mb-[4px]">
           {title}
         </h3>
-        <p className="text-sm text-typography-subhead mb-px[8]">
+        <p className="text-sm text-typography-subhead mb-[8px]">
           {description}
         </p>
       </div>

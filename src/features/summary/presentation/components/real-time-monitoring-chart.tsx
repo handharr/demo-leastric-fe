@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import {
   LineChart,
@@ -10,25 +11,38 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import { RealTimeMonitoringChartProps } from "@/features/summary/presentation/types/ui";
+import {
+  RealTimeMonitoringChartProps,
+  SecondsIntervalOption,
+} from "@/features/summary/presentation/types/ui";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
+import { Dropdown } from "@/shared/presentation/components/dropdown";
+
+const availableIntervals = [
+  SecondsIntervalOption.Ten,
+  SecondsIntervalOption.Fifteen,
+  SecondsIntervalOption.Thirty,
+  SecondsIntervalOption.Sixty,
+];
 
 export function RealTimeMonitoringChart({
   data,
   currentUsage,
-  refreshInterval = 10,
 }: RealTimeMonitoringChartProps) {
+  const [selectedInterval, setSelectedInterval] =
+    useState<SecondsIntervalOption>(SecondsIntervalOption.Ten);
   const isEmpty = !data || data.length === 0;
 
   const controlsSection = (
     <div className="flex flex-row items-center justify-between gap-4 mb-6">
-      <button className="flex items-center gap-2 px-3 py-2 border border-default-border rounded-lg text-sm text-typography-headline bg-white w-fit">
-        <div className="w-4 h-4 rounded-full border-2 border-gray-400 flex items-center justify-center">
-          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
-        </div>
-        {refreshInterval} Seconds
-      </button>
+      <div className="w-fit">
+        <Dropdown
+          options={availableIntervals}
+          value={selectedInterval}
+          onChange={setSelectedInterval}
+        />
+      </div>
 
       <div className="text-right">
         <div className="text-2xl font-bold text-typography-headline">

@@ -49,7 +49,7 @@ export function Dropdown<T extends string>({
         />
       </button>
       {open && (
-        <div className="absolute z-20 mt-2 w-full bg-white shadow-lg rounded-lg py-1 border border-gray-100">
+        <div className="absolute z-20 mt-2 min-w-max left-0 bg-white shadow-lg rounded-lg py-1 border border-gray-100">
           {options.map((option) => (
             <button
               key={option}

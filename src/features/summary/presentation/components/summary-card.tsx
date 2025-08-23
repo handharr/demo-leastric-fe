@@ -1,6 +1,14 @@
 import { cn } from "@/lib/utils";
 
-import { SummaryCardProps } from "@/features/summary/presentation/types/ui";
+interface SummaryCardProps {
+  title: string;
+  description: string;
+  value: string | number;
+  unit?: string;
+  prefix?: string;
+  className?: string;
+  children?: React.ReactNode;
+}
 
 export function SummaryCard({
   title,

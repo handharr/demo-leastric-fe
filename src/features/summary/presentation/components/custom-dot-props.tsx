@@ -1,4 +1,11 @@
-import { CustomDotProps } from "@/features/summary/presentation/types/ui";
+interface CustomDotProps {
+  cx?: number;
+  cy?: number;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  r?: number;
+}
 
 export function CustomDot({
   cx,

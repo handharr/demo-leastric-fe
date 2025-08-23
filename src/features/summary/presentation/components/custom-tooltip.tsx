@@ -1,5 +1,15 @@
-import { CustomTooltipProps } from "@/features/summary/presentation/types/ui";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    dataKey: string;
+  }>;
+  label?: string | number;
+  unit?: string;
+  titles?: string[];
+}
 
 export function CustomTooltip({
   active,

@@ -1,7 +1,13 @@
 "use client";
 
-import { ElectricUsageHistoryTableProps } from "@/features/summary/presentation/types/ui";
+import { ElectricUsageRecord } from "@/features/summary/presentation/types/ui";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
+
+interface ElectricUsageHistoryTableProps {
+  data: ElectricUsageRecord[];
+  showAll?: boolean;
+  onShowMore?: () => void;
+}
 
 export function ElectricUsageHistoryTable({
   data,

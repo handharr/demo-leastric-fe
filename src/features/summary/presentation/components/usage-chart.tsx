@@ -11,9 +11,9 @@ import {
   Tooltip,
 } from "recharts";
 import {
-  UsageChartProps,
   EnergyUnit,
   TimePeriod,
+  ChartDataPoint,
 } from "@/features/summary/presentation/types/ui";
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import { CustomDot } from "@/features/summary/presentation/components/custom-dot-props";
@@ -37,6 +37,14 @@ const availableUnits = [
   EnergyUnit.Volt,
   EnergyUnit.Watt,
 ];
+
+interface UsageChartProps {
+  title?: string;
+  description?: string;
+  className?: string;
+  data: ChartDataPoint[];
+  comparedData: ChartDataPoint[];
+}
 
 export function UsageChart({
   title = "This Month's Est. Usage",

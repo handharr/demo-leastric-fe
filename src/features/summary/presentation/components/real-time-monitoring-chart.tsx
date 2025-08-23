@@ -12,7 +12,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import {
-  RealTimeMonitoringChartProps,
+  RealTimeDataPoint,
   SecondsIntervalOption,
 } from "@/features/summary/presentation/types/ui";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
@@ -25,6 +25,12 @@ const availableIntervals = [
   SecondsIntervalOption.Thirty,
   SecondsIntervalOption.Sixty,
 ];
+
+interface RealTimeMonitoringChartProps {
+  data: RealTimeDataPoint[];
+  currentUsage: number;
+  className?: string;
+}
 
 export function RealTimeMonitoringChart({
   data,

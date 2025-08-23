@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import {
   LineChart,
   Line,
@@ -14,22 +13,36 @@ import {
 import {
   UsageChartProps,
   EnergyUnit,
+  TimePeriod,
 } from "@/features/summary/presentation/types/ui";
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import { CustomDot } from "@/features/summary/presentation/components/custom-dot-props";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
+import { Dropdown } from "@/shared/presentation/components/dropdown";
+
+const availableTimePeriods = [
+  TimePeriod.Daily,
+  TimePeriod.Weekly,
+  TimePeriod.Monthly,
+];
 
 export function UsageChart({
   title = "This Month's Est. Usage",
   description = "This is for description",
   className = "",
   data,
-  availableUnits = [EnergyUnit.KWH, EnergyUnit.MWH, EnergyUnit.GWH],
+  availableUnits = [
+    EnergyUnit.Ampere,
+    EnergyUnit.KWH,
+    EnergyUnit.Volt,
+    EnergyUnit.Watt,
+  ],
   defaultUnit = EnergyUnit.KWH,
 }: UsageChartProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedPeriod, setSelectedPeriod] = useState("Daily");
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
+    TimePeriod.Daily
+  );
   const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(defaultUnit);
   const [compareEnabled, setCompareEnabled] = useState(false);
 
@@ -40,38 +53,18 @@ export function UsageChart({
       {/* Left Side - Period and Unit Selectors */}
       <div className="grid grid-cols-2 gap-3">
         {/* Period Selector */}
-        <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors justify-center">
-          <Image
-            src="/resources/icons/time/calendar.svg"
-            alt="Calendar"
-            width={20}
-            height={20}
-            className="opacity-60"
-          />
-          {selectedPeriod}
-        </button>
+        <Dropdown
+          options={availableTimePeriods}
+          value={selectedPeriod}
+          onChange={setSelectedPeriod}
+        />
 
         {/* Unit Selector */}
-        <div className="relative w-full">
-          <select
-            value={selectedUnit}
-            onChange={(e) => setSelectedUnit(e.target.value as EnergyUnit)}
-            className="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 cursor-pointer w-full hover:bg-gray-50"
-          >
-            {availableUnits.map((unit) => (
-              <option key={unit} value={unit}>
-                {unit}
-              </option>
-            ))}
-          </select>
-          <Image
-            src="/resources/icons/arrow/chevron-down.svg"
-            alt="Dropdown"
-            width={16}
-            height={16}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none opacity-60"
-          />
-        </div>
+        <Dropdown
+          options={availableUnits}
+          value={selectedUnit}
+          onChange={setSelectedUnit}
+        />
       </div>
 
       {/* Right Side - Compare Toggle */}

@@ -14,9 +14,16 @@ export interface ChartDataPoint {
 }
 
 export enum EnergyUnit {
-  KWH = "KWh",
-  MWH = "MWh",
-  GWH = "GWh",
+  Ampere = "Ampere",
+  KWH = "Kwh",
+  Volt = "Volt",
+  Watt = "Watt",
+}
+
+export enum TimePeriod {
+  Daily = "Daily",
+  Weekly = "Weekly",
+  Monthly = "Monthly",
 }
 
 export interface UsageChartProps {

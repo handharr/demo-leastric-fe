@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { RealTimeMonitoringChartProps } from "@/features/summary/presentation/types/ui";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
+import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 
 export function RealTimeMonitoringChart({
   data,
@@ -83,18 +84,11 @@ export function RealTimeMonitoringChart({
   );
 
   return (
-    <div className="bg-white rounded-xl border border-default-border p-6">
-      {/* Header */}
-      <div className="mb-2">
-        <h3 className="font-semibold text-typography-headline mb-1">
-          Real-Time Monitoring
-        </h3>
-        <p className="text-sm text-typography-secondary mb-4">
-          This is for description
-        </p>
-      </div>
-
+    <TilePrimary
+      title="Real-Time Monitoring"
+      description="This is for description"
+    >
       {isEmpty ? <EmptyData /> : contents}
-    </div>
+    </TilePrimary>
   );
 }

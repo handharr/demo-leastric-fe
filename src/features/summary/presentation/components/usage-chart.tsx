@@ -18,6 +18,7 @@ import {
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import { CustomDot } from "@/features/summary/presentation/components/custom-dot-props";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
+import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 
 export function UsageChart({
   title = "This Month's Est. Usage",
@@ -174,18 +175,8 @@ export function UsageChart({
   );
 
   return (
-    <div
-      className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}
-    >
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-typography-headline mb-1">
-          {title}
-        </h2>
-        <p className="text-sm text-typography-subhead">{description}</p>
-      </div>
-
+    <TilePrimary title={title} description={description} className={className}>
       {isEmpty ? <EmptyData /> : sections}
-    </div>
+    </TilePrimary>
   );
 }

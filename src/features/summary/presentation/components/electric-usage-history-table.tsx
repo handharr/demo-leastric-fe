@@ -1,6 +1,7 @@
 "use client";
 
 import { ElectricUsageHistoryTableProps } from "@/features/summary/presentation/types/ui";
+import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 
 export function ElectricUsageHistoryTable({
   data,
@@ -10,26 +11,21 @@ export function ElectricUsageHistoryTable({
   const displayData = showAll ? data : data.slice(0, 7);
 
   return (
-    <div className="bg-white rounded-xl border border-default-border p-6">
-      <div className="flex items-start justify-between mb-6">
-        <div>
-          <h3 className="font-semibold text-typography-headline mb-1">
-            Electricity Usage History
-          </h3>
-          <p className="text-sm text-typography-secondary">
-            This is for description
-          </p>
-        </div>
-        {!showAll && onShowMore && (
+    <TilePrimary
+      title="Electricity Usage History"
+      description="This is for description"
+      topRightContent={
+        !showAll &&
+        onShowMore && (
           <button
             onClick={onShowMore}
-            className="text-sm text-leastric-primary hover:text-green-700 font-semibold"
+            className="cursor-pointer text-sm text-leastric-primary hover:text-green-700 font-semibold"
           >
             Show more
           </button>
-        )}
-      </div>
-
+        )
+      }
+    >
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -71,6 +67,6 @@ export function ElectricUsageHistoryTable({
           </tbody>
         </table>
       </div>
-    </div>
+    </TilePrimary>
   );
 }

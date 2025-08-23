@@ -27,23 +27,24 @@ const availableTimePeriods = [
   TimePeriod.Monthly,
 ];
 
+const availableUnits = [
+  EnergyUnit.Ampere,
+  EnergyUnit.KWH,
+  EnergyUnit.Volt,
+  EnergyUnit.Watt,
+];
+
 export function UsageChart({
   title = "This Month's Est. Usage",
   description = "This is for description",
   className = "",
   data,
-  availableUnits = [
-    EnergyUnit.Ampere,
-    EnergyUnit.KWH,
-    EnergyUnit.Volt,
-    EnergyUnit.Watt,
-  ],
-  defaultUnit = EnergyUnit.KWH,
+  comparedData,
 }: UsageChartProps) {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
     TimePeriod.Daily
   );
-  const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(defaultUnit);
+  const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(EnergyUnit.KWH);
   const [compareEnabled, setCompareEnabled] = useState(false);
 
   const isEmpty = !data || data.length === 0;
@@ -75,7 +76,7 @@ export function UsageChart({
         <button
           onClick={() => setCompareEnabled(!compareEnabled)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
-            compareEnabled ? "bg-green-600" : "bg-gray-300"
+            compareEnabled ? "bg-leastric-primary" : "bg-neutral-disabled"
           }`}
         >
           <span
@@ -92,7 +93,6 @@ export function UsageChart({
     <div className="h-64 mb-[16px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={data}
           margin={{
             top: 5,
             right: 30,
@@ -137,6 +137,7 @@ export function UsageChart({
           <Line
             type="linear"
             dataKey="usage"
+            data={data}
             stroke="#2a6335"
             strokeWidth={2}
             dot={<CustomDot />}
@@ -147,6 +148,22 @@ export function UsageChart({
               strokeWidth: 2,
             }}
           />
+          {compareEnabled && (
+            <Line
+              type="linear"
+              dataKey="usage"
+              data={comparedData}
+              stroke="#BABABA"
+              strokeWidth={2}
+              dot={<CustomDot />}
+              activeDot={{
+                r: 5,
+                fill: "#BABABA",
+                stroke: "#BABABA",
+                strokeWidth: 2,
+              }}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </div>

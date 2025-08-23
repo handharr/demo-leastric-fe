@@ -13,6 +13,7 @@ import Image from "next/image";
 import { FilterChip } from "@/shared/presentation/components/filter/filter-chip";
 import clsx from "clsx";
 import {
+  anotherChartDataDummies,
   chartDataDummies,
   electricUsageHistoryDummies,
   realTimeDataDummies,
@@ -41,6 +42,7 @@ export default function SummaryPage() {
 
   // Sample data points for the chart
   const chartData = chartDataDummies;
+  const comparedChartData = anotherChartDataDummies;
 
   // Sample real-time monitoring data
   const realTimeData = realTimeDataDummies;
@@ -243,7 +245,7 @@ export default function SummaryPage() {
 
       {/* Usage Chart */}
       <div className="mb-[16px]">
-        <UsageChart data={chartData} />
+        <UsageChart data={chartData} comparedData={comparedChartData} />
       </div>
 
       {/* Real-Time Monitoring and Usage History */}

@@ -38,8 +38,7 @@ export interface UsageChartProps {
   description?: string;
   className?: string;
   data: ChartDataPoint[];
-  availableUnits?: EnergyUnit[];
-  defaultUnit?: EnergyUnit;
+  comparedData: ChartDataPoint[];
 }
 
 export interface CustomTooltipProps {

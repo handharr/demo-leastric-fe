@@ -20,6 +20,10 @@ import { CustomDot } from "@/features/summary/presentation/components/custom-dot
 import { EmptyData } from "@/shared/presentation/components/empty-data";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
+import {
+  getTimePeriodPastLabel,
+  getTimePeriodCurrentLabel,
+} from "@/features/summary/presentation/helper/presentation-helper";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -130,9 +134,15 @@ export function UsageChart({
             tickCount={4}
           />
           <Tooltip
-            content={(props) => (
-              <CustomTooltip {...props} unit={selectedUnit} />
-            )}
+            content={(props) => {
+              const titles = [
+                getTimePeriodCurrentLabel(selectedPeriod),
+                getTimePeriodPastLabel(selectedPeriod),
+              ];
+              return (
+                <CustomTooltip {...props} unit={selectedUnit} titles={titles} />
+              );
+            }}
           />
           <Line
             type="linear"
@@ -170,9 +180,17 @@ export function UsageChart({
   );
 
   const legendSection = (
-    <div className="flex items-center gap-2">
-      <div className="w-[20px] h-[20px] bg-leastric-primary rounded-sm"></div>
-      <span className="text-sm text-gray-600">This month</span>
+    <div className="flex flex-row items-center gap-[16px]">
+      <div className="flex items-center gap-[8px]">
+        <div className="w-[20px] h-[20px] bg-leastric-primary rounded-sm"></div>
+        <span className="text-sm text-typography-headline">This month</span>
+      </div>
+      {compareEnabled && (
+        <div className="flex items-center gap-[8px]">
+          <div className="w-[20px] h-[20px] bg-neutral-shadow-base rounded-sm"></div>
+          <span className="text-sm text-typography-headline">Last month</span>
+        </div>
+      )}
     </div>
   );
 

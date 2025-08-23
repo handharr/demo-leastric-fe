@@ -52,6 +52,7 @@
   --color-default-border: #dedede;
   --color-neutral-shadow-lighter: #bababa;
   --color-neutral-disabled: #909090;
+  --color-neutral-shadow-base: #909090;
 
   /* Radius */
   --radius-sm: calc(var(--radius) - 4px);

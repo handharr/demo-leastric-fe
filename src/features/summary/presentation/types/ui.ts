@@ -49,6 +49,7 @@ export interface CustomTooltipProps {
   }>;
   label?: string | number;
   unit?: string;
+  titles?: string[];
 }
 
 export interface CustomDotProps {

@@ -1,10 +1,12 @@
 import { CustomTooltipProps } from "@/features/summary/presentation/types/ui";
+import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 
 export function CustomTooltip({
   active,
   payload,
   label,
   unit = "KWh",
+  titles = [],
 }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     return (
@@ -12,12 +14,12 @@ export function CustomTooltip({
         <p className="text-sm text-gray-600">{`Day ${label}`}</p>
         {payload.map((entry, index) => (
           <p
-            key={entry.dataKey}
+            key={index}
             className={`text-sm ${
               index == 0 ? "text-leastric-primary" : "text-typography-subhead"
             }`}
           >
-            {`${entry.dataKey}: ${entry.value} ${unit}`}
+            {`${optional(titles[index]).orEmpty()}: ${entry.value} ${unit}`}
           </p>
         ))}
       </div>

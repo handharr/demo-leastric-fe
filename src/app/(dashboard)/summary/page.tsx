@@ -247,9 +247,13 @@ export default function SummaryPage() {
       </div>
 
       {/* Real-Time Monitoring and Usage History */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[16px]">
+      <div className="grid grid-cols-1 lg:flex lg:flex-row gap-[16px]">
         {/* Real-Time Monitoring Chart */}
-        <RealTimeMonitoringChart data={realTimeData} currentUsage={172.45} />
+        <RealTimeMonitoringChart
+          data={realTimeData}
+          currentUsage={172.45}
+          className="lg:flex-3/4"
+        />
 
         {/* Electric Usage History Table */}
         <ElectricUsageHistoryTable

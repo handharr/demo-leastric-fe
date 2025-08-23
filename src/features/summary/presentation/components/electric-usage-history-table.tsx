@@ -56,7 +56,7 @@ export function ElectricUsageHistoryTable({
                 <td className="py-3 px-2 text-sm text-typography-headline">
                   {record.date}
                 </td>
-                <td className="py-3 px-2 text-sm text-typography-headline">
+                <td className="py-3 px-2 text-sm text-typography-headline text-right">
                   {record.usage}
                 </td>
                 <td className="py-3 px-2 text-sm text-typography-headline">

@@ -29,6 +29,7 @@ const availableIntervals = [
 export function RealTimeMonitoringChart({
   data,
   currentUsage,
+  className = "",
 }: RealTimeMonitoringChartProps) {
   const [selectedInterval, setSelectedInterval] =
     useState<SecondsIntervalOption>(SecondsIntervalOption.Ten);
@@ -101,6 +102,7 @@ export function RealTimeMonitoringChart({
     <TilePrimary
       title="Real-Time Monitoring"
       description="This is for description"
+      className={className}
     >
       {isEmpty ? <EmptyData /> : contents}
     </TilePrimary>

@@ -82,4 +82,5 @@ export interface RealTimeDataPoint {
 export interface RealTimeMonitoringChartProps {
   data: RealTimeDataPoint[];
   currentUsage: number;
+  className?: string;
 }

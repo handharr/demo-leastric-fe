@@ -17,7 +17,7 @@ export function TilePrimary({
 }: TilePrimaryProps) {
   return (
     <div
-      className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}
+      className={`bg-white rounded-lg border border-gray-200 p-[24px] ${className}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-6">

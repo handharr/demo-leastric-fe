@@ -96,7 +96,7 @@ export function UsageChart({
   );
 
   const chartSection = (
-    <div className="h-64 mb-4">
+    <div className="h-64 mb-[16px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
@@ -161,7 +161,7 @@ export function UsageChart({
 
   const legendSection = (
     <div className="flex items-center gap-2">
-      <div className="w-3 h-3 bg-green-600 rounded-sm"></div>
+      <div className="w-[20px] h-[20px] bg-leastric-primary rounded-sm"></div>
       <span className="text-sm text-gray-600">This month</span>
     </div>
   );

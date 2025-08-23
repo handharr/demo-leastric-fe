@@ -14,7 +14,7 @@ export function SummaryCard({
   return (
     <div
       className={cn(
-        "bg-white rounded-lg border border-default-border p-4 shadow-sm flex flex-col h-full",
+        "bg-white rounded-lg border border-default-border p-[16px] shadow-sm flex flex-col h-full",
         className
       )}
     >

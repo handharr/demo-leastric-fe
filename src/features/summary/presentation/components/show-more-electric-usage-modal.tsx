@@ -31,7 +31,7 @@ export function ShowMoreElectricUsageModalButton({
         Show more
       </button>
       <Modal open={open} onClose={() => setOpen(false)}>
-        <div>
+        <div className="w-auto">
           <h2 className="text-lg font-semibold mb-1">
             Electricity Usage History
           </h2>
@@ -48,7 +48,7 @@ export function ShowMoreElectricUsageModalButton({
             />
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-lvh">
               <thead>
                 <tr className="border-b border-default-border">
                   <th className="text-left py-3 px-2 text-sm font-medium text-typography-secondary">

@@ -1,4 +1,5 @@
 "use client";
+import "react-day-picker/dist/style.css";
 
 import { ElectricUsageRecord } from "@/features/summary/presentation/types/ui";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";

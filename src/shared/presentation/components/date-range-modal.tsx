@@ -1,6 +1,7 @@
 import { Modal } from "@/shared/presentation/components/modal";
 import { useState } from "react";
 import Image from "next/image";
+import { DayPicker } from "react-day-picker";
 
 interface DateRangeModalProps {
   onClose?: () => void;
@@ -20,6 +21,11 @@ export function DateRangeModal({
   const [localEnd, setLocalEnd] = useState(endDate);
   const [open, setOpen] = useState(false);
 
+  const handleClose = () => {
+    setOpen(false);
+    onClose?.();
+  };
+
   // Simulate calendar UI with two inputs for simplicity
   return (
     <>
@@ -35,36 +41,38 @@ export function DateRangeModal({
         />
         {startDate} - {endDate}
       </button>
-      <Modal open={open} onClose={() => onClose?.()}>
-        <div className="p-4 w-full">
+      <Modal open={open} onClose={handleClose}>
+        <div className="p-4 w-auto">
+          {/* Title */}
           <div className="mb-4 font-semibold text-lg">Select Date Range</div>
           {/* Replace below with your calendar picker */}
-          <div className="flex gap-4 mb-6">
-            <div>
-              <label className="block text-xs mb-1">Start Date</label>
-              <input
-                type="text"
-                value={localStart}
-                onChange={(e) => setLocalStart(e.target.value)}
-                className="border rounded px-2 py-1 w-32"
-                placeholder="1-7-2025"
-              />
-            </div>
-            <div>
-              <label className="block text-xs mb-1">End Date</label>
-              <input
-                type="text"
-                value={localEnd}
-                onChange={(e) => setLocalEnd(e.target.value)}
-                className="border rounded px-2 py-1 w-32"
-                placeholder="30-7-2025"
-              />
-            </div>
+          <div className="flex flex-row">
+            <DayPicker
+              captionLayout="label"
+              mode="range"
+              navLayout="around"
+              numberOfMonths={2}
+              required
+              timeZone="Asia/Jakarta"
+              selected={
+                localStart && localEnd
+                  ? { from: new Date(localStart), to: new Date(localEnd) }
+                  : undefined
+              }
+              onSelect={(range) => {
+                console.log(range);
+                if (range?.from && range?.to) {
+                  setLocalStart(range.from.toLocaleDateString("en-GB"));
+                  setLocalEnd(range.to.toLocaleDateString("en-GB"));
+                }
+              }}
+            />
           </div>
+          {/* Footer */}
           <div className="flex flex-grow justify-end gap-3">
             <button
               className="border rounded-lg px-4 py-1 text-typography-headline font-semibold"
-              onClick={onClose}
+              onClick={handleClose}
             >
               Cancel
             </button>
@@ -72,7 +80,7 @@ export function DateRangeModal({
               className="bg-leastric-primary text-white rounded-lg px-4 py-1 text-sm font-semibold"
               onClick={() => {
                 onApply(localStart, localEnd);
-                onClose?.();
+                handleClose();
               }}
             >
               Apply

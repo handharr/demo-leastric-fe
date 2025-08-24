@@ -5,31 +5,10 @@ import Image from "next/image";
 import {
   DeviceFilterState,
   DeviceFilterModal,
+  deviceFilterMeta,
 } from "@/features/device/presentation/components/device-filter-modal";
 import { DeviceTable } from "@/features/device/presentation/components/device-table";
-import { FilterType } from "@/shared/presentation/types/filter-ui";
 import { ActiveFilterChips } from "@/shared/presentation/components/active-filter-chips";
-
-const deviceFilterMeta = {
-  location: {
-    type: FilterType.Single,
-    defaultValue: "all",
-  },
-  subLocation: {
-    type: FilterType.Single,
-    defaultValue: "all",
-  },
-  detailLocations: {
-    label: "Detail location",
-    type: FilterType.Multi,
-    defaultValue: [],
-  },
-  units: {
-    label: "Unit",
-    type: FilterType.Multi,
-    defaultValue: ["watt"],
-  },
-};
 
 export default function DevicePage() {
   const [search, setSearch] = useState("");

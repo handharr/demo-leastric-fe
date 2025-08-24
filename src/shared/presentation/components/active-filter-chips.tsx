@@ -1,24 +1,18 @@
 import { FilterChip } from "@/shared/presentation/components/filter/filter-chip";
 
-import { FilterType } from "@/shared/presentation/types/filter-ui";
+import { FilterType, FilterMeta } from "@/shared/presentation/types/filter-ui";
 
-interface FilterMeta {
-  label?: string;
-  type: FilterType;
-  defaultValue: unknown;
-}
-
-type Props<T = Record<string, unknown>> = {
+interface ActiveFilterChipsProps<T = Record<string, unknown>> {
   filters: T;
   onChange: (filters: T) => void;
   meta: Record<keyof T, FilterMeta>;
-};
+}
 
 export function ActiveFilterChips<T extends Record<string, unknown>>({
   filters,
   onChange,
   meta,
-}: Props<T>) {
+}: ActiveFilterChipsProps<T>) {
   return (
     <div className="flex flex-wrap gap-3 mb-6">
       {Object.entries(meta).map(([key, config]) => {

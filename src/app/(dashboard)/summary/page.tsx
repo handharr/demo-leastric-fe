@@ -9,6 +9,7 @@ import {
   SummaryFilterModal,
   SummaryFilterState,
   filterDefaultValue,
+  summaryFilterMeta,
 } from "@/features/summary/presentation/components/summary-filter-modal";
 import {
   anotherChartDataDummies,
@@ -16,29 +17,7 @@ import {
   electricUsageHistoryDummies,
   realTimeDataDummies,
 } from "@/features/summary/presentation/data/dummies";
-import { FilterType } from "@/shared/presentation/types/filter-ui";
 import { ActiveFilterChips } from "@/shared/presentation/components/active-filter-chips";
-
-const summaryFilterMeta = {
-  location: {
-    type: FilterType.Single,
-    defaultValue: "all",
-  },
-  subLocation: {
-    type: FilterType.Single,
-    defaultValue: "all",
-  },
-  detailLocations: {
-    label: "Detail location",
-    type: FilterType.Multi,
-    defaultValue: [],
-  },
-  units: {
-    label: "Unit",
-    type: FilterType.Multi,
-    defaultValue: ["watt"],
-  },
-};
 
 export default function SummaryPage() {
   const [activeFilters, setActiveFilters] =

@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import {
   FilterOption,
   FilterModalProps,
+  FilterType,
 } from "@/shared/presentation/types/filter-ui";
 import {
   SingleSelectSection,
@@ -23,6 +24,27 @@ export interface DeviceFilterState {
   units: string[];
   [key: string]: unknown;
 }
+
+export const deviceFilterMeta = {
+  location: {
+    type: FilterType.Single,
+    defaultValue: "all",
+  },
+  subLocation: {
+    type: FilterType.Single,
+    defaultValue: "all",
+  },
+  detailLocations: {
+    label: "Detail location",
+    type: FilterType.Multi,
+    defaultValue: [],
+  },
+  units: {
+    label: "Unit",
+    type: FilterType.Multi,
+    defaultValue: ["watt"],
+  },
+};
 
 export function isDefaultFilters(filters: DeviceFilterState) {
   return (

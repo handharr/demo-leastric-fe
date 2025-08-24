@@ -3,6 +3,12 @@ export interface FilterOption {
   label: string;
 }
 
+export interface FilterMeta {
+  label?: string;
+  type: FilterType;
+  defaultValue: unknown;
+}
+
 export enum FilterType {
   Single = "single",
   Multi = "multi",

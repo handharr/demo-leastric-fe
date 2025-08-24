@@ -2,17 +2,16 @@
 
 import { ElectricUsageRecord } from "@/features/summary/presentation/types/ui";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
+import { ShowMoreElectricUsageModalButton } from "@/features/summary/presentation/components/show-more-electric-usage-modal";
 
 interface ElectricUsageHistoryTableProps {
   data: ElectricUsageRecord[];
   showAll?: boolean;
-  onShowMore?: () => void;
 }
 
 export function ElectricUsageHistoryTable({
   data,
   showAll = false,
-  onShowMore,
 }: ElectricUsageHistoryTableProps) {
   const displayData = showAll ? data : data.slice(0, 7);
 
@@ -20,17 +19,7 @@ export function ElectricUsageHistoryTable({
     <TilePrimary
       title="Electricity Usage History"
       description="This is for description"
-      topRightContent={
-        !showAll &&
-        onShowMore && (
-          <button
-            onClick={onShowMore}
-            className="cursor-pointer text-sm text-leastric-primary hover:text-green-700 font-semibold"
-          >
-            Show more
-          </button>
-        )
-      }
+      topRightContent={<ShowMoreElectricUsageModalButton data={data} />}
     >
       <div className="overflow-x-auto">
         <table className="w-full">

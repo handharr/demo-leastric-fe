@@ -8,6 +8,7 @@ import { ElectricUsageHistoryTable } from "@/features/summary/presentation/compo
 import {
   SummaryFilterModal,
   SummaryFilterState,
+  filterDefaultValue,
 } from "@/features/summary/presentation/components/summary-filter-modal";
 import {
   anotherChartDataDummies,
@@ -40,12 +41,8 @@ const summaryFilterMeta = {
 };
 
 export default function SummaryPage() {
-  const [activeFilters, setActiveFilters] = useState<SummaryFilterState>({
-    location: "all",
-    subLocation: "all",
-    detailLocations: [],
-    units: ["watt"],
-  });
+  const [activeFilters, setActiveFilters] =
+    useState<SummaryFilterState>(filterDefaultValue);
 
   // Sample data points for the chart
   const chartData = chartDataDummies;

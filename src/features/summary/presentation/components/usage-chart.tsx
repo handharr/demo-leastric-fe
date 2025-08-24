@@ -87,7 +87,7 @@ export function UsageChart({
         </span>
         <button
           onClick={() => setCompareEnabled(!compareEnabled)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+          className={`relative inline-flex cursor-pointer h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
             compareEnabled ? "bg-leastric-primary" : "bg-neutral-disabled"
           }`}
         >

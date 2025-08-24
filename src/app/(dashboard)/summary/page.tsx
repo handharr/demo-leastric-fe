@@ -8,10 +8,9 @@ import { ElectricUsageHistoryTable } from "@/features/summary/presentation/compo
 import {
   SummaryFilterModal,
   SummaryFilterState,
+  isDefaultFilters,
 } from "@/features/summary/presentation/components/summary-filter-modal";
-import Image from "next/image";
 import { FilterChip } from "@/shared/presentation/components/filter/filter-chip";
-import clsx from "clsx";
 import {
   anotherChartDataDummies,
   chartDataDummies,
@@ -19,18 +18,7 @@ import {
   realTimeDataDummies,
 } from "@/features/summary/presentation/data/dummies";
 
-function isDefaultFilters(filters: SummaryFilterState) {
-  return (
-    filters.location === "all" &&
-    filters.subLocation === "all" &&
-    filters.detailLocations.length === 0 &&
-    filters.units.length === 1 &&
-    filters.units[0] === "watt"
-  );
-}
-
 export default function SummaryPage() {
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<SummaryFilterState>({
     location: "all",
     subLocation: "all",
@@ -75,34 +63,12 @@ export default function SummaryPage() {
 
       {/* Filter and Export Section */}
       <div className="flex items-center justify-between mb-[16px]">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setIsFilterModalOpen(true)}
-            className={clsx(
-              "flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold cursor-pointer transition-colors",
-              hasActiveFilters
-                ? "bg-leastric-primary/10 border-leastric-primary text-leastric-primary"
-                : "border-default-border text-typography-headline hover:bg-gray-50"
-            )}
-          >
-            <Image
-              src="resources/icons/system/filter.svg"
-              alt="Filter"
-              width={20}
-              height={20}
-            />
-            Filter
-          </button>
-          {hasActiveFilters && (
-            <button
-              className="text-leastric-primary font-semibold text-sm hover:underline"
-              onClick={handleFilterReset}
-              type="button"
-            >
-              Clear Filters
-            </button>
-          )}
-        </div>
+        {/* Filter Modal */}
+        <SummaryFilterModal
+          isOpen={false}
+          onApply={handleFilterApply}
+          onReset={handleFilterReset}
+        />
         <button className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer">
           Export
         </button>
@@ -263,14 +229,6 @@ export default function SummaryPage() {
           onShowMore={() => console.log("Show more clicked")}
         />
       </div>
-
-      {/* Filter Modal */}
-      <SummaryFilterModal
-        isOpen={isFilterModalOpen}
-        onClose={() => setIsFilterModalOpen(false)}
-        onApply={handleFilterApply}
-        onReset={handleFilterReset}
-      />
     </div>
   );
 }

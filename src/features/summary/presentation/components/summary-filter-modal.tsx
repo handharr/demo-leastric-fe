@@ -17,12 +17,24 @@ import { FilterCategoryItem } from "@/shared/presentation/components/filter/filt
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
 import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
 import { FilterModal } from "@/shared/presentation/components/filter/filter-modal";
+import Image from "next/image";
+import clsx from "clsx";
 
 export interface SummaryFilterState {
   location: string;
   subLocation: string;
   detailLocations: string[];
   units: string[];
+}
+
+export function isDefaultFilters(filters: SummaryFilterState) {
+  return (
+    filters.location === "all" &&
+    filters.subLocation === "all" &&
+    filters.detailLocations.length === 0 &&
+    filters.units.length === 1 &&
+    filters.units[0] === "watt"
+  );
 }
 
 const locations: FilterOption[] = [
@@ -60,11 +72,12 @@ const units: FilterOption[] = [
 ];
 
 export function SummaryFilterModal({
-  isOpen,
+  // isOpen,
   onClose,
   onApply,
   onReset,
 }: FilterModalProps<SummaryFilterState>) {
+  const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<SummaryFilterState>({
     location: "all",
     subLocation: "all",
@@ -72,6 +85,8 @@ export function SummaryFilterModal({
     units: ["watt"],
   });
   const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  const hasActiveFilters = !isDefaultFilters(filter);
 
   const handleSingleSelect = useCallback(
     (key: keyof SummaryFilterState) => (id: string) => {
@@ -96,7 +111,8 @@ export function SummaryFilterModal({
 
   const handleApply = useCallback(() => {
     onApply(filter);
-    onClose();
+    onClose?.();
+    setIsOpen(false);
   }, [filter, onApply, onClose]);
 
   const handleReset = useCallback(() => {
@@ -111,7 +127,45 @@ export function SummaryFilterModal({
     onReset(resetValue);
   }, [onReset]);
 
-  if (!isOpen) return null;
+  const handleOpen = useCallback(() => {
+    setIsOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+    onClose?.();
+  }, [onClose]);
+
+  const filterButton = (
+    <div className="flex items-center gap-4">
+      <button
+        onClick={handleOpen}
+        className={clsx(
+          "flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold cursor-pointer transition-colors",
+          hasActiveFilters
+            ? "bg-leastric-primary/10 border-leastric-primary text-leastric-primary"
+            : "border-default-border text-typography-headline hover:bg-gray-50"
+        )}
+      >
+        <Image
+          src="resources/icons/system/filter.svg"
+          alt="Filter"
+          width={20}
+          height={20}
+        />
+        Filter
+      </button>
+      {hasActiveFilters && (
+        <button
+          className="text-leastric-primary font-semibold text-sm hover:underline"
+          onClick={handleReset}
+          type="button"
+        >
+          Clear Filters
+        </button>
+      )}
+    </div>
+  );
 
   const leftContent = (
     <div>
@@ -211,18 +265,23 @@ export function SummaryFilterModal({
   const footer = (
     <FilterModalFooter
       onReset={handleReset}
-      onClose={onClose}
+      onClose={handleClose}
       onApply={handleApply}
     />
   );
 
   return (
-    <FilterModal
-      isOpen={isOpen}
-      onClose={onClose}
-      leftContent={leftContent}
-      rightContent={rightContent}
-      footer={footer}
-    />
+    <>
+      {filterButton}
+      {isOpen && (
+        <FilterModal
+          isOpen={isOpen}
+          onClose={handleClose}
+          leftContent={leftContent}
+          rightContent={rightContent}
+          footer={footer}
+        />
+      )}
+    </>
   );
 }

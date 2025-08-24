@@ -1,0 +1,22 @@
+/* .rdp-root {
+  --rdp-accent-color: #2a6335;
+} */
+
+/* Reduce font size and spacing for compact look */
+.rdp-root {
+  --rdp-accent-color: #2a6335;
+  --rdp-background-color: #e6f4ea;
+  --rdp-accent-background-color: #dff6e9;
+  --rdp-outline: none;
+  --rdp-day_button-border-radius: 8px;
+}
+
+.rdp-selected {
+  font-weight: normal !important;
+  font-size: inherit !important;
+}
+
+.rdp-month_caption {
+  font-weight: normal !important;
+  font-size: inherit !important;
+}

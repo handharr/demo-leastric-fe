@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ElectricUsageRecord } from "@/features/summary/presentation/types/ui";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DateRangeModal } from "@/shared/presentation/components/date-range-modal";
+import { format } from "date-fns";
 
 function paginate<T>(array: T[], pageSize: number, page: number) {
   const start = (page - 1) * pageSize;
@@ -17,8 +18,8 @@ export function ShowMoreElectricUsageModalButton({
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const totalPages = Math.ceil(data.length / pageSize);
-  const [startDate, setStartDate] = useState("1-7-2025");
-  const [endDate, setEndDate] = useState("30-7-2025");
+  const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   const pagedData = paginate(data, pageSize, page);
 
@@ -30,12 +31,13 @@ export function ShowMoreElectricUsageModalButton({
       >
         Show more
       </button>
-      <Modal open={open} onClose={() => setOpen(false)}>
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Electricity Usage History"
+        description="This is for description"
+      >
         <div className="w-auto">
-          <h2 className="text-lg font-semibold mb-1">
-            Electricity Usage History
-          </h2>
-          <p className="text-sm text-gray-500 mb-4">This is for description</p>
           {/* Date range filter placeholder */}
           <div className="mb-4">
             <DateRangeModal

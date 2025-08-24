@@ -152,10 +152,7 @@ export default function SummaryPage() {
         />
 
         {/* Electric Usage History Table */}
-        <ElectricUsageHistoryTable
-          data={electricUsageHistory}
-          onShowMore={() => console.log("Show more clicked")}
-        />
+        <ElectricUsageHistoryTable data={electricUsageHistory} />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ElectricUsageRecord } from "@/features/summary/presentation/types/ui";
 import { Modal } from "@/shared/presentation/components/modal";
-import Image from "next/image";
+import { DateRangeModal } from "@/shared/presentation/components/date-range-modal";
 
 function paginate<T>(array: T[], pageSize: number, page: number) {
   const start = (page - 1) * pageSize;
@@ -17,6 +17,8 @@ export function ShowMoreElectricUsageModalButton({
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const totalPages = Math.ceil(data.length / pageSize);
+  const [startDate, setStartDate] = useState("1-7-2025");
+  const [endDate, setEndDate] = useState("30-7-2025");
 
   const pagedData = paginate(data, pageSize, page);
 
@@ -36,15 +38,14 @@ export function ShowMoreElectricUsageModalButton({
           <p className="text-sm text-gray-500 mb-4">This is for description</p>
           {/* Date range filter placeholder */}
           <div className="mb-4">
-            <button className="border rounded-md px-3 py-1 text-sm flex items-center gap-2">
-              <Image
-                src="resources/icons/time/calendar.svg"
-                alt="Calendar"
-                width={16}
-                height={16}
-              />
-              1-7-2025 - 30-7-2025
-            </button>
+            <DateRangeModal
+              startDate={startDate}
+              endDate={endDate}
+              onApply={(start, end) => {
+                setStartDate(start);
+                setEndDate(end);
+              }}
+            />
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">

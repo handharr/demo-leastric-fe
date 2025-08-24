@@ -2,13 +2,34 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { FilterChip } from "@/shared/presentation/components/filter/filter-chip";
 import {
   DeviceFilterState,
   DeviceFilterModal,
-  isDefaultFilters,
 } from "@/features/device/presentation/components/device-filter-modal";
 import { DeviceTable } from "@/features/device/presentation/components/device-table";
+import { FilterType } from "@/shared/presentation/types/filter-ui";
+import { ActiveFilterChips } from "@/shared/presentation/components/active-filter-chips";
+
+const deviceFilterMeta = {
+  location: {
+    type: FilterType.Single,
+    defaultValue: "all",
+  },
+  subLocation: {
+    type: FilterType.Single,
+    defaultValue: "all",
+  },
+  detailLocations: {
+    label: "Detail location",
+    type: FilterType.Multi,
+    defaultValue: [],
+  },
+  units: {
+    label: "Unit",
+    type: FilterType.Multi,
+    defaultValue: ["watt"],
+  },
+};
 
 export default function DevicePage() {
   const [search, setSearch] = useState("");
@@ -18,8 +39,6 @@ export default function DevicePage() {
     detailLocations: [],
     units: ["watt"],
   });
-
-  const hasActiveFilters = !isDefaultFilters(activeFilters);
 
   const handleFilterApply = (filters: DeviceFilterState) => {
     setActiveFilters(filters);
@@ -60,78 +79,18 @@ export default function DevicePage() {
         </div>
         {/* Filter Modal */}
         <DeviceFilterModal
+          currentState={activeFilters}
           onApply={handleFilterApply}
           onReset={handleFilterReset}
         />
       </div>
 
       {/* Active Filters Chips */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap gap-3 mb-6">
-          {/* Location Chip */}
-          {activeFilters.location !== "all" && (
-            <FilterChip
-              value={activeFilters.location}
-              onRemove={() =>
-                setActiveFilters((prev) => ({
-                  ...prev,
-                  location: "all",
-                }))
-              }
-            />
-          )}
-          {/* SubLocation Chip */}
-          {activeFilters.subLocation !== "all" && (
-            <FilterChip
-              value={activeFilters.subLocation}
-              onRemove={() =>
-                setActiveFilters((prev) => ({
-                  ...prev,
-                  subLocation: "all",
-                }))
-              }
-            />
-          )}
-          {/* Detail Location Chip */}
-          {activeFilters.detailLocations.length > 0 && (
-            <FilterChip
-              label="Detail location"
-              value={
-                <span className="inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
-                  {activeFilters.detailLocations.length}
-                </span>
-              }
-              onRemove={() =>
-                setActiveFilters((prev) => ({
-                  ...prev,
-                  detailLocations: [],
-                }))
-              }
-            />
-          )}
-          {/* Unit Chip */}
-          {activeFilters.units.length > 0 &&
-            !(
-              activeFilters.units.length === 1 &&
-              activeFilters.units[0] === "watt"
-            ) && (
-              <FilterChip
-                label="Unit"
-                value={
-                  <span className="inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
-                    {activeFilters.units.length}
-                  </span>
-                }
-                onRemove={() =>
-                  setActiveFilters((prev) => ({
-                    ...prev,
-                    units: ["watt"],
-                  }))
-                }
-              />
-            )}
-        </div>
-      )}
+      <ActiveFilterChips<DeviceFilterState>
+        filters={activeFilters}
+        onChange={setActiveFilters}
+        meta={deviceFilterMeta}
+      />
 
       {/* Device Table */}
       <DeviceTable />

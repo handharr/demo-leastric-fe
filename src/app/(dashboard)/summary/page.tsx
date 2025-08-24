@@ -8,15 +8,36 @@ import { ElectricUsageHistoryTable } from "@/features/summary/presentation/compo
 import {
   SummaryFilterModal,
   SummaryFilterState,
-  isDefaultFilters,
 } from "@/features/summary/presentation/components/summary-filter-modal";
-import { FilterChip } from "@/shared/presentation/components/filter/filter-chip";
 import {
   anotherChartDataDummies,
   chartDataDummies,
   electricUsageHistoryDummies,
   realTimeDataDummies,
 } from "@/features/summary/presentation/data/dummies";
+import { FilterType } from "@/shared/presentation/types/filter-ui";
+import { ActiveFilterChips } from "@/shared/presentation/components/active-filter-chips";
+
+const summaryFilterMeta = {
+  location: {
+    type: FilterType.Single,
+    defaultValue: "all",
+  },
+  subLocation: {
+    type: FilterType.Single,
+    defaultValue: "all",
+  },
+  detailLocations: {
+    label: "Detail location",
+    type: FilterType.Multi,
+    defaultValue: [],
+  },
+  units: {
+    label: "Unit",
+    type: FilterType.Multi,
+    defaultValue: ["watt"],
+  },
+};
 
 export default function SummaryPage() {
   const [activeFilters, setActiveFilters] = useState<SummaryFilterState>({
@@ -25,8 +46,6 @@ export default function SummaryPage() {
     detailLocations: [],
     units: ["watt"],
   });
-
-  const hasActiveFilters = !isDefaultFilters(activeFilters);
 
   // Sample data points for the chart
   const chartData = chartDataDummies;
@@ -59,6 +78,7 @@ export default function SummaryPage() {
       <div className="flex items-center justify-between mb-[16px]">
         {/* Filter Modal */}
         <SummaryFilterModal
+          currentState={activeFilters}
           onApply={handleFilterApply}
           onReset={handleFilterReset}
         />
@@ -68,72 +88,11 @@ export default function SummaryPage() {
       </div>
 
       {/* Active Filters Chips */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap gap-3 mb-6">
-          {/* Location Chip */}
-          {activeFilters.location !== "all" && (
-            <FilterChip
-              value={activeFilters.location}
-              onRemove={() =>
-                setActiveFilters((prev) => ({
-                  ...prev,
-                  location: "all",
-                }))
-              }
-            />
-          )}
-          {/* SubLocation Chip */}
-          {activeFilters.subLocation !== "all" && (
-            <FilterChip
-              value={activeFilters.subLocation}
-              onRemove={() =>
-                setActiveFilters((prev) => ({
-                  ...prev,
-                  subLocation: "all",
-                }))
-              }
-            />
-          )}
-          {/* Detail Location Chip */}
-          {activeFilters.detailLocations.length > 0 && (
-            <FilterChip
-              label="Detail location"
-              value={
-                <span className="inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
-                  {activeFilters.detailLocations.length}
-                </span>
-              }
-              onRemove={() =>
-                setActiveFilters((prev) => ({
-                  ...prev,
-                  detailLocations: [],
-                }))
-              }
-            />
-          )}
-          {/* Unit Chip */}
-          {activeFilters.units.length > 0 &&
-            !(
-              activeFilters.units.length === 1 &&
-              activeFilters.units[0] === "watt"
-            ) && (
-              <FilterChip
-                label="Unit"
-                value={
-                  <span className="inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
-                    {activeFilters.units.length}
-                  </span>
-                }
-                onRemove={() =>
-                  setActiveFilters((prev) => ({
-                    ...prev,
-                    units: ["watt"],
-                  }))
-                }
-              />
-            )}
-        </div>
-      )}
+      <ActiveFilterChips<SummaryFilterState>
+        filters={activeFilters}
+        onChange={setActiveFilters}
+        meta={summaryFilterMeta}
+      />
 
       {/* Summary Cards Grid */}
       <div className="overflow-x-auto pb-4 mb-[16px]">

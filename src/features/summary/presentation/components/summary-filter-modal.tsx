@@ -25,6 +25,7 @@ export interface SummaryFilterState {
   subLocation: string;
   detailLocations: string[];
   units: string[];
+  [key: string]: unknown;
 }
 
 export function isDefaultFilters(filters: SummaryFilterState) {
@@ -71,18 +72,21 @@ const units: FilterOption[] = [
   { id: "volt", label: "Volt" },
 ];
 
+const resetValue = {
+  location: "all",
+  subLocation: "all",
+  detailLocations: [],
+  units: ["watt"],
+};
+
 export function SummaryFilterModal({
+  currentState,
   onClose,
   onApply,
   onReset,
 }: FilterModalProps<SummaryFilterState>) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState<SummaryFilterState>({
-    location: "all",
-    subLocation: "all",
-    detailLocations: [],
-    units: ["watt"],
-  });
+  const [filter, setFilter] = useState<SummaryFilterState>(resetValue);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const hasActiveFilters = !isDefaultFilters(filter);
@@ -115,20 +119,15 @@ export function SummaryFilterModal({
   }, [filter, onApply, onClose]);
 
   const handleReset = useCallback(() => {
-    const resetValue = {
-      location: "all",
-      subLocation: "all",
-      detailLocations: [],
-      units: ["watt"],
-    };
     setFilter(resetValue);
     setActiveSection(null);
     onReset(resetValue);
   }, [onReset]);
 
   const handleOpen = useCallback(() => {
+    setFilter(currentState ?? resetValue);
     setIsOpen(true);
-  }, []);
+  }, [currentState]);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);

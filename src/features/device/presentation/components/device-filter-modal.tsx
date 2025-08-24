@@ -21,6 +21,7 @@ export interface DeviceFilterState {
   subLocation: string;
   detailLocations: string[];
   units: string[];
+  [key: string]: unknown;
 }
 
 export function isDefaultFilters(filters: DeviceFilterState) {
@@ -42,18 +43,21 @@ const locations: FilterOption[] = [
   { id: "location-e", label: "Location E" },
 ];
 
+const resetValue = {
+  location: "all",
+  subLocation: "all",
+  detailLocations: [],
+  units: ["watt"],
+};
+
 export function DeviceFilterModal({
+  currentState,
   onClose,
   onApply,
   onReset,
 }: FilterModalProps<DeviceFilterState>) {
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState<DeviceFilterState>({
-    location: "all",
-    subLocation: "all",
-    detailLocations: [],
-    units: ["watt"],
-  });
+  const [filter, setFilter] = useState<DeviceFilterState>(resetValue);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const hasActiveFilters = !isDefaultFilters(filter);
@@ -72,20 +76,15 @@ export function DeviceFilterModal({
   }, [filter, onApply, onClose]);
 
   const handleReset = useCallback(() => {
-    const resetValue = {
-      location: "all",
-      subLocation: "all",
-      detailLocations: [],
-      units: ["watt"],
-    };
     setFilter(resetValue);
     setActiveSection(null);
     onReset(resetValue);
   }, [onReset]);
 
   const handleOpen = useCallback(() => {
+    setFilter(currentState ?? resetValue);
     setIsOpen(true);
-  }, []);
+  }, [currentState]);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);

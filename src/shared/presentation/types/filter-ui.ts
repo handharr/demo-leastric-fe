@@ -3,7 +3,13 @@ export interface FilterOption {
   label: string;
 }
 
-export interface FilterModalProps<TFilterState = unknown> {
+export enum FilterType {
+  Single = "single",
+  Multi = "multi",
+}
+
+export interface FilterModalProps<TFilterState = Record<string, unknown>> {
+  currentState?: TFilterState;
   onClose?: () => void;
   onApply: (filters: TFilterState) => void;
   onReset: (filters: TFilterState) => void;

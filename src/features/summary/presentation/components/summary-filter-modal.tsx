@@ -72,7 +72,6 @@ const units: FilterOption[] = [
 ];
 
 export function SummaryFilterModal({
-  // isOpen,
   onClose,
   onApply,
   onReset,

@@ -41,16 +41,10 @@ export default function SummaryPage() {
   const handleFilterApply = (filters: SummaryFilterState) => {
     setActiveFilters(filters);
     console.log("Applied filters:", filters);
-    // Apply filters to your data here
   };
 
-  const handleFilterReset = () => {
-    setActiveFilters({
-      location: "all",
-      subLocation: "all",
-      detailLocations: [],
-      units: ["watt"],
-    });
+  const handleFilterReset = (resetValue: SummaryFilterState) => {
+    setActiveFilters(resetValue);
     console.log("Filters reset");
   };
 
@@ -65,7 +59,6 @@ export default function SummaryPage() {
       <div className="flex items-center justify-between mb-[16px]">
         {/* Filter Modal */}
         <SummaryFilterModal
-          isOpen={false}
           onApply={handleFilterApply}
           onReset={handleFilterReset}
         />

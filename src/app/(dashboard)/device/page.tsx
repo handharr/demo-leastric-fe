@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import clsx from "clsx";
 import { FilterChip } from "@/shared/presentation/components/filter/filter-chip";
 import {
   DeviceFilterState,
   DeviceFilterModal,
+  isDefaultFilters,
 } from "@/features/device/presentation/components/device-filter-modal";
 
 const mockDevices = Array.from({ length: 10 }).map((_, i) => ({
@@ -46,19 +46,8 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function isDefaultFilters(filters: DeviceFilterState) {
-  return (
-    filters.location === "all" &&
-    filters.subLocation === "all" &&
-    filters.detailLocations.length === 0 &&
-    filters.units.length === 1 &&
-    filters.units[0] === "watt"
-  );
-}
-
 export default function DevicePage() {
   const [search, setSearch] = useState("");
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<DeviceFilterState>({
     location: "all",
     subLocation: "all",
@@ -71,16 +60,10 @@ export default function DevicePage() {
   const handleFilterApply = (filters: DeviceFilterState) => {
     setActiveFilters(filters);
     console.log("Applied filters:", filters);
-    // Apply filters to your data here
   };
 
-  const handleFilterReset = () => {
-    setActiveFilters({
-      location: "all",
-      subLocation: "all",
-      detailLocations: [],
-      units: ["watt"],
-    });
+  const handleFilterReset = (resetValue: DeviceFilterState) => {
+    setActiveFilters(resetValue);
     console.log("Filters reset");
   };
 
@@ -111,34 +94,11 @@ export default function DevicePage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setIsFilterModalOpen(true)}
-            className={clsx(
-              "flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold cursor-pointer transition-colors",
-              hasActiveFilters
-                ? "bg-leastric-primary/10 border-leastric-primary text-leastric-primary"
-                : "border-default-border text-typography-headline hover:bg-gray-50"
-            )}
-          >
-            <Image
-              src="resources/icons/system/filter.svg"
-              alt="Filter"
-              width={20}
-              height={20}
-            />
-            Filter
-          </button>
-          {hasActiveFilters && (
-            <button
-              className="text-leastric-primary font-semibold text-sm hover:underline"
-              onClick={handleFilterReset}
-              type="button"
-            >
-              Clear Filters
-            </button>
-          )}
-        </div>
+        {/* Filter Modal */}
+        <DeviceFilterModal
+          onApply={handleFilterApply}
+          onReset={handleFilterReset}
+        />
       </div>
 
       {/* Active Filters Chips */}
@@ -290,14 +250,6 @@ export default function DevicePage() {
           </div>
         </div>
       </div>
-
-      {/* Filter Modal */}
-      <DeviceFilterModal
-        isOpen={isFilterModalOpen}
-        onClose={() => setIsFilterModalOpen(false)}
-        onApply={handleFilterApply}
-        onReset={handleFilterReset}
-      />
     </div>
   );
 }

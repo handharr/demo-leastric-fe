@@ -4,8 +4,7 @@ export interface FilterOption {
 }
 
 export interface FilterModalProps<TFilterState = unknown> {
-  isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onApply: (filters: TFilterState) => void;
   onReset: (filters: TFilterState) => void;
 }

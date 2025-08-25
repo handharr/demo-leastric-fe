@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { GetAllDevicesUseCase } from "@/features/device/domain/use-cases/get-all-device-use-case";
-import { DeviceModel } from "@/features/device/domain/entities/device-types";
+import {
+  DeviceModel,
+  deviceModelDummies,
+} from "@/features/device/domain/entities/device-types";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 
@@ -9,10 +12,19 @@ export function useDevices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const useDummy = true;
+
   useEffect(() => {
     const fetchDevices = async () => {
       setLoading(true);
       setError(null);
+
+      if (useDummy) {
+        setDevices(deviceModelDummies);
+        setLoading(false);
+        return;
+      }
+
       try {
         const useCase = new GetAllDevicesUseCase();
         const result = await useCase.execute();
@@ -31,7 +43,7 @@ export function useDevices() {
       }
     };
     fetchDevices();
-  }, []);
+  }, [useDummy]);
 
   return { devices, loading, error };
 }

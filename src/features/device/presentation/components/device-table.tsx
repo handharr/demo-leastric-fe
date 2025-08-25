@@ -1,31 +1,29 @@
 import { StatusBadge } from "@/shared/presentation/components/status-badge";
-
-const mockDevices = Array.from({ length: 10 }).map((_, i) => ({
-  name: "Device 1",
-  type: "Type A",
-  status: i === 1 ? "Inactive" : "Active",
-  tariff: i === 1 ? "R2" : "R1",
-  phase: "Phase 1",
-  power: i === 5 ? "200.000" : i === 3 ? "900" : "1.300",
-  location: [
-    "Apartement A",
-    "Apartement B",
-    "Apartement C",
-    "Apartement D",
-    "Apartement E",
-    "Apartement F",
-    "Apartement G",
-    "Apartement H",
-    "Apartement I",
-    "Mall A",
-  ][i],
-  subLocation: "Tower A",
-  detailLocation: "Floor 1",
-}));
+import { useDevices } from "@/features/device/presentation/hooks/use-devices";
+import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 
 export function DeviceTable() {
+  const { devices, loading, error } = useDevices();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        Loading devices...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-40 text-red-500">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-x-auto bg-white rounded-xl shadow border">
+      {/* Table */}
       <table className="min-w-full text-sm">
         <thead>
           <tr className="bg-gray-50 text-gray-700">
@@ -44,14 +42,14 @@ export function DeviceTable() {
           </tr>
         </thead>
         <tbody>
-          {mockDevices.map((d, i) => (
+          {devices.map((d, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-              <td className="px-4 py-3">{d.name}</td>
-              <td className="px-4 py-3">{d.type}</td>
+              <td className="px-4 py-3">{d.deviceName}</td>
+              <td className="px-4 py-3">{d.deviceType}</td>
               <td className="px-4 py-3">
-                <StatusBadge status={d.status} />
+                <StatusBadge status={optional(d.status).orDefault("Unknown")} />
               </td>
-              <td className="px-4 py-3">{d.tariff}</td>
+              <td className="px-4 py-3">{d.tariffGroup}</td>
               <td className="px-4 py-3">{d.phase}</td>
               <td className="px-4 py-3">{d.power}</td>
               <td className="px-4 py-3">{d.location}</td>
@@ -75,6 +73,8 @@ export function DeviceTable() {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination */}
       <div className="flex items-center justify-between px-4 py-3 border-t bg-gray-50 text-gray-600 text-sm">
         <span>
           Show <b>1-10</b> of <b>100</b> data

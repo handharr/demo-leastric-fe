@@ -1,6 +1,7 @@
 import { StatusBadge } from "@/shared/presentation/components/status-badge";
 import { useDevices } from "@/features/device/presentation/hooks/use-devices";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { EditDeviceModal } from "@/features/device/presentation/components/edit-device-modal";
 
 export function DeviceTable() {
   const { devices, loading, error } = useDevices();
@@ -56,18 +57,7 @@ export function DeviceTable() {
               <td className="px-4 py-3">{d.subLocation}</td>
               <td className="px-4 py-3">{d.detailLocation}</td>
               <td className="px-4 py-3">
-                <button className="p-1 hover:bg-gray-100 rounded">
-                  <svg
-                    className="w-4 h-4 text-gray-500"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 20h9" />
-                    <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z" />
-                  </svg>
-                </button>
+                <EditDeviceModal device={d} />
               </td>
             </tr>
           ))}
@@ -88,7 +78,7 @@ export function DeviceTable() {
               key={n}
               className={`px-2 py-1 rounded ${
                 n === 1
-                  ? "bg-green-100 border border-green-400 text-green-700"
+                  ? "bg-green-100 border border-brand-secondary text-brand-primary"
                   : "hover:bg-gray-200"
               }`}
             >

@@ -38,7 +38,9 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-leastric-primary: #2a6335;
+  --color-brand-primary: #2a6335;
   --color-leastric-secondary: #16a953;
+  --color-brand-secondary: #16a953;
   --color-background-subtle: #fafafa;
   --color-background-brand-subtle: #dff6e9;
   --color-brand-subtle: #dff6e9;
@@ -56,6 +58,7 @@
   --color-neutral-shadow-lighter: #bababa;
   --color-neutral-disabled: #909090;
   --color-neutral-shadow-base: #909090;
+  --color-form-disabled: #e6e6e6;
 
   /* Radius */
   --radius-sm: calc(var(--radius) - 4px);

@@ -18,7 +18,7 @@ export function Modal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
       <div className="bg-white rounded-xl shadow-lg w-auto flex flex-col">
-        {title && description && (
+        {title && (
           <div className="flex justify-between p-4 items-center">
             <div>
               <h2 className="text-lg font-semibold">{title}</h2>

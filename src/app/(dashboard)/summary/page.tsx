@@ -115,7 +115,7 @@ export default function SummaryPage() {
               className="md:flex-1"
             >
               <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-1 justify-between">
                   <span className="text-sm text-typography-headline">
                     Active
                   </span>
@@ -123,7 +123,8 @@ export default function SummaryPage() {
                     1
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="h-8 w-px bg-default-border" />
+                <div className="flex items-center gap-2 flex-1 justify-between">
                   <span className="text-sm text-typography-headline">
                     Inactive
                   </span>

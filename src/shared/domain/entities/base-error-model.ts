@@ -54,7 +54,9 @@ export function isErrorModel<T>(
     "message" in response &&
     typeof (response as BaseErrorModel).message === "string" &&
     typeof (response as BaseErrorModel).type === "string" &&
-    validErrorTypes.includes((response as BaseErrorModel).type as ErrorType)
+    validErrorTypes.includes((response as BaseErrorModel).type as ErrorType) &&
+    "statusCode" in response &&
+    (response as BaseErrorModel).statusCode !== undefined
   );
 }
 

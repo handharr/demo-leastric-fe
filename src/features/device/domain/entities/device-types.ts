@@ -1,4 +1,5 @@
 export interface DeviceModel {
+  id: string;
   deviceName: string;
   deviceType: string;
   tariffGroup: string;
@@ -13,6 +14,7 @@ export interface DeviceModel {
 
 export const deviceModelDummies = [
   {
+    id: "1",
     deviceName: "Device 1",
     deviceType: "Type A",
     tariffGroup: "R1",
@@ -24,6 +26,7 @@ export const deviceModelDummies = [
     phase: "Phase 1",
   },
   {
+    id: "2",
     deviceName: "Device 2",
     deviceType: "Type B",
     tariffGroup: "R2",
@@ -35,6 +38,7 @@ export const deviceModelDummies = [
     phase: "Phase 2",
   },
   {
+    id: "3",
     deviceName: "Device 3",
     deviceType: "Type C",
     tariffGroup: "R1",
@@ -46,6 +50,7 @@ export const deviceModelDummies = [
     phase: "Phase 1",
   },
   {
+    id: "4",
     deviceName: "Device 4",
     deviceType: "Type D",
     tariffGroup: "R2",
@@ -57,6 +62,7 @@ export const deviceModelDummies = [
     phase: "Phase 2",
   },
   {
+    id: "5",
     deviceName: "Device 5",
     deviceType: "Type E",
     tariffGroup: "R1",

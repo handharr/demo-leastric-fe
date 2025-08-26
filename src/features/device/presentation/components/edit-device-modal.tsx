@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DeviceModel } from "@/features/device/domain/entities/device-types";
 import { Select } from "@/shared/presentation/components/select";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { useGetDevice } from "@/features/device/presentation/hooks/use-get-device";
 
 const tariffOptions = [
   { label: "R1", value: "R1" },
@@ -27,15 +28,92 @@ type EditDeviceModalProps = {
 
 export function EditDeviceModal({ device }: EditDeviceModalProps) {
   const [open, setOpen] = useState(false);
+  // Fetch latest device data when modal opens
+  const {
+    device: fetchedDevice,
+    loading,
+    error,
+  } = useGetDevice({ deviceId: device.id });
   const [tariffGroup, setTariffGroup] = useState(
     optional(device.tariffGroup).orEmpty()
   );
   const [location, setLocation] = useState(optional(device.location).orEmpty());
 
+  useEffect(() => {
+    if (fetchedDevice) {
+      setTariffGroup(optional(fetchedDevice.tariffGroup).orEmpty());
+      setLocation(optional(fetchedDevice.location).orEmpty());
+    }
+  }, [fetchedDevice]);
+
+  const formContent = () => (
+    <form className="min-w-[30vw]">
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Device name</label>
+        <input
+          className="w-full border rounded px-3 py-2"
+          defaultValue={fetchedDevice?.deviceName ?? device.deviceName}
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Tariff</label>
+        <Select
+          value={tariffGroup}
+          onChange={setTariffGroup}
+          options={tariffOptions}
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Locations</label>
+        <Select
+          value={location}
+          onChange={setLocation}
+          options={locationOptions}
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Sub-location</label>
+        <input
+          disabled
+          className="w-full border rounded px-3 py-2 disabled:bg-form-disabled"
+          defaultValue={fetchedDevice?.subLocation ?? device.subLocation}
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">
+          Detail location
+        </label>
+        <input
+          disabled
+          className="w-full border rounded px-3 py-2 disabled:bg-form-disabled"
+          defaultValue={fetchedDevice?.detailLocation ?? device.detailLocation}
+        />
+      </div>
+      <div className="flex justify-end gap-2 mt-6">
+        <button
+          type="button"
+          className="cursor-pointer px-4 py-2 rounded border"
+          onClick={() => setOpen(false)}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="cursor-pointer px-4 py-2 rounded bg-brand-primary text-white"
+          disabled
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  );
+
   return (
     <>
       <button
-        className="p-1 hover:bg-gray-100 rounded"
+        className="p-1 cursor-pointer rounded"
         onClick={() => setOpen(true)}
         aria-label="Edit device"
       >
@@ -56,72 +134,13 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
         title="Edit Device"
         description=""
       >
-        <form className="min-w-[30vw]">
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Device name
-            </label>
-            <input
-              className="w-full border rounded px-3 py-2"
-              defaultValue={device.deviceName}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Tariff</label>
-            <Select
-              value={tariffGroup}
-              onChange={setTariffGroup}
-              options={tariffOptions}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Locations</label>
-            <Select
-              value={location}
-              onChange={setLocation}
-              options={locationOptions}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Sub-location
-            </label>
-            <input
-              disabled
-              className="w-full border rounded px-3 py-2 disabled:bg-form-disabled"
-              defaultValue={device.subLocation}
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">
-              Detail location
-            </label>
-            <input
-              disabled
-              className="w-full border rounded px-3 py-2 disabled:bg-form-disabled"
-              defaultValue={device.detailLocation}
-            />
-          </div>
-          {/* Add more fields as needed */}
-          <div className="flex justify-end gap-2 mt-6">
-            <button
-              type="button"
-              className="px-4 py-2 rounded border"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded bg-brand-primary text-white"
-              disabled
-            >
-              Save
-            </button>
-          </div>
-        </form>
+        {loading ? (
+          <div>Loading...</div>
+        ) : error ? (
+          <div className="text-red-500">{error}</div>
+        ) : fetchedDevice ? (
+          formContent()
+        ) : null}
       </Modal>
     </>
   );

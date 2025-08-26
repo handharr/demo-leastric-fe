@@ -7,12 +7,12 @@ import {
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 
+const useDummy = true;
+
 export function useDevices() {
   const [devices, setDevices] = useState<DeviceModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const useDummy = true;
 
   useEffect(() => {
     const fetchDevices = async () => {
@@ -43,7 +43,7 @@ export function useDevices() {
       }
     };
     fetchDevices();
-  }, [useDummy]);
+  }, []);
 
   return { devices, loading, error };
 }

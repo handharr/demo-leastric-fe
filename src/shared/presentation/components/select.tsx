@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 type Option = {
   label: string;
@@ -93,9 +94,13 @@ export function Select({
         name={name}
         tabIndex={0}
       />
-      <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-green-700">
-        ▼
-      </span>
+      <Image
+        src="/resources/icons/arrow/chevron-down.svg"
+        alt="Select icon"
+        className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+        width={16}
+        height={16}
+      />
       {open && !disabled && (
         <div
           ref={listRef}
@@ -123,7 +128,13 @@ export function Select({
             >
               {option.label}
               {value === option.value && (
-                <span className="ml-2 text-green-700">✔</span>
+                <Image
+                  src="/resources/icons/arrow/chevron-down.svg"
+                  alt="Select icon"
+                  className="ml-2 pointer-events-none"
+                  width={16}
+                  height={16}
+                />
               )}
             </div>
           ))}

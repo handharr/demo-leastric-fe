@@ -20,6 +20,7 @@ type UpdateDeviceResult = {
     pathParam: GetDevicePathParams;
     deviceData: UpdateDeviceFormData;
   }) => Promise<void>;
+  resetUpdateSuccess: () => void;
 };
 
 const isUseDummy = true;
@@ -29,6 +30,8 @@ export function useUpdateDevice(): UpdateDeviceResult {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [updatedDevice, setUpdatedDevice] = useState<DeviceModel | null>(null);
+
+  const resetUpdateSuccess = useCallback(() => setSuccess(false), []);
 
   const updateDevice = useCallback(
     async ({
@@ -74,5 +77,12 @@ export function useUpdateDevice(): UpdateDeviceResult {
     []
   );
 
-  return { loading, error, success, updatedDevice, updateDevice };
+  return {
+    loading,
+    error,
+    success,
+    updatedDevice,
+    updateDevice,
+    resetUpdateSuccess,
+  };
 }

@@ -5,6 +5,10 @@ import { Select } from "@/shared/presentation/components/select";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { useGetDevice } from "@/features/device/presentation/hooks/use-get-device";
 import { useUpdateDevice } from "@/features/device/presentation/hooks/use-update-device";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
 
 const tariffOptions = [
   { label: "R1", value: "R1" },
@@ -29,6 +33,8 @@ type EditDeviceModalProps = {
 
 export function EditDeviceModal({ device }: EditDeviceModalProps) {
   const [open, setOpen] = useState(false);
+  const { showPopup } = usePopup();
+
   // Fetch latest device data when modal opens
   const {
     device: fetchedDevice,
@@ -40,6 +46,7 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
     error: updateError,
     success: updateSuccess,
     updateDevice,
+    resetUpdateSuccess,
   } = useUpdateDevice();
 
   // Add local state for editable fields
@@ -74,9 +81,11 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
   // Reset success state and close modal on success
   useEffect(() => {
     if (updateSuccess) {
+      showPopup("Device updated successfully", PopupType.SUCCESS);
       setOpen(false);
+      resetUpdateSuccess();
     }
-  }, [updateSuccess]);
+  }, [updateSuccess, showPopup, resetUpdateSuccess]);
 
   const formContent = () => (
     <form className="min-w-[30vw]" onSubmit={handleSubmit}>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import SidebarMenuItem from "@/shared/presentation/components/sidebar-menu-item";
 import { SidebarMenuItemProps } from "@/shared/presentation/types/ui";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { PopupProvider } from "@/shared/presentation/hooks/top-popup-context";
 
 // Constants - moved outside component to prevent recreation
 const MENU_ITEMS: SidebarMenuItemProps[] = [
@@ -150,104 +151,106 @@ export default function Layout({
   );
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-neutral-50">
-      {/* Sidebar */}
-      <aside className={sidebarClasses}>
-        {/* Logo Section */}
-        <header className="h-16 bg-white border-b border-color-default-border flex items-center p-2 lg:p-3 shrink-0">
-          <div className="flex items-center justify-between w-full">
-            <Image
-              src="/resources/images/logo/leastric-logo-small.svg"
-              alt="Leastric Logo"
-              width={20}
-              height={30}
-              className="lg:hidden"
-              priority
-            />
-            <Logo sidebarOpen={sidebarOpen} className="hidden lg:block" />
-            <button
-              onClick={toggleSidebar}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
-              aria-label="Toggle sidebar"
-            >
+    <PopupProvider>
+      <div className="flex h-screen w-screen overflow-hidden bg-neutral-50">
+        {/* Sidebar */}
+        <aside className={sidebarClasses}>
+          {/* Logo Section */}
+          <header className="h-16 bg-white border-b border-color-default-border flex items-center p-2 lg:p-3 shrink-0">
+            <div className="flex items-center justify-between w-full">
               <Image
-                src="/resources/icons/system/bar-left.svg"
-                alt=""
+                src="/resources/images/logo/leastric-logo-small.svg"
+                alt="Leastric Logo"
+                width={20}
+                height={30}
+                className="lg:hidden"
+                priority
+              />
+              <Logo sidebarOpen={sidebarOpen} className="hidden lg:block" />
+              <button
+                onClick={toggleSidebar}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                aria-label="Toggle sidebar"
+              >
+                <Image
+                  src="/resources/icons/system/bar-left.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                />
+              </button>
+            </div>
+          </header>
+
+          {/* Navigation Menu */}
+          <nav className="flex-1 overflow-y-auto p-3">
+            {MENU_ITEMS.map((item) => (
+              <SidebarMenuItem
+                key={item.label}
+                label={item.label}
+                isActive={item.label === activeMenu?.label}
+                onClick={() => handleMenuClick(item)}
+                iconSource={item.iconSource}
+                isSidebarOpen={sidebarOpen}
+                route={item.route}
+              />
+            ))}
+          </nav>
+
+          {/* Footer */}
+          <footer className="bg-white border-t border-[#dedede] px-4 py-3 shrink-0">
+            <p className="text-xs text-[#909090] text-center font-medium">
+              ©Leastric Tech, 2025
+            </p>
+          </footer>
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="flex-1 flex flex-col h-full w-full lg:w-auto relative">
+          {/* Mobile Overlay */}
+          {sidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black/75 z-40 lg:hidden"
+              onClick={toggleSidebar}
+              role="button"
+              tabIndex={0}
+              aria-label="Close sidebar"
+            />
+          )}
+
+          {/* Top Navigation Bar */}
+          <header className="h-16 bg-white border-b border-[#dedede] flex items-center justify-between px-4 lg:px-6 shrink-0 relative z-30">
+            <div className="flex items-center gap-4">
+              <button
+                className={mobileMenuButtonClasses}
+                onClick={toggleSidebar}
+                aria-label="Open sidebar"
+              >
+                <Image
+                  src="/resources/icons/system/bar-left.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                />
+              </button>
+              <Image
+                src="/resources/images/logo/leastric-logo-small.svg"
+                alt="Leastric Logo"
                 width={20}
                 height={20}
+                className={mobileLogo}
               />
-            </button>
-          </div>
-        </header>
+              <Breadcrumb activeMenu={activeMenu} />
+            </div>
+            <UserProfile />
+          </header>
 
-        {/* Navigation Menu */}
-        <nav className="flex-1 overflow-y-auto p-3">
-          {MENU_ITEMS.map((item) => (
-            <SidebarMenuItem
-              key={item.label}
-              label={item.label}
-              isActive={item.label === activeMenu?.label}
-              onClick={() => handleMenuClick(item)}
-              iconSource={item.iconSource}
-              isSidebarOpen={sidebarOpen}
-              route={item.route}
-            />
-          ))}
-        </nav>
-
-        {/* Footer */}
-        <footer className="bg-white border-t border-[#dedede] px-4 py-3 shrink-0">
-          <p className="text-xs text-[#909090] text-center font-medium">
-            ©Leastric Tech, 2025
-          </p>
-        </footer>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-full w-full lg:w-auto relative">
-        {/* Mobile Overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/75 z-40 lg:hidden"
-            onClick={toggleSidebar}
-            role="button"
-            tabIndex={0}
-            aria-label="Close sidebar"
-          />
-        )}
-
-        {/* Top Navigation Bar */}
-        <header className="h-16 bg-white border-b border-[#dedede] flex items-center justify-between px-4 lg:px-6 shrink-0 relative z-30">
-          <div className="flex items-center gap-4">
-            <button
-              className={mobileMenuButtonClasses}
-              onClick={toggleSidebar}
-              aria-label="Open sidebar"
-            >
-              <Image
-                src="/resources/icons/system/bar-left.svg"
-                alt=""
-                width={20}
-                height={20}
-              />
-            </button>
-            <Image
-              src="/resources/images/logo/leastric-logo-small.svg"
-              alt="Leastric Logo"
-              width={20}
-              height={20}
-              className={mobileLogo}
-            />
-            <Breadcrumb activeMenu={activeMenu} />
-          </div>
-          <UserProfile />
-        </header>
-
-        {/* Content Area */}
-        <section className="flex-1 overflow-auto p-4 lg:p-8 relative z-10">
-          {children}
-        </section>
-      </main>
-    </div>
+          {/* Content Area */}
+          <section className="flex-1 overflow-auto p-4 lg:p-8 relative z-10">
+            {children}
+          </section>
+        </main>
+      </div>
+    </PopupProvider>
   );
 }

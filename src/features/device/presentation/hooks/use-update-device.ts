@@ -2,8 +2,11 @@ import { useState, useCallback } from "react";
 import { UpdateDeviceUseCase } from "@/features/device/domain/use-cases/update-device-use-case";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
 import { UpdateDeviceFormData } from "@/features/device/domain/params/data-params";
-import { DeviceModel } from "@/features/device/domain/entities/device-types";
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import {
+  DeviceModel,
+  deviceModelDummies,
+} from "@/features/device/domain/entities/device-types";
+import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 
 type UpdateDeviceResult = {
   loading: boolean;
@@ -18,6 +21,8 @@ type UpdateDeviceResult = {
     deviceData: UpdateDeviceFormData;
   }) => Promise<void>;
 };
+
+const isUseDummy = true;
 
 export function useUpdateDevice(): UpdateDeviceResult {
   const [loading, setLoading] = useState(false);
@@ -38,15 +43,32 @@ export function useUpdateDevice(): UpdateDeviceResult {
       setSuccess(false);
       setUpdatedDevice(null);
 
+      if (isUseDummy) {
+        const device = deviceModelDummies.find(
+          (d) => d.id === pathParam.deviceId
+        );
+        if (!device) {
+          setError("Device not found");
+          setLoading(false);
+          return;
+        }
+        setUpdatedDevice({ ...device, ...deviceData });
+        setSuccess(true);
+        setLoading(false);
+        return;
+      }
+
       const useCase = new UpdateDeviceUseCase();
       const result = await useCase.execute({ pathParam, deviceData });
 
-      if ("id" in result) {
-        setUpdatedDevice(result as DeviceModel);
-        setSuccess(true);
-      } else {
-        setError((result as BaseErrorModel).message || "Unknown error");
+      if (isErrorModel(result)) {
+        setError(result.message || "Unknown error");
+        setLoading(false);
+        return;
       }
+
+      setUpdatedDevice(result);
+      setSuccess(true);
       setLoading(false);
     },
     []

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import clsx from "clsx";
+import SidebarMenuItem from "@/shared/presentation/components/sidebar-menu-item";
 
 // Dummy user data for sidebar
 const user = {
@@ -14,23 +13,28 @@ const user = {
 const MENU_ITEMS = [
   {
     label: "Profile",
-    icon: "/resources/icons/system/user.svg",
+    icon: "/resources/icons/user/account",
+    route: "/setting/profile",
   },
   {
     label: "Security",
-    icon: "/resources/icons/system/shield-check.svg",
+    icon: "/resources/icons/security/shield-check",
+    route: "/setting/security",
   },
   {
     label: "Access Manager",
-    icon: "/resources/icons/system/users.svg",
+    icon: "/resources/icons/security/keyhole",
+    route: "/setting/access",
   },
   {
     label: "Customer Support",
-    icon: "/resources/icons/system/question.svg",
+    icon: "/resources/icons/menu/question-circle",
+    route: "/setting/support",
   },
   {
     label: "Logout",
-    icon: "/resources/icons/system/logout.svg",
+    icon: "/resources/icons/arrow/logout",
+    route: "/setting/logout",
   },
 ];
 
@@ -67,28 +71,15 @@ export default function Layout({
           {/* Menu */}
           <nav className="flex flex-col gap-1">
             {MENU_ITEMS.map((item, idx) => (
-              <button
+              <SidebarMenuItem
                 key={item.label}
-                className={clsx(
-                  "flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors",
-                  idx === activeIndex
-                    ? "bg-[#E6F4EA] text-[#2a6335] font-semibold"
-                    : "hover:bg-gray-100 text-gray-700"
-                )}
+                iconSource={item.icon}
+                label={item.label}
+                isActive={idx === activeIndex}
                 onClick={() => setActiveIndex(idx)}
-              >
-                <Image
-                  src={item.icon}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className={clsx(
-                    "transition-colors",
-                    idx === activeIndex ? "filter-none" : "grayscale"
-                  )}
-                />
-                <span>{item.label}</span>
-              </button>
+                route={item.route}
+                isSidebarOpen={true}
+              />
             ))}
           </nav>
         </aside>

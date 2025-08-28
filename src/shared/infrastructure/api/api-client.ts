@@ -47,11 +47,10 @@ export class ApiClient {
   private currentRefreshAttempts = 0;
 
   constructor(config: ApiClientConfig = {}) {
+    const baseURL =
+      config.baseURL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
     this.config = {
-      baseURL:
-        config.baseURL ||
-        process.env.PUBLIC_API_BASE_URL ||
-        "http://localhost:3000/api",
+      baseURL,
       timeout: config.timeout || 10000,
       enableRetry: config.enableRetry ?? true,
       enableTokenRefresh: config.enableTokenRefresh ?? true,

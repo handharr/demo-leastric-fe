@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 
 // Dummy user data for sidebar
 const user = {
@@ -10,32 +11,38 @@ const user = {
   email: "Jonosujono@gmail.com",
 };
 
+interface SettingMenuItem {
+  label: string;
+  icon: string;
+  route: string;
+}
+
 // Menu items for settings sidebar
-const MENU_ITEMS = [
+const MENU_ITEMS: SettingMenuItem[] = [
   {
     label: "Profile",
     icon: "/resources/icons/user/account.svg",
-    route: "/setting/profile",
+    route: "/profile",
   },
   {
     label: "Security",
     icon: "/resources/icons/security/shield-check.svg",
-    route: "/setting/security",
+    route: "/security",
   },
   {
     label: "Access Manager",
     icon: "/resources/icons/security/keyhole.svg",
-    route: "/setting/access",
+    route: "/access",
   },
   {
     label: "Customer Support",
     icon: "/resources/icons/menu/question-circle.svg",
-    route: "/setting/support",
+    route: "/customer-support",
   },
   {
     label: "Logout",
     icon: "/resources/icons/arrow/logout.svg",
-    route: "/setting/logout",
+    route: "/logout",
   },
 ];
 
@@ -44,7 +51,16 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleMenuClick = useCallback(
+    (item: SettingMenuItem) => {
+      setActiveIndex(MENU_ITEMS.indexOf(item));
+      router.push(item.route);
+    },
+    [router]
+  );
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-col">
@@ -77,10 +93,10 @@ export default function Layout({
                 className={clsx(
                   "flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors",
                   idx === activeIndex
-                    ? "bg-[#E6F4EA] text-[#2a6335] font-semibold"
-                    : "hover:bg-gray-100 text-gray-700"
+                    ? "bg-[#E6F4EA] text-brand-primary font-semibold"
+                    : "hover:bg-gray-100 text-typography-headline"
                 )}
-                onClick={() => setActiveIndex(idx)}
+                onClick={() => handleMenuClick(item)}
               >
                 <Image
                   src={item.icon}

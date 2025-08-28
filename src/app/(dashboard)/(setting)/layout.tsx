@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import SidebarMenuItem from "@/shared/presentation/components/sidebar-menu-item";
+import Image from "next/image";
+import clsx from "clsx";
 
 // Dummy user data for sidebar
 const user = {
@@ -13,27 +14,27 @@ const user = {
 const MENU_ITEMS = [
   {
     label: "Profile",
-    icon: "/resources/icons/user/account",
+    icon: "/resources/icons/user/account.svg",
     route: "/setting/profile",
   },
   {
     label: "Security",
-    icon: "/resources/icons/security/shield-check",
+    icon: "/resources/icons/security/shield-check.svg",
     route: "/setting/security",
   },
   {
     label: "Access Manager",
-    icon: "/resources/icons/security/keyhole",
+    icon: "/resources/icons/security/keyhole.svg",
     route: "/setting/access",
   },
   {
     label: "Customer Support",
-    icon: "/resources/icons/menu/question-circle",
+    icon: "/resources/icons/menu/question-circle.svg",
     route: "/setting/support",
   },
   {
     label: "Logout",
-    icon: "/resources/icons/arrow/logout",
+    icon: "/resources/icons/arrow/logout.svg",
     route: "/setting/logout",
   },
 ];
@@ -71,15 +72,28 @@ export default function Layout({
           {/* Menu */}
           <nav className="flex flex-col gap-1">
             {MENU_ITEMS.map((item, idx) => (
-              <SidebarMenuItem
+              <button
                 key={item.label}
-                iconSource={item.icon}
-                label={item.label}
-                isActive={idx === activeIndex}
+                className={clsx(
+                  "flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors",
+                  idx === activeIndex
+                    ? "bg-[#E6F4EA] text-[#2a6335] font-semibold"
+                    : "hover:bg-gray-100 text-gray-700"
+                )}
                 onClick={() => setActiveIndex(idx)}
-                route={item.route}
-                isSidebarOpen={true}
-              />
+              >
+                <Image
+                  src={item.icon}
+                  alt=""
+                  width={16}
+                  height={16}
+                  className={clsx(
+                    "transition-colors w-[16px] h-[16px]",
+                    idx === activeIndex ? "filter-none" : "grayscale"
+                  )}
+                />
+                <span>{item.label}</span>
+              </button>
             ))}
           </nav>
         </aside>

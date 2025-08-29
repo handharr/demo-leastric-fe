@@ -7,7 +7,7 @@ import {
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 
-const useDummy = true;
+const useDummy = false;
 
 export function useDevices() {
   const [devices, setDevices] = useState<DeviceModel[]>([]);
@@ -32,6 +32,7 @@ export function useDevices() {
         if (isErrorModel(result)) {
           setError(result.message);
         } else {
+          console.log("debugTest: ", result);
           setDevices(result); // Adjust if result shape differs
         }
       } catch (e: unknown) {

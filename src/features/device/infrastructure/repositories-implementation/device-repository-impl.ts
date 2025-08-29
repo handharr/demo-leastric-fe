@@ -23,7 +23,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     pathParam: GetDevicePathParams;
   }): Promise<DeviceModel | BaseErrorModel> {
     const result = await this.dataSource.getDeviceDetails({
-      deviceId: pathParam.deviceId,
+      deviceId: Number(pathParam.deviceId),
     });
 
     if (isErrorResponse(result)) {
@@ -32,6 +32,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
 
     if (result.flash?.type === "success" && result.data?.device) {
       return {
+        id: optional(result.data?.device?.id).orEmpty(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
         deviceType: optional(result.data?.device?.deviceType).orEmpty(),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),
@@ -50,13 +51,14 @@ export class DeviceRepositoryImpl implements DeviceRepository {
 
   async getAllDevices(): Promise<DeviceModel[] | BaseErrorModel> {
     const result = await this.dataSource.getAllDevices();
-
+    console.log("debugTest: ", result);
     if (isErrorResponse(result)) {
       return mapErrorResponseToModel({ response: result });
     }
 
     if (result.flash?.type === "success" && result.data?.devices) {
       return result.data.devices.map((device) => ({
+        id: optional(device.id).orEmpty(),
         deviceName: optional(device.deviceName).orEmpty(),
         deviceType: optional(device.deviceType).orEmpty(),
         tariffGroup: optional(device.tariffGroup).orEmpty(),
@@ -88,6 +90,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
 
     if (result.flash?.type === "success" && result.data?.device) {
       return {
+        id: optional(result.data?.device?.id).orEmpty(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
         deviceType: optional(result.data?.device?.deviceType).orEmpty(),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),
@@ -112,7 +115,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     deviceData: UpdateDeviceFormData;
   }): Promise<DeviceModel | BaseErrorModel> {
     const result = await this.dataSource.updateDeviceDetails({
-      deviceId: pathParam.deviceId,
+      deviceId: Number(pathParam.deviceId),
       deviceData,
     });
 
@@ -122,6 +125,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
 
     if (result.flash?.type === "success" && result.data?.device) {
       return {
+        id: optional(result.data?.device?.id).orEmpty(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
         deviceType: optional(result.data?.device?.deviceType).orEmpty(),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),
@@ -144,7 +148,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     pathParam: GetDevicePathParams;
   }): Promise<string | BaseErrorModel> {
     const result = await this.dataSource.deleteDevice({
-      deviceId: pathParam.deviceId,
+      deviceId: Number(pathParam.deviceId),
     });
 
     if (isErrorResponse(result)) {

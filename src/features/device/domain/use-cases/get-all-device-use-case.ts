@@ -17,6 +17,7 @@ export class GetAllDevicesUseCase {
   async execute(): Promise<DeviceModel[] | BaseErrorModel> {
     try {
       const devices = await this.deviceRepository.getAllDevices();
+      console.log("debugTest: ", devices);
       return devices;
     } catch (error) {
       console.error("Failed to get all devices:", error);

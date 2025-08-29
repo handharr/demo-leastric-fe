@@ -11,6 +11,7 @@ import {
   RetryHandler,
   RetryOptions,
 } from "@/shared/utils/helpers/retry-helper";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export interface ApiClientConfig {
   baseURL?: string;
@@ -98,6 +99,8 @@ export class ApiClient {
           _authFailureHandled?: boolean;
         };
 
+        Logger.error("ApiClient", "API Response Error:", error);
+
         // Handle 401 errors with automatic token refresh
         if (
           error.response?.status === 401 &&
@@ -110,20 +113,27 @@ export class ApiClient {
             const refreshSuccess = await this.handleTokenRefresh();
 
             if (refreshSuccess) {
+              Logger.info("ApiClient", "Token refreshed successfully");
               // Update the original request with new token
               const newToken = this.getAuthToken();
               if (newToken && originalRequest.headers) {
+                Logger.info(
+                  "ApiClient",
+                  "Setting Authorization header with new token"
+                );
                 originalRequest.headers.Authorization = newToken;
               }
 
               // Retry the original request
+              Logger.info("ApiClient", "Retrying original request");
               return this.axiosInstance(originalRequest);
             } else {
+              Logger.warn("ApiClient", "Token refresh failed");
               // Token refresh failed, handle auth failure
               await this.handleAuthFailure();
             }
           } catch (refreshError) {
-            console.error("Token refresh failed:", refreshError);
+            Logger.error("ApiClient", "Token refresh failed:", refreshError);
             await this.handleAuthFailure();
           }
         }
@@ -133,10 +143,12 @@ export class ApiClient {
           error.response?.status === 403 &&
           !originalRequest._authFailureHandled
         ) {
+          Logger.warn("ApiClient", "Handling 403 Forbidden error");
           originalRequest._authFailureHandled = true;
           await this.handleAuthFailure();
         }
 
+        Logger.error("ApiClient", "API Request Error:", error);
         return Promise.reject(error);
       }
     );
@@ -148,10 +160,12 @@ export class ApiClient {
   private initializeTokenRefreshHandler(): void {
     // Only setup if token refresh is enabled and no custom handler is set
     if (!this.config.enableTokenRefresh) {
+      Logger.warn("ApiClient", "Token refresh is disabled");
       return;
     }
 
     // Set up the default token refresh handler
+    Logger.info("ApiClient", "Setting up default token refresh handler");
     this.customTokenRefreshHandler = this.createDefaultTokenRefreshHandler();
   }
 
@@ -162,7 +176,7 @@ export class ApiClient {
     return {
       refreshToken: async (token: string) => {
         try {
-          console.log("Attempting token refresh...");
+          Logger.info("ApiClient", "Attempting token refresh...");
 
           // Use axios instance directly to avoid interceptors for refresh call
           const response = await axios.post<DefaultRefreshTokenResponse>(
@@ -177,25 +191,28 @@ export class ApiClient {
           );
 
           if (response.data.success && response.data.token) {
+            Logger.info("ApiClient", "Token refresh successful");
             return { success: true, token: response.data.token };
           }
 
-          console.warn(
+          Logger.warn(
+            "ApiClient",
             "Token refresh API returned failure:",
             response.data.message
           );
           return { success: false };
         } catch (error) {
-          console.error("Token refresh API call failed:", error);
+          Logger.error("ApiClient", "Token refresh API call failed:", error);
           return { success: false };
         }
       },
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onRefreshSuccess: (newToken: string) => {
-        console.log("Token refreshed successfully");
+        Logger.info("ApiClient", "Token refreshed successfully:", newToken);
+        this.setAuthToken(newToken);
       },
       onRefreshFailure: (error: unknown) => {
-        console.error("Token refresh failed, will trigger logout:", error);
+        Logger.error("ApiClient", "Token refresh failed:", error);
       },
     };
   }
@@ -204,6 +221,7 @@ export class ApiClient {
    * Set custom token refresh handler (overrides default)
    */
   setTokenRefreshHandler(handler: TokenRefreshHandler): void {
+    Logger.info("ApiClient", "Setting custom token refresh handler");
     this.customTokenRefreshHandler = handler;
   }
 
@@ -211,7 +229,8 @@ export class ApiClient {
    * Handle authentication failure - clear tokens and trigger logout
    */
   private async handleAuthFailure(): Promise<void> {
-    console.warn(
+    Logger.warn(
+      "ApiClient",
       "Authentication failed, clearing tokens and redirecting to login"
     );
 
@@ -225,9 +244,10 @@ export class ApiClient {
 
     // Call the auth failure callback (logout/redirect)
     try {
+      Logger.info("ApiClient", "Calling auth failure callback");
       this.config.onAuthFailure();
     } catch (error) {
-      console.error("Error during auth failure handling:", error);
+      Logger.error("ApiClient", "Error during auth failure handling:", error);
     }
   }
 
@@ -235,10 +255,11 @@ export class ApiClient {
    * Default auth failure handler
    */
   private defaultAuthFailureHandler(): void {
-    console.log("Default auth failure handler - tokens cleared");
+    Logger.info("ApiClient", "Default auth failure handler - tokens cleared");
 
     if (typeof window !== "undefined") {
       // Emit an event that components can listen to
+      Logger.info("ApiClient", "Emitting auth failure event");
       window.dispatchEvent(
         new CustomEvent("auth:failure", {
           detail: { reason: "authentication_failed" },
@@ -251,6 +272,7 @@ export class ApiClient {
    * Set auth failure handler
    */
   setAuthFailureHandler(handler: () => void): void {
+    Logger.info("ApiClient", "Setting custom auth failure handler");
     this.config.onAuthFailure = handler;
   }
 
@@ -258,36 +280,47 @@ export class ApiClient {
    * Handle token refresh with max attempts
    */
   private async handleTokenRefresh(): Promise<boolean> {
+    Logger.info(
+      "ApiClient",
+      "Handling token refresh:",
+      this.currentRefreshAttempts
+    );
     if (!this.customTokenRefreshHandler) {
-      console.warn("No token refresh handler available");
+      Logger.warn("ApiClient", "No token refresh handler available");
       return false;
     }
 
     // Check if we've exceeded max refresh attempts
     if (this.currentRefreshAttempts >= this.maxRefreshAttempts) {
-      console.warn("Max token refresh attempts exceeded");
+      Logger.warn("ApiClient", "Max token refresh attempts exceeded");
       return false;
     }
 
     // Prevent multiple refresh attempts
     if (this.isRefreshing && this.refreshPromise) {
+      Logger.info("ApiClient", "Waiting for ongoing token refresh");
       return this.refreshPromise;
     }
 
+    Logger.info("ApiClient", "Starting token refresh");
     this.isRefreshing = true;
     this.currentRefreshAttempts++;
     this.refreshPromise = this.performTokenRefresh();
 
     try {
+      Logger.info("ApiClient", "Waiting for token refresh to complete");
       const result = await this.refreshPromise;
-
+      Logger.info("ApiClient", "Token refresh result:", result);
       if (result) {
         // Reset attempts on successful refresh
+        Logger.info("ApiClient", "Token refresh successful");
         this.currentRefreshAttempts = 0;
       }
 
+      Logger.info("ApiClient", "Token refresh completed");
       return result;
     } finally {
+      Logger.info("ApiClient", "Token refresh attempt finished");
       this.isRefreshing = false;
       this.refreshPromise = null;
     }
@@ -295,34 +328,39 @@ export class ApiClient {
 
   private async performTokenRefresh(): Promise<boolean> {
     if (!this.customTokenRefreshHandler) {
+      Logger.warn("ApiClient", "No token refresh handler available");
       return false;
     }
 
     try {
       const refreshToken = this.getRefreshToken();
       if (!refreshToken) {
-        console.warn("No refresh token available");
+        Logger.warn("ApiClient", "No refresh token available");
         return false;
       }
+
+      Logger.info("ApiClient", "Attempting token refresh with:", refreshToken);
 
       const result = await this.customTokenRefreshHandler.refreshToken(
         refreshToken
       );
 
+      Logger.info("ApiClient", "Token refresh result:", result);
+
       if (result.success && result.token) {
         this.setAuthToken(result.token);
         this.customTokenRefreshHandler.onRefreshSuccess?.(result.token);
-        console.log("Token refresh successful");
+        Logger.info("ApiClient", "Token refresh successful", result.token);
         return true;
       } else {
-        console.warn("Token refresh returned failure");
+        Logger.warn("ApiClient", "Token refresh returned failure");
         this.customTokenRefreshHandler.onRefreshFailure?.(
           new Error("Token refresh failed")
         );
         return false;
       }
     } catch (error) {
-      console.error("Token refresh error:", error);
+      Logger.error("ApiClient", "Token refresh error:", error);
       this.customTokenRefreshHandler.onRefreshFailure?.(error);
       return false;
     }
@@ -335,7 +373,12 @@ export class ApiClient {
     apiCall: () => Promise<AxiosResponse<T>>,
     retryOptions?: Partial<RetryOptions>
   ): Promise<T> {
+    Logger.info("ApiClient", "Executing API call with retry");
     if (!this.config.enableRetry) {
+      Logger.info(
+        "ApiClient",
+        "Retry is disabled, executing API call without retry"
+      );
       const response = await apiCall();
       return response.data;
     }
@@ -344,6 +387,7 @@ export class ApiClient {
       ...this.config.retryOptions,
       ...retryOptions,
       retryCondition: (error: unknown) => {
+        Logger.info("ApiClient", "Checking retry condition");
         if (error && typeof error === "object" && "response" in error) {
           const axiosError = error as AxiosError;
           const status = axiosError.response?.status;
@@ -351,28 +395,34 @@ export class ApiClient {
           // Don't retry 4xx client errors (except 408, 429)
           // Don't retry 401 (handled by token refresh)
           if (status && status >= 400 && status < 500) {
+            Logger.info("ApiClient", "Not retrying 4xx error:", status);
             return status === 408 || status === 429;
           }
 
+          Logger.info("ApiClient", "Not retrying 5xx error:", status);
           // Retry 5xx server errors and network errors
           return !status || status >= 500;
         }
         return true; // Retry network errors
       },
       onRetry: (attempt, error) => {
-        console.log(`API retry attempt ${attempt}:`, error);
+        Logger.info("ApiClient", `API retry attempt ${attempt}:`, error);
         retryOptions?.onRetry?.(attempt, error);
       },
     };
 
     const result = await RetryHandler.withRetry(async () => {
+      Logger.info("ApiClient", "Executing API call");
       const response = await apiCall();
+      Logger.info("ApiClient", "API call executed successfully");
       return response.data;
     }, options);
 
     if (result.success && result.data !== undefined) {
+      Logger.info("ApiClient", "API call result:", result.data);
       return result.data;
     } else {
+      Logger.error("ApiClient", "API call failed:", result.error);
       throw result.error;
     }
   }
@@ -381,24 +431,33 @@ export class ApiClient {
    * Token management methods
    */
   private getAuthToken(): string {
+    Logger.info("ApiClient", "Getting auth token");
     if (typeof window === "undefined") return "";
     const token = storage.getAuthToken();
+    Logger.info("ApiClient", "Auth token retrieved:", token);
     return token ? `Bearer ${token}` : "";
   }
 
   private getRefreshToken(): string | null {
+    Logger.info("ApiClient", "Getting refresh token");
     if (typeof window === "undefined") return null;
-    return storage.getRefreshToken();
+    const token = storage.getRefreshToken();
+    Logger.info("ApiClient", "Refresh token retrieved:", token);
+    return token;
   }
 
   private setAuthToken(token: string): void {
+    Logger.info("ApiClient", "Setting auth token:", token);
     if (typeof window !== "undefined") {
+      Logger.info("ApiClient", "Storing auth token");
       storage.setAuthToken({ token });
     }
   }
 
   private clearTokens(): void {
+    Logger.info("ApiClient", "Clearing tokens");
     if (typeof window !== "undefined") {
+      Logger.info("ApiClient", "Removing auth token");
       storage.clearAuthData();
       storage.clearAuthData({ options: { useSessionStorage: true } });
     }
@@ -461,10 +520,11 @@ export class ApiClient {
     error: AxiosError<BaseErrorResponse>,
     defaultMessage: string
   ): BaseErrorResponse {
-    console.error("API Error:", error);
+    Logger.error("ApiClient", "API Error:", error);
 
     // Handle network errors
     if (!error.response) {
+      Logger.error("ApiClient", "Network error:", error);
       return {
         statusCode: 501,
         method: error.request?.method,
@@ -477,6 +537,7 @@ export class ApiClient {
       };
     }
 
+    Logger.error("ApiClient", "HTTP error:", error);
     // Handle HTTP errors with response data
     const responseData = error.response.data;
     const statusCode = error.response.status;

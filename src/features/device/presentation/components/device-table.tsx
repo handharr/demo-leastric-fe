@@ -22,6 +22,8 @@ export function DeviceTable() {
     );
   }
 
+  const devicesArray = Array.isArray(devices) ? devices : [];
+
   return (
     <div className="overflow-x-auto bg-white rounded-xl shadow border">
       {/* Table */}
@@ -43,7 +45,7 @@ export function DeviceTable() {
           </tr>
         </thead>
         <tbody>
-          {devices.map((d, i) => (
+          {devicesArray.map((d, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
               <td className="px-4 py-3">{d.deviceName}</td>
               <td className="px-4 py-3">{d.deviceType}</td>

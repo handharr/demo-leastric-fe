@@ -181,7 +181,7 @@ export class ApiClient {
           // Use axios instance directly to avoid interceptors for refresh call
           const response = await axios.post<DefaultRefreshTokenResponse>(
             `${this.config.baseURL}${this.config.refreshTokenEndpoint}`,
-            { token },
+            { refresh_token: token },
             {
               timeout: this.config.timeout,
               headers: {
@@ -235,7 +235,7 @@ export class ApiClient {
     );
 
     // Clear all tokens
-    this.clearTokens();
+    // this.clearTokens();
 
     // Reset refresh attempts
     this.currentRefreshAttempts = 0;

@@ -33,7 +33,7 @@ const MENU_ITEMS: SidebarMenuItemProps[] = [
   {
     label: "Setting",
     iconSource: "/resources/icons/system/setting",
-    route: "/setting",
+    route: "/profile",
   },
 ];
 

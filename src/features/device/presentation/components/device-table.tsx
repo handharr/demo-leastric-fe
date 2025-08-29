@@ -31,7 +31,6 @@ export function DeviceTable() {
         <thead>
           <tr className="bg-gray-50 text-gray-700">
             <th className="px-4 py-3 text-left font-semibold">Device name</th>
-            <th className="px-4 py-3 text-left font-semibold">Device Type</th>
             <th className="px-4 py-3 text-left font-semibold">Status</th>
             <th className="px-4 py-3 text-left font-semibold">Tariff Group</th>
             <th className="px-4 py-3 text-left font-semibold">Device Type</th>
@@ -48,12 +47,11 @@ export function DeviceTable() {
           {devicesArray.map((d, i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
               <td className="px-4 py-3">{d.deviceName}</td>
-              <td className="px-4 py-3">{d.deviceType}</td>
               <td className="px-4 py-3">
                 <StatusBadge status={optional(d.status).orDefault("Unknown")} />
               </td>
               <td className="px-4 py-3">{d.tariffGroup}</td>
-              <td className="px-4 py-3">{d.phase}</td>
+              <td className="px-4 py-3">{d.deviceType}</td>
               <td className="px-4 py-3">{d.power}</td>
               <td className="px-4 py-3">{d.location}</td>
               <td className="px-4 py-3">{d.subLocation}</td>

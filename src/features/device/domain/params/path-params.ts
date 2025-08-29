@@ -1,11 +1,11 @@
 export interface GetDevicePathParams {
-  deviceId: string;
+  deviceId: number;
 }
 
 export interface UpdateDevicePathParams {
-  deviceId: string;
+  deviceId: number;
 }
 
 export interface DeleteDevicePathParams {
-  deviceId: string;
+  deviceId: number;
 }

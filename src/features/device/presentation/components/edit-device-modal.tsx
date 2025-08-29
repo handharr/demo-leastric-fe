@@ -95,6 +95,7 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
           className="w-full border rounded px-3 py-2"
           value={deviceName}
           onChange={(e) => setDeviceName(e.target.value)}
+          required
         />
       </div>
       <div className="mb-4">

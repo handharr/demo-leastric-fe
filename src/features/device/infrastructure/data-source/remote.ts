@@ -17,6 +17,7 @@ import {
   UpdateDeviceFormData,
 } from "@/features/device/domain/params/data-params";
 import { DeviceDataSource } from "@/features/device/infrastructure/data-source/interface";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export class RemoteDeviceDataSource implements DeviceDataSource {
   private apiClient: ApiClient;
@@ -35,11 +36,17 @@ export class RemoteDeviceDataSource implements DeviceDataSource {
   }: {
     deviceId: number;
   }): Promise<BaseResponse<GetDeviceResponse> | BaseErrorResponse> {
+    Logger.info("RemoteDeviceDataSource", "Fetching device details:", deviceId);
     try {
       return await this.apiClient.get<BaseResponse<GetDeviceResponse>>(
         `v1/devices/${deviceId}`
       );
     } catch (error) {
+      Logger.error(
+        "RemoteDeviceDataSource",
+        "Error fetching device details:",
+        error
+      );
       return this.apiClient.handleError(
         error as AxiosError<BaseErrorResponse>,
         "Failed to retrieve device details. Please try again."

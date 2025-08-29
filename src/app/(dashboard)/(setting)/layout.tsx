@@ -30,11 +30,6 @@ const MENU_ITEMS: SettingMenuItem[] = [
     route: "/security",
   },
   {
-    label: "Access Manager",
-    icon: "/resources/icons/security/keyhole.svg",
-    route: "/access",
-  },
-  {
     label: "Customer Support",
     icon: "/resources/icons/menu/question-circle.svg",
     route: "/customer-support",
@@ -42,7 +37,7 @@ const MENU_ITEMS: SettingMenuItem[] = [
   {
     label: "Logout",
     icon: "/resources/icons/arrow/logout.svg",
-    route: "/logout",
+    route: "",
   },
 ];
 
@@ -53,14 +48,29 @@ export default function Layout({
 }>) {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleMenuClick = useCallback(
     (item: SettingMenuItem) => {
+      if (item.label === "Logout") {
+        setShowLogoutDialog(true);
+        return;
+      }
       setActiveIndex(MENU_ITEMS.indexOf(item));
       router.push(item.route);
     },
     [router]
   );
+
+  const handleLogout = () => {
+    setShowLogoutDialog(false);
+    // TODO: Add your logout logic here (e.g., signOut())
+    router.push("/auth/login");
+  };
+
+  const handleCancelLogout = () => {
+    setShowLogoutDialog(false);
+  };
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-col">
@@ -120,6 +130,30 @@ export default function Layout({
           </div>
         </main>
       </div>
+      {/* Logout Dialog */}
+      {showLogoutDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-2xl p-8 min-w-[350px] shadow-lg flex flex-col items-center">
+            <div className="text-xl font-semibold mb-6 text-gray-800 text-center">
+              Are you sure you want to Logout?
+            </div>
+            <div className="flex gap-4 w-full">
+              <button
+                className="flex-1 border border-gray-300 rounded-xl py-3 text-lg font-medium text-gray-700 hover:bg-gray-100 transition"
+                onClick={handleCancelLogout}
+              >
+                Cancel
+              </button>
+              <button
+                className="flex-1 bg-[#2a6335] rounded-xl py-3 text-lg font-medium text-white hover:bg-[#215027] transition"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

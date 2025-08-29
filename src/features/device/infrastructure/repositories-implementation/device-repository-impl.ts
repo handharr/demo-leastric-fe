@@ -23,13 +23,17 @@ export class DeviceRepositoryImpl implements DeviceRepository {
   }: {
     pathParam: GetDevicePathParams;
   }): Promise<DeviceModel | BaseErrorModel> {
+    Logger.info("DeviceRepositoryImpl", "getDevice", pathParam);
     const result = await this.dataSource.getDeviceDetails({
       deviceId: Number(pathParam.deviceId),
     });
 
     if (isErrorResponse(result)) {
+      Logger.error("DeviceRepositoryImpl", "getDevice", result);
       return mapErrorResponseToModel({ response: result });
     }
+
+    Logger.info("DeviceRepositoryImpl", "getDevice", result);
 
     if (result.flash?.type === "success" && result.data?.device) {
       return {

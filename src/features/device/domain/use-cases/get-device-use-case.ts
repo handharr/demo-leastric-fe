@@ -7,6 +7,7 @@ import {
   BaseErrorModel,
   createErrorModel,
 } from "@/shared/domain/entities/base-error-model";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export class GetDeviceUseCase {
   constructor(
@@ -22,9 +23,10 @@ export class GetDeviceUseCase {
   }): Promise<DeviceModel | BaseErrorModel> {
     try {
       const device = await this.deviceRepository.getDevice({ pathParam });
+      Logger.info("GetDeviceUseCase", "Successfully retrieved device:", device);
       return device;
     } catch (error) {
-      console.error("Failed to get device:", error);
+      Logger.error("GetDeviceUseCase", "Failed to get device:", error);
       return createErrorModel({
         message: "Failed to get device",
         details: error instanceof Error ? error.message : "Unknown error",

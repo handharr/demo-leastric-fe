@@ -1,7 +1,7 @@
 class Logger {
   private static env =
     typeof process !== "undefined"
-      ? process.env.NEXT_NODE_ENV || process.env.NODE_ENV
+      ? process.env.NEXT_PUBLIC_NODE_ENV || process.env.NEXT_PUBLIC_NODE_ENV
       : undefined;
 
   private static shouldLog(): boolean {
@@ -10,7 +10,7 @@ class Logger {
   }
 
   static debug(identifier: string, ...args: unknown[]) {
-    if (Logger.shouldLog()) console.debug(`[Logger][${identifier}]`, ...args);
+    if (Logger.shouldLog()) console.log(`[Logger][${identifier}]`, ...args);
   }
 
   static info(identifier: string, ...args: unknown[]) {

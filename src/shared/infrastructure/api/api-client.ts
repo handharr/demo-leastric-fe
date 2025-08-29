@@ -62,7 +62,7 @@ export class ApiClient {
         backoffFactor: 2,
       },
       onAuthFailure: config.onAuthFailure || this.defaultAuthFailureHandler,
-      refreshTokenEndpoint: config.refreshTokenEndpoint || "/auth/refresh",
+      refreshTokenEndpoint: config.refreshTokenEndpoint || "/v1/refresh",
     };
 
     this.axiosInstance = axios.create({
@@ -256,6 +256,7 @@ export class ApiClient {
    */
   private defaultAuthFailureHandler(): void {
     Logger.info("ApiClient", "Default auth failure handler - tokens cleared");
+    return;
 
     if (typeof window !== "undefined") {
       // Emit an event that components can listen to
@@ -265,6 +266,9 @@ export class ApiClient {
           detail: { reason: "authentication_failed" },
         })
       );
+      // Redirect to /login
+      Logger.info("ApiClient", "Redirecting to /login");
+      window.location.href = "/login";
     }
   }
 

@@ -95,13 +95,52 @@ export class OptionalBoolean {
   }
 }
 
+export class OptionalArray<T> {
+  constructor(private value: T[] | null | undefined) {}
+
+  orEmpty(): T[] {
+    return this.value ?? [];
+  }
+
+  orDefault(defaultValue: T[]): T[] {
+    return this.value ?? defaultValue;
+  }
+
+  isNullOrEmpty(): boolean {
+    return this.value == null || this.value.length === 0;
+  }
+
+  isNotNullOrEmpty(): boolean {
+    return !this.isNullOrEmpty();
+  }
+
+  ifPresent(action: (value: T[]) => void): OptionalArray<T> {
+    if (this.value != null) {
+      action(this.value);
+    }
+    return this;
+  }
+
+  map<R>(mapper: (value: T[]) => R): R | null {
+    return this.value != null ? mapper(this.value) : null;
+  }
+
+  get(): T[] | null | undefined {
+    return this.value;
+  }
+}
+
 // Factory functions for creating optionals
 export function optional(value: string | null | undefined): OptionalString;
 export function optional(value: number | null | undefined): OptionalNumber;
 export function optional(value: boolean | null | undefined): OptionalBoolean;
+export function optional<T>(value: T[] | null | undefined): OptionalArray<T>;
 export function optional(value: unknown): unknown {
   const valueType = typeof value;
 
+  if (Array.isArray(value) || value === null || value === undefined) {
+    return new OptionalArray(value as unknown[]);
+  }
   if (valueType === "string" || value === null || value === undefined) {
     return new OptionalString(value as string | null | undefined);
   }

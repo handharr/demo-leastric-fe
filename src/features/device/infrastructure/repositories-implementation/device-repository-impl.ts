@@ -13,6 +13,7 @@ import {
   UpdateDeviceFormData,
 } from "@/features/device/domain/params/data-params";
 import { DeviceDataSource } from "@/features/device/infrastructure/data-source/interface";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export class DeviceRepositoryImpl implements DeviceRepository {
   constructor(private dataSource: DeviceDataSource) {}
@@ -32,7 +33,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
 
     if (result.flash?.type === "success" && result.data?.device) {
       return {
-        id: optional(result.data?.device?.id).orEmpty(),
+        id: optional(result.data?.device?.id).orZero(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
         deviceType: optional(result.data?.device?.deviceType).orEmpty(),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),
@@ -51,14 +52,19 @@ export class DeviceRepositoryImpl implements DeviceRepository {
 
   async getAllDevices(): Promise<DeviceModel[] | BaseErrorModel> {
     const result = await this.dataSource.getAllDevices();
-    console.log("debugTest: ", result);
+
+    Logger.info("DeviceRepositoryImpl", "getAllDevices", result);
+
     if (isErrorResponse(result)) {
+      Logger.info("DeviceRepositoryImpl", "getAllDevices", result);
       return mapErrorResponseToModel({ response: result });
     }
 
     if (result.flash?.type === "success" && result.data?.devices) {
-      return result.data.devices.map((device) => ({
-        id: optional(device.id).orEmpty(),
+      const devices = optional(result.data?.devices).orEmpty();
+      Logger.info("DeviceRepositoryImpl", "getAllDevices success", devices);
+      return devices.map((device) => ({
+        id: optional(device.id).orZero(),
         deviceName: optional(device.deviceName).orEmpty(),
         deviceType: optional(device.deviceType).orEmpty(),
         tariffGroup: optional(device.tariffGroup).orEmpty(),
@@ -67,6 +73,8 @@ export class DeviceRepositoryImpl implements DeviceRepository {
         detailLocation: optional(device.detailLocation).orEmpty(),
       }));
     }
+
+    Logger.error("DeviceRepositoryImpl", "getAllDevices error", result);
 
     return createErrorModel({
       message: "Unexpected error",
@@ -90,7 +98,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
 
     if (result.flash?.type === "success" && result.data?.device) {
       return {
-        id: optional(result.data?.device?.id).orEmpty(),
+        id: optional(result.data?.device?.id).orZero(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
         deviceType: optional(result.data?.device?.deviceType).orEmpty(),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),
@@ -125,7 +133,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
 
     if (result.flash?.type === "success" && result.data?.device) {
       return {
-        id: optional(result.data?.device?.id).orEmpty(),
+        id: optional(result.data?.device?.id).orZero(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
         deviceType: optional(result.data?.device?.deviceType).orEmpty(),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),

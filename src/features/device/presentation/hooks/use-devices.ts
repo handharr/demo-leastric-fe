@@ -6,6 +6,7 @@ import {
 } from "@/features/device/domain/entities/device-types";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
+import { Logger } from "@/shared/utils/logger/logger";
 
 const useDummy = false;
 
@@ -29,10 +30,11 @@ export function useDevices() {
         const useCase = new GetAllDevicesUseCase();
         const result = await useCase.execute();
 
+        Logger.info("useDevices", "execute", result);
+
         if (isErrorModel(result)) {
           setError(result.message);
         } else {
-          console.log("debugTest: ", result);
           setDevices(result); // Adjust if result shape differs
         }
       } catch (e: unknown) {

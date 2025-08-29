@@ -1,5 +1,5 @@
 export interface DeviceResponse {
-  id?: string;
+  id?: number;
   deviceName?: string;
   deviceType?: string;
   tariffGroup?: string;

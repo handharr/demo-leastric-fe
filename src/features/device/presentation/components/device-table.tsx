@@ -2,9 +2,19 @@ import { StatusBadge } from "@/shared/presentation/components/status-badge";
 import { useDevices } from "@/features/device/presentation/hooks/use-devices";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { EditDeviceModal } from "@/features/device/presentation/components/edit-device-modal";
+import { useState } from "react";
+import {
+  PaginationModel,
+  Pagination,
+} from "@/shared/presentation/components/pagination";
 
 export function DeviceTable() {
   const { devices, loading, error } = useDevices();
+  const [pagination, setPagination] = useState<PaginationModel>({
+    total: 10,
+    page: 1,
+    pageSize: 10,
+  });
 
   if (loading) {
     return (
@@ -73,33 +83,10 @@ export function DeviceTable() {
       </div>
 
       {/* Pagination */}
-      <div className="w-full bg-gray-50 border-t rounded-b-xl">
-        <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 text-gray-600 text-sm gap-2">
-          <div className="flex items-center gap-1 overflow-x-auto">
-            <button className="p-1 rounded hover:bg-gray-200" disabled>
-              <span className="text-gray-400">&laquo;</span>
-            </button>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <button
-                key={n}
-                className={`px-2 py-1 rounded ${
-                  n === 1
-                    ? "bg-green-100 border border-brand-secondary text-brand-primary"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-            <button className="p-1 rounded hover:bg-gray-200">
-              <span className="text-gray-600">&raquo;</span>
-            </button>
-          </div>
-          <span>
-            Show <b>1-10</b> of <b>100</b> data
-          </span>
-        </div>
-      </div>
+      <Pagination
+        model={pagination}
+        onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
+      />
     </div>
   );
 }

@@ -12,6 +12,8 @@ import {
   RetryOptions,
 } from "@/shared/utils/helpers/retry-helper";
 import { Logger } from "@/shared/utils/logger/logger";
+import { BaseResponse } from "@/shared/infrastructure/model/base-response";
+import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 
 export interface ApiClientConfig {
   baseURL?: string;
@@ -26,16 +28,17 @@ export interface ApiClientConfig {
 export interface TokenRefreshHandler {
   refreshToken: (
     token: string
-  ) => Promise<{ success: boolean; token?: string }>;
-  onRefreshSuccess?: (newToken: string) => void;
+  ) => Promise<{ success: boolean; token?: DefaultRefreshTokenResponse }>;
+  onRefreshSuccess?: (newToken: DefaultRefreshTokenResponse) => void;
   onRefreshFailure?: (error: unknown) => void;
 }
 
 // Default refresh token response interface
 interface DefaultRefreshTokenResponse {
-  success: boolean;
-  token?: string;
-  message?: string;
+  tokens: {
+    access_token?: string;
+    refresh_token?: string;
+  };
 }
 
 export class ApiClient {
@@ -179,7 +182,9 @@ export class ApiClient {
           Logger.info("ApiClient", "Attempting token refresh...");
 
           // Use axios instance directly to avoid interceptors for refresh call
-          const response = await axios.post<DefaultRefreshTokenResponse>(
+          const response = await axios.post<
+            BaseResponse<DefaultRefreshTokenResponse>
+          >(
             `${this.config.baseURL}${this.config.refreshTokenEndpoint}`,
             { refresh_token: token },
             {
@@ -191,15 +196,18 @@ export class ApiClient {
             }
           );
 
-          if (response.data.success && response.data.token) {
+          if (
+            response.data.flash?.type == "success" &&
+            response.data.data?.tokens
+          ) {
             Logger.info("ApiClient", "Token refresh successful");
-            return { success: true, token: response.data.token };
+            return { success: true, tokens: response.data.data };
           }
 
           Logger.warn(
             "ApiClient",
             "Token refresh API returned failure:",
-            response.data.message
+            optional(response.data.flash?.message).orEmpty()
           );
           return { success: false };
         } catch (error) {
@@ -207,9 +215,8 @@ export class ApiClient {
           return { success: false };
         }
       },
-      onRefreshSuccess: (newToken: string) => {
+      onRefreshSuccess: (newToken: DefaultRefreshTokenResponse) => {
         Logger.info("ApiClient", "Token refreshed successfully:", newToken);
-        this.setAuthToken(newToken);
       },
       onRefreshFailure: (error: unknown) => {
         Logger.error("ApiClient", "Token refresh failed:", error);
@@ -352,7 +359,10 @@ export class ApiClient {
       Logger.info("ApiClient", "Token refresh result:", result);
 
       if (result.success && result.token) {
-        this.setAuthToken(result.token);
+        this.setAuthToken(optional(result.token.tokens.access_token).orEmpty());
+        this.setRefreshToken(
+          optional(result.token.tokens.refresh_token).orEmpty()
+        );
         this.customTokenRefreshHandler.onRefreshSuccess?.(result.token);
         Logger.info("ApiClient", "Token refresh successful", result.token);
         return true;
@@ -455,6 +465,14 @@ export class ApiClient {
     if (typeof window !== "undefined") {
       Logger.info("ApiClient", "Storing auth token");
       storage.setAuthToken({ token });
+    }
+  }
+
+  private setRefreshToken(token: string): void {
+    Logger.info("ApiClient", "Setting refresh token:", token);
+    if (typeof window !== "undefined") {
+      Logger.info("ApiClient", "Storing refresh token");
+      storage.setRefreshToken({ token });
     }
   }
 

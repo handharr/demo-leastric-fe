@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { GetDeviceUseCase } from "@/features/device/domain/use-cases/get-device-use-case";
 import {
   DeviceModel,
@@ -28,45 +28,44 @@ export function useGetDevice({
     [getDevicePathParams.deviceId]
   );
 
-  useEffect(() => {
-    if (!enabled) return;
+  const fetchDevice = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    if (useDummy) {
+      setDevice(
+        deviceModelDummies.find((d) => d.id === pathParams.deviceId) || null
+      );
+      setLoading(false);
+      return;
+    }
 
     const getDeviceUseCase = new GetDeviceUseCase();
 
-    const fetchDevice = async () => {
-      setLoading(true);
-      setError(null);
-
-      if (useDummy) {
-        setDevice(
-          deviceModelDummies.find((d) => d.id === pathParams.deviceId) || null
-        );
-        setLoading(false);
-        return;
+    try {
+      const result = await getDeviceUseCase.execute({
+        pathParam: pathParams,
+      });
+      Logger.info("useGetDevice", "Fetched device:", result);
+      if (isErrorModel(result)) {
+        Logger.error("useGetDevice", "Error fetching device:", result);
+        setError(result.message);
+      } else {
+        Logger.info("useGetDevice", "Successfully fetched device:", result);
+        setDevice(result);
       }
+    } catch (err) {
+      Logger.error("useGetDevice", "Error fetching device:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  }, [pathParams]);
 
-      try {
-        const result = await getDeviceUseCase.execute({
-          pathParam: pathParams,
-        });
-        Logger.info("useGetDevice", "Fetched device:", result);
-        if (isErrorModel(result)) {
-          Logger.error("useGetDevice", "Error fetching device:", result);
-          setError(result.message);
-        } else {
-          Logger.info("useGetDevice", "Successfully fetched device:", result);
-          setDevice(result);
-        }
-      } catch (err) {
-        Logger.error("useGetDevice", "Error fetching device:", err);
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
+  useEffect(() => {
+    if (!enabled) return;
     fetchDevice();
-  }, [pathParams, enabled]);
+  }, [fetchDevice, enabled]);
 
   return { device, loading, error };
 }

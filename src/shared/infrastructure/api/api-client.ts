@@ -186,6 +186,7 @@ export class ApiClient {
               timeout: this.config.timeout,
               headers: {
                 "Content-Type": "application/json",
+                Authorization: this.getAuthToken(),
               },
             }
           );

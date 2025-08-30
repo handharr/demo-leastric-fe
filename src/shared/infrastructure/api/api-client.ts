@@ -206,7 +206,6 @@ export class ApiClient {
           return { success: false };
         }
       },
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onRefreshSuccess: (newToken: string) => {
         Logger.info("ApiClient", "Token refreshed successfully:", newToken);
         this.setAuthToken(newToken);

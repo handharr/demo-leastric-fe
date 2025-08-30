@@ -32,15 +32,25 @@ type EditDeviceModalProps = {
 };
 
 export function EditDeviceModal({ device }: EditDeviceModalProps) {
+  // MARK: STATES
+  // Local state for modal open/close
   const [open, setOpen] = useState(false);
   const { showPopup } = usePopup();
-
+  // Add local state for editable fields
+  const [deviceName, setDeviceName] = useState(device.deviceName);
+  const [tariffGroup, setTariffGroup] = useState(
+    optional(device.tariffGroup).orEmpty()
+  );
+  const [location, setLocation] = useState(optional(device.location).orEmpty());
   // Fetch latest device data when modal opens
   const {
     device: fetchedDevice,
     loading: loadingDevice,
     error: errorDevice,
-  } = useGetDevice({ deviceId: device.id });
+  } = useGetDevice({
+    getDevicePathParams: { deviceId: device.id },
+    enabled: open,
+  });
   const {
     loading: updating,
     error: updateError,
@@ -49,17 +59,10 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
     resetUpdateSuccess,
   } = useUpdateDevice();
 
-  // Add local state for editable fields
-  const [deviceName, setDeviceName] = useState(device.deviceName);
-  const [tariffGroup, setTariffGroup] = useState(
-    optional(device.tariffGroup).orEmpty()
-  );
-  const [location, setLocation] = useState(optional(device.location).orEmpty());
-
   // Update local state when fetchedDevice changes
   useEffect(() => {
     if (fetchedDevice) {
-      setDeviceName(fetchedDevice.deviceName);
+      setDeviceName(optional(fetchedDevice.deviceName).orEmpty());
       setTariffGroup(optional(fetchedDevice.tariffGroup).orEmpty());
       setLocation(optional(fetchedDevice.location).orEmpty());
     }

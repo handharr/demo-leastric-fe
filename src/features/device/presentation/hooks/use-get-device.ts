@@ -10,9 +10,17 @@ import { Logger } from "@/shared/utils/logger/logger";
 
 const useDummy = false; // Toggle this to switch between dummy and real data
 
-export function useGetDevice(getDevicePathParams: GetDevicePathParams) {
+interface UseGetDeviceProps {
+  getDevicePathParams: GetDevicePathParams;
+  enabled?: boolean;
+}
+
+export function useGetDevice({
+  getDevicePathParams,
+  enabled = true,
+}: UseGetDeviceProps) {
   const [device, setDevice] = useState<DeviceModel | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const pathParams = useMemo(
@@ -21,6 +29,8 @@ export function useGetDevice(getDevicePathParams: GetDevicePathParams) {
   );
 
   useEffect(() => {
+    if (!enabled) return;
+
     const getDeviceUseCase = new GetDeviceUseCase();
 
     const fetchDevice = async () => {
@@ -56,7 +66,7 @@ export function useGetDevice(getDevicePathParams: GetDevicePathParams) {
     };
 
     fetchDevice();
-  }, [pathParams]);
+  }, [pathParams, enabled]);
 
   return { device, loading, error };
 }

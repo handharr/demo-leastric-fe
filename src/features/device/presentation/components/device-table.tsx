@@ -7,6 +7,10 @@ import {
   PaginationModel,
   Pagination,
 } from "@/shared/presentation/components/pagination";
+import {
+  EmptyData,
+  EmptyDataState,
+} from "@/shared/presentation/components/empty-data";
 
 export function DeviceTable() {
   const { devices, loading, error } = useDevices();
@@ -18,9 +22,7 @@ export function DeviceTable() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-40">
-        Loading devices...
-      </div>
+      <EmptyData message="Loading Devices..." state={EmptyDataState.LOADING} />
     );
   }
 

@@ -6,17 +6,3 @@ export interface SidebarMenuItemProps {
   isSidebarOpen?: boolean;
   route: string;
 }
-
-export enum EmptyDataState {
-  EMPTY = "empty",
-  LOADING = "loading",
-  ERROR = "error",
-}
-
-export interface EmptyDataProps {
-  message?: string;
-  description?: string;
-  onRefresh?: () => void;
-  refreshLabel?: string;
-  state?: EmptyDataState;
-}

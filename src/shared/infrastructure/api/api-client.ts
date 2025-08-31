@@ -28,7 +28,7 @@ export interface ApiClientConfig {
 export interface TokenRefreshHandler {
   refreshToken: (
     token: string
-  ) => Promise<{ success: boolean; token?: DefaultRefreshTokenResponse }>;
+  ) => Promise<{ success: boolean; data?: DefaultRefreshTokenResponse }>;
   onRefreshSuccess?: (newToken: DefaultRefreshTokenResponse) => void;
   onRefreshFailure?: (error: unknown) => void;
 }
@@ -201,7 +201,7 @@ export class ApiClient {
             response.data.data?.tokens
           ) {
             Logger.info("ApiClient", "Token refresh successful");
-            return { success: true, tokens: response.data.data };
+            return { success: true, data: response.data.data };
           }
 
           Logger.warn(
@@ -356,15 +356,15 @@ export class ApiClient {
         refreshToken
       );
 
-      Logger.info("ApiClient", "Token refresh result:", result);
+      Logger.info("ApiClient", "customTokenRefreshHandler result:", result);
 
-      if (result.success && result.token) {
-        this.setAuthToken(optional(result.token.tokens.access_token).orEmpty());
+      if (result.success && result.data?.tokens) {
+        this.setAuthToken(optional(result.data.tokens.access_token).orEmpty());
         this.setRefreshToken(
-          optional(result.token.tokens.refresh_token).orEmpty()
+          optional(result.data.tokens.refresh_token).orEmpty()
         );
-        this.customTokenRefreshHandler.onRefreshSuccess?.(result.token);
-        Logger.info("ApiClient", "Token refresh successful", result.token);
+        this.customTokenRefreshHandler.onRefreshSuccess?.(result.data);
+        Logger.info("ApiClient", "Token refresh successful", result.data);
         return true;
       } else {
         Logger.warn("ApiClient", "Token refresh returned failure");

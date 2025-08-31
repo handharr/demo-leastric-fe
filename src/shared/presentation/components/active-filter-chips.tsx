@@ -13,8 +13,17 @@ export function ActiveFilterChips<T extends Record<string, unknown>>({
   onChange,
   meta,
 }: ActiveFilterChipsProps<T>) {
+  const hasActive = Object.entries(meta).some(([key, config]) => {
+    const value = filters[key as keyof T];
+    return config.type === FilterType.Single
+      ? value !== config.defaultValue
+      : Array.isArray(value) &&
+          value.length > 0 &&
+          JSON.stringify(value) !== JSON.stringify(config.defaultValue);
+  });
+
   return (
-    <div className="flex flex-wrap gap-3 mb-6">
+    <div className={`flex flex-wrap gap-3${hasActive ? " mb-6" : ""}`}>
       {Object.entries(meta).map(([key, config]) => {
         const value = filters[key as keyof T];
         const isActive =

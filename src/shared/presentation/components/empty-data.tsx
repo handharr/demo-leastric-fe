@@ -1,6 +1,11 @@
 import React from "react";
 import Image from "next/image";
-import { EmptyDataProps, EmptyDataState } from "@/shared/presentation/types/ui";
+
+export enum EmptyDataState {
+  EMPTY = "empty",
+  LOADING = "loading",
+  ERROR = "error",
+}
 
 const stateConfig = {
   [EmptyDataState.EMPTY]: {
@@ -23,6 +28,14 @@ const stateConfig = {
   },
 };
 
+export interface EmptyDataProps {
+  message?: string;
+  description?: string;
+  onRefresh?: () => void;
+  refreshLabel?: string;
+  state?: EmptyDataState;
+}
+
 export const EmptyData: React.FC<EmptyDataProps> = ({
   state = EmptyDataState.EMPTY,
   message,
@@ -33,7 +46,7 @@ export const EmptyData: React.FC<EmptyDataProps> = ({
   const config = stateConfig[state] || stateConfig[EmptyDataState.EMPTY];
   return (
     <div
-      className="flex flex-col items-center justify-center w-full min-h-[200px] text-typography-headline"
+      className="flex flex-col items-center justify-center w-full min-h-[200px] min-w-[300px] text-typography-headline"
       data-testid="empty-data"
     >
       <Image

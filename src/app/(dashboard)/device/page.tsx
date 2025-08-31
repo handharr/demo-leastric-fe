@@ -32,14 +32,14 @@ export default function DevicePage() {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-[16px]">
         <h1 className="text-2xl font-bold text-typography-headline">
           Device List
         </h1>
       </div>
 
       {/* Filter and search Section */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-[16px]">
         {/* Search Input */}
         <div className="flex-1 flex items-center bg-white rounded-lg border px-3 py-2 max-w-xs">
           <Image

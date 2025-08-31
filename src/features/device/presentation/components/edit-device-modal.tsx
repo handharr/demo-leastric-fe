@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DeviceModel } from "@/features/device/domain/entities/device-types";
-import { Select } from "@/shared/presentation/components/select";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { useGetDevice } from "@/features/device/presentation/hooks/use-get-device";
 import { useUpdateDevice } from "@/features/device/presentation/hooks/use-update-device";
@@ -9,23 +8,10 @@ import {
   usePopup,
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
-
-const tariffOptions = [
-  { label: "R1", value: "R1" },
-  { label: "R2", value: "R2" },
-  { label: "B3", value: "B3" },
-  { label: "I3", value: "I3" },
-  { label: "I4", value: "I4" },
-  { label: "P1", value: "P1" },
-];
-
-const locationOptions = [
-  { label: "Location 1", value: "Location 1" },
-  { label: "Location 2", value: "Location 2" },
-  { label: "Location 3", value: "Location 3" },
-  { label: "Location 4", value: "Location 4" },
-  { label: "Location 5", value: "Location 5" },
-];
+import {
+  EmptyData,
+  EmptyDataState,
+} from "@/shared/presentation/components/empty-data";
 
 type EditDeviceModalProps = {
   device: DeviceModel;
@@ -62,11 +48,26 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
   // Update local state when fetchedDevice changes
   useEffect(() => {
     if (fetchedDevice) {
-      setDeviceName(optional(fetchedDevice.deviceName).orEmpty());
-      setTariffGroup(optional(fetchedDevice.tariffGroup).orEmpty());
-      setLocation(optional(fetchedDevice.location).orEmpty());
+      const newDeviceName = optional(fetchedDevice.deviceName).orEmpty();
+      if (newDeviceName !== "") {
+        setDeviceName(newDeviceName);
+      } else {
+        setDeviceName(device.deviceName);
+      }
+      const newTariffGroup = optional(fetchedDevice.tariffGroup).orEmpty();
+      if (newTariffGroup !== "") {
+        setTariffGroup(newTariffGroup);
+      } else {
+        setTariffGroup(device.tariffGroup);
+      }
+      const newLocation = optional(fetchedDevice.location).orEmpty();
+      if (newLocation !== "") {
+        setLocation(newLocation);
+      } else {
+        setLocation(device.location);
+      }
     }
-  }, [fetchedDevice]);
+  }, [fetchedDevice, device]);
 
   // Handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,8 +92,11 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
   }, [updateSuccess, showPopup, resetUpdateSuccess]);
 
   const formContent = () => (
-    <form className="min-w-[30vw]" onSubmit={handleSubmit}>
-      <div className="mb-4">
+    <form
+      className="flex flex-col gap-[16px] min-w-[30vw]"
+      onSubmit={handleSubmit}
+    >
+      <div>
         <label className="block text-sm font-medium mb-1">Device name</label>
         <input
           className="w-full border rounded px-3 py-2"
@@ -101,40 +105,21 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
           required
         />
       </div>
-      <div className="mb-4">
+      <div>
         <label className="block text-sm font-medium mb-1">Tariff</label>
-        <Select
-          value={tariffGroup}
-          onChange={setTariffGroup}
-          options={tariffOptions}
-          required
+        <input
+          disabled
+          className="w-full border rounded px-3 py-2 disabled:bg-form-disabled"
+          value={fetchedDevice?.tariffGroup ?? device.tariffGroup}
         />
       </div>
-      <div className="mb-4">
+      <div>
         <label className="block text-sm font-medium mb-1">Locations</label>
-        <Select
+        <input
+          className="w-full border rounded px-3 py-2"
           value={location}
-          onChange={setLocation}
-          options={locationOptions}
+          onChange={(e) => setLocation(e.target.value)}
           required
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Sub-location</label>
-        <input
-          disabled
-          className="w-full border rounded px-3 py-2 disabled:bg-form-disabled"
-          value={fetchedDevice?.subLocation ?? device.subLocation}
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">
-          Detail location
-        </label>
-        <input
-          disabled
-          className="w-full border rounded px-3 py-2 disabled:bg-form-disabled"
-          value={fetchedDevice?.detailLocation ?? device.detailLocation}
         />
       </div>
       {updateError && <div className="text-red-500 mb-2">{updateError}</div>}
@@ -183,9 +168,12 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
         description=""
       >
         {loadingDevice ? (
-          <div>Loading...</div>
+          <EmptyData
+            message="Loading device..."
+            state={EmptyDataState.LOADING}
+          />
         ) : errorDevice ? (
-          <div className="text-red-500">{errorDevice}</div>
+          <EmptyData message={errorDevice} state={EmptyDataState.ERROR} />
         ) : fetchedDevice ? (
           formContent()
         ) : null}

@@ -23,7 +23,7 @@ type UpdateDeviceResult = {
   resetUpdateSuccess: () => void;
 };
 
-const isUseDummy = true;
+const isUseDummy = false;
 
 export function useUpdateDevice(): UpdateDeviceResult {
   const [loading, setLoading] = useState(false);

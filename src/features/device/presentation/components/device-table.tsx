@@ -11,9 +11,10 @@ import {
   EmptyData,
   EmptyDataState,
 } from "@/shared/presentation/components/empty-data";
+import { getDeviceTypeLabel } from "@/features/device/utils/device-helper";
 
 export function DeviceTable() {
-  const { devices, loading, error } = useDevices();
+  const { devices, loading, error, fetchDevices } = useDevices();
   const [pagination, setPagination] = useState<PaginationModel>({
     total: 10,
     page: 1,
@@ -49,14 +50,7 @@ export function DeviceTable() {
                 Tariff Group
               </th>
               <th className="px-4 py-3 text-left font-semibold">Device Type</th>
-              <th className="px-4 py-3 text-left font-semibold">Power (VA)</th>
               <th className="px-4 py-3 text-left font-semibold">Location</th>
-              <th className="px-4 py-3 text-left font-semibold">
-                Sub-location
-              </th>
-              <th className="px-4 py-3 text-left font-semibold">
-                Detail location
-              </th>
               <th className="px-4 py-3 text-left font-semibold">Action</th>
             </tr>
           </thead>
@@ -70,13 +64,12 @@ export function DeviceTable() {
                   />
                 </td>
                 <td className="px-4 py-3">{d.tariffGroup}</td>
-                <td className="px-4 py-3">{d.deviceType}</td>
-                <td className="px-4 py-3">{d.power}</td>
-                <td className="px-4 py-3">{d.location}</td>
-                <td className="px-4 py-3">{d.subLocation}</td>
-                <td className="px-4 py-3">{d.detailLocation}</td>
                 <td className="px-4 py-3">
-                  <EditDeviceModal device={d} />
+                  {getDeviceTypeLabel(d.deviceType)}
+                </td>
+                <td className="px-4 py-3">{d.location}</td>
+                <td className="px-4 py-3">
+                  <EditDeviceModal device={d} onSuccessUpdate={fetchDevices} />
                 </td>
               </tr>
             ))}

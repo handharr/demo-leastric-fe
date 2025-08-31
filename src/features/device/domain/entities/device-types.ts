@@ -1,7 +1,11 @@
+export enum DeviceType {
+  SinglePhase = "single_phase",
+  ThreePhase = "three_phase",
+}
 export interface DeviceModel {
   id: number;
   deviceName: string;
-  deviceType: string;
+  deviceType: DeviceType;
   tariffGroup: string;
   location: string;
   subLocation: string;
@@ -16,7 +20,7 @@ export const deviceModelDummies = [
   {
     id: 1,
     deviceName: "Device 1",
-    deviceType: "Type A",
+    deviceType: DeviceType.SinglePhase,
     tariffGroup: "R1",
     location: "Location 1",
     subLocation: "Sub-location 1",
@@ -28,7 +32,7 @@ export const deviceModelDummies = [
   {
     id: 2,
     deviceName: "Device 2",
-    deviceType: "Type B",
+    deviceType: DeviceType.ThreePhase,
     tariffGroup: "R2",
     location: "Location 2",
     subLocation: "Sub-location 2",
@@ -40,7 +44,7 @@ export const deviceModelDummies = [
   {
     id: 3,
     deviceName: "Device 3",
-    deviceType: "Type C",
+    deviceType: DeviceType.SinglePhase,
     tariffGroup: "R1",
     location: "Location 3",
     subLocation: "Sub-location 3",
@@ -52,7 +56,7 @@ export const deviceModelDummies = [
   {
     id: 4,
     deviceName: "Device 4",
-    deviceType: "Type D",
+    deviceType: DeviceType.ThreePhase,
     tariffGroup: "R2",
     location: "Location 4",
     subLocation: "Sub-location 4",
@@ -64,7 +68,7 @@ export const deviceModelDummies = [
   {
     id: 5,
     deviceName: "Device 5",
-    deviceType: "Type E",
+    deviceType: DeviceType.SinglePhase,
     tariffGroup: "R1",
     location: "Location 5",
     subLocation: "Sub-location 5",

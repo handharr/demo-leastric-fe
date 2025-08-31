@@ -62,7 +62,7 @@ export class RemoteDeviceDataSource implements DeviceDataSource {
     deviceData: UpdateDeviceFormData;
   }): Promise<BaseResponse<UpdateDeviceResponse> | BaseErrorResponse> {
     try {
-      return await this.apiClient.put<BaseResponse<UpdateDeviceResponse>>(
+      return await this.apiClient.patch<BaseResponse<UpdateDeviceResponse>>(
         `v1/devices/${deviceId}`,
         deviceData
       );

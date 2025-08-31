@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { GetAllDevicesUseCase } from "@/features/device/domain/use-cases/get-all-device-use-case";
 import {
   DeviceModel,
@@ -15,38 +15,39 @@ export function useDevices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchDevices = async () => {
-      setLoading(true);
-      setError(null);
+  const fetchDevices = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-      if (useDummy) {
-        setDevices(deviceModelDummies);
-        setLoading(false);
-        return;
+    if (useDummy) {
+      setDevices(deviceModelDummies);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const useCase = new GetAllDevicesUseCase();
+      const result = await useCase.execute();
+
+      Logger.info("useDevices", "execute", result);
+
+      if (isErrorModel(result)) {
+        setError(result.message);
+      } else {
+        setDevices(result);
       }
-
-      try {
-        const useCase = new GetAllDevicesUseCase();
-        const result = await useCase.execute();
-
-        Logger.info("useDevices", "execute", result);
-
-        if (isErrorModel(result)) {
-          setError(result.message);
-        } else {
-          setDevices(result); // Adjust if result shape differs
-        }
-      } catch (e: unknown) {
-        setError(
-          optional((e as Error)?.message).orDefault("Failed to fetch devices")
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDevices();
+    } catch (e: unknown) {
+      setError(
+        optional((e as Error)?.message).orDefault("Failed to fetch devices")
+      );
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { devices, loading, error };
+  useEffect(() => {
+    fetchDevices();
+  }, [fetchDevices]);
+
+  return { devices, loading, error, fetchDevices };
 }

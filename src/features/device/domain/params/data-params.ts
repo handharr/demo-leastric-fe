@@ -1,6 +1,7 @@
+import { DeviceType } from "@/features/device/domain/entities/device-types";
 export interface CreateDeviceFormData {
   deviceName?: string;
-  deviceType?: string;
+  deviceType?: DeviceType;
   tariffGroup?: string;
   location?: string;
   subLocation?: string;
@@ -9,7 +10,7 @@ export interface CreateDeviceFormData {
 
 export interface UpdateDeviceFormData {
   deviceName?: string;
-  deviceType?: string;
+  deviceType?: DeviceType;
   tariffGroup?: string;
   location?: string;
   subLocation?: string;

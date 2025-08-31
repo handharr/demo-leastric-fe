@@ -15,9 +15,13 @@ import {
 
 type EditDeviceModalProps = {
   device: DeviceModel;
+  onSuccessUpdate?: () => void;
 };
 
-export function EditDeviceModal({ device }: EditDeviceModalProps) {
+export function EditDeviceModal({
+  device,
+  onSuccessUpdate,
+}: EditDeviceModalProps) {
   // MARK: STATES
   // Local state for modal open/close
   const [open, setOpen] = useState(false);
@@ -76,7 +80,6 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
       pathParam: { deviceId: device.id },
       deviceData: {
         deviceName,
-        tariffGroup,
         location,
       },
     });
@@ -85,11 +88,12 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
   // Reset success state and close modal on success
   useEffect(() => {
     if (updateSuccess) {
+      resetUpdateSuccess();
+      onSuccessUpdate?.();
       showPopup("Device updated successfully", PopupType.SUCCESS);
       setOpen(false);
-      resetUpdateSuccess();
     }
-  }, [updateSuccess, showPopup, resetUpdateSuccess]);
+  }, [updateSuccess, showPopup, resetUpdateSuccess, onSuccessUpdate]);
 
   const formContent = () => (
     <form
@@ -110,7 +114,7 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
         <input
           disabled
           className="w-full border rounded px-3 py-2 disabled:bg-form-disabled"
-          value={fetchedDevice?.tariffGroup ?? device.tariffGroup}
+          value={tariffGroup}
         />
       </div>
       <div>
@@ -122,7 +126,9 @@ export function EditDeviceModal({ device }: EditDeviceModalProps) {
           required
         />
       </div>
-      {updateError && <div className="text-red-500 mb-2">{updateError}</div>}
+      {updateError && (
+        <div className="text-typography-negative mb-2">{updateError}</div>
+      )}
       <div className="flex justify-end gap-2 mt-6">
         <button
           type="button"

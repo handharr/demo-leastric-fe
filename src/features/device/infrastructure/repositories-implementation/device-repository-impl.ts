@@ -15,6 +15,10 @@ import {
 import { DeviceDataSource } from "@/features/device/infrastructure/data-source/device-data-source";
 import { Logger } from "@/shared/utils/logger/logger";
 import { getDeviceType } from "@/features/device/utils/device-helper";
+import {
+  mapCreateDeviceFormDataToDto,
+  mapUpdateDeviceFormDataToDto,
+} from "@/features/device/domain/mapper/device-params-mapper";
 
 export class DeviceRepositoryImpl implements DeviceRepository {
   constructor(private dataSource: DeviceDataSource) {}
@@ -95,8 +99,9 @@ export class DeviceRepositoryImpl implements DeviceRepository {
   }: {
     deviceData: CreateDeviceFormData;
   }): Promise<DeviceModel | BaseErrorModel> {
+    const deviceDto = mapCreateDeviceFormDataToDto(deviceData);
     const result = await this.dataSource.createDevice({
-      deviceData,
+      deviceData: deviceDto,
     });
 
     if (isErrorResponse(result)) {
@@ -131,9 +136,10 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     pathParam: GetDevicePathParams;
     deviceData: UpdateDeviceFormData;
   }): Promise<DeviceModel | BaseErrorModel> {
+    const deviceDto = mapUpdateDeviceFormDataToDto(deviceData);
     const result = await this.dataSource.updateDeviceDetails({
       deviceId: Number(pathParam.deviceId),
-      deviceData,
+      deviceData: deviceDto,
     });
 
     if (isErrorResponse(result)) {

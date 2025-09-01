@@ -8,9 +8,9 @@ import {
   UpdateDeviceResponse,
 } from "@/features/device/infrastructure/model/device-response";
 import {
-  CreateDeviceFormData,
-  UpdateDeviceFormData,
-} from "@/features/device/domain/params/data-params";
+  CreateDeviceDto,
+  UpdateDeviceDto,
+} from "@/features/device/infrastructure/params/device-dto";
 
 export interface DeviceDataSource {
   getDeviceDetails({
@@ -24,7 +24,7 @@ export interface DeviceDataSource {
     deviceData,
   }: {
     deviceId: number;
-    deviceData: UpdateDeviceFormData;
+    deviceData: UpdateDeviceDto;
   }): Promise<BaseResponse<UpdateDeviceResponse> | BaseErrorResponse>;
 
   deleteDevice({
@@ -36,7 +36,7 @@ export interface DeviceDataSource {
   createDevice({
     deviceData,
   }: {
-    deviceData: CreateDeviceFormData;
+    deviceData: CreateDeviceDto;
   }): Promise<BaseResponse<CreateDeviceResponse> | BaseErrorResponse>;
 
   getAllDevices(): Promise<

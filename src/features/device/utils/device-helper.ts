@@ -1,4 +1,4 @@
-import { DeviceType } from "@/features/device/domain/entities/device-types";
+import { DeviceType } from "@/features/device/domain/entities/device-model";
 
 export function getDeviceTypeLabel(deviceType: DeviceType): string {
   switch (deviceType) {
@@ -8,5 +8,16 @@ export function getDeviceTypeLabel(deviceType: DeviceType): string {
       return "Three Phase";
     default:
       return "Unknown";
+  }
+}
+
+export function getDeviceType(stringType: string): DeviceType {
+  switch (stringType) {
+    case "Single Phase":
+      return DeviceType.SinglePhase;
+    case "Three Phase":
+      return DeviceType.ThreePhase;
+    default:
+      throw new Error(`Unknown device type: ${stringType}`);
   }
 }

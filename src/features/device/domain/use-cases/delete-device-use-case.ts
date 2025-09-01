@@ -4,7 +4,7 @@ import {
 } from "@/shared/domain/entities/base-error-model";
 import { DeviceRepository } from "@/features/device/domain/repositories/device-repository";
 import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositories-implementation/device-repository-impl";
-import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-source/remote";
+import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-source/remote-device-data-source";
 import { GetDevicePathParams } from "../params/path-params";
 
 export class DeleteDeviceUseCase {

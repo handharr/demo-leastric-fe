@@ -1,4 +1,4 @@
-import { DeviceType } from "@/features/device/domain/entities/device-types";
+import { DeviceType } from "@/features/device/domain/entities/device-model";
 export interface CreateDeviceFormData {
   deviceName?: string;
   deviceType?: DeviceType;

@@ -6,7 +6,7 @@ import {
   GetDeviceResponse,
   GetDevicesResponse,
   UpdateDeviceResponse,
-} from "@/features/device/infrastructure/model/device-types";
+} from "@/features/device/infrastructure/model/device-response";
 import {
   CreateDeviceFormData,
   UpdateDeviceFormData,

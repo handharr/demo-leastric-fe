@@ -3,7 +3,7 @@ import { GetAllDevicesUseCase } from "@/features/device/domain/use-cases/get-all
 import {
   DeviceModel,
   deviceModelDummies,
-} from "@/features/device/domain/entities/device-types";
+} from "@/features/device/domain/entities/device-model";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { Logger } from "@/shared/utils/logger/logger";

@@ -5,7 +5,7 @@ import { UpdateDeviceFormData } from "@/features/device/domain/params/data-param
 import {
   DeviceModel,
   deviceModelDummies,
-} from "@/features/device/domain/entities/device-types";
+} from "@/features/device/domain/entities/device-model";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 
 type UpdateDeviceResult = {

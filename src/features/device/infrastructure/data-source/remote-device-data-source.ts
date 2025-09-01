@@ -11,12 +11,12 @@ import {
   GetDeviceResponse,
   GetDevicesResponse,
   UpdateDeviceResponse,
-} from "@/features/device/infrastructure/model/device-types";
+} from "@/features/device/infrastructure/model/device-response";
 import {
   CreateDeviceFormData,
   UpdateDeviceFormData,
 } from "@/features/device/domain/params/data-params";
-import { DeviceDataSource } from "@/features/device/infrastructure/data-source/interface";
+import { DeviceDataSource } from "@/features/device/infrastructure/data-source/device-data-source";
 import { Logger } from "@/shared/utils/logger/logger";
 
 export class RemoteDeviceDataSource implements DeviceDataSource {

@@ -7,13 +7,14 @@ import {
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
-import { DeviceModel } from "@/features/device/domain/entities/device-types";
+import { DeviceModel } from "@/features/device/domain/entities/device-model";
 import {
   CreateDeviceFormData,
   UpdateDeviceFormData,
 } from "@/features/device/domain/params/data-params";
-import { DeviceDataSource } from "@/features/device/infrastructure/data-source/interface";
+import { DeviceDataSource } from "@/features/device/infrastructure/data-source/device-data-source";
 import { Logger } from "@/shared/utils/logger/logger";
+import { getDeviceType } from "@/features/device/utils/device-helper";
 
 export class DeviceRepositoryImpl implements DeviceRepository {
   constructor(private dataSource: DeviceDataSource) {}
@@ -39,7 +40,9 @@ export class DeviceRepositoryImpl implements DeviceRepository {
       return {
         id: optional(result.data?.device?.id).orZero(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
-        deviceType: optional(result.data?.device?.deviceType).orEmpty(),
+        deviceType: getDeviceType(
+          optional(result.data?.device?.deviceType).orEmpty()
+        ),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),
         location: optional(result.data?.device?.location).orEmpty(),
         subLocation: optional(result.data?.device?.subLocation).orEmpty(),
@@ -70,7 +73,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
       return devices.map((device) => ({
         id: optional(device.id).orZero(),
         deviceName: optional(device.deviceName).orEmpty(),
-        deviceType: optional(device.deviceType).orEmpty(),
+        deviceType: getDeviceType(optional(device.deviceType).orEmpty()),
         tariffGroup: optional(device.tariffGroup).orEmpty(),
         location: optional(device.location).orEmpty(),
         subLocation: optional(device.subLocation).orEmpty(),
@@ -104,7 +107,9 @@ export class DeviceRepositoryImpl implements DeviceRepository {
       return {
         id: optional(result.data?.device?.id).orZero(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
-        deviceType: optional(result.data?.device?.deviceType).orEmpty(),
+        deviceType: getDeviceType(
+          optional(result.data?.device?.deviceType).orEmpty()
+        ),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),
         location: optional(result.data?.device?.location).orEmpty(),
         subLocation: optional(result.data?.device?.subLocation).orEmpty(),
@@ -139,7 +144,9 @@ export class DeviceRepositoryImpl implements DeviceRepository {
       return {
         id: optional(result.data?.device?.id).orZero(),
         deviceName: optional(result.data?.device?.deviceName).orEmpty(),
-        deviceType: optional(result.data?.device?.deviceType).orEmpty(),
+        deviceType: getDeviceType(
+          optional(result.data?.device?.deviceType).orEmpty()
+        ),
         tariffGroup: optional(result.data?.device?.tariffGroup).orEmpty(),
         location: optional(result.data?.device?.location).orEmpty(),
         subLocation: optional(result.data?.device?.subLocation).orEmpty(),

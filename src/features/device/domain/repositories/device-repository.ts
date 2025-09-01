@@ -1,4 +1,4 @@
-import { DeviceModel } from "@/features/device/domain/entities/device-types";
+import { DeviceModel } from "@/features/device/domain/entities/device-model";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
 import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import {

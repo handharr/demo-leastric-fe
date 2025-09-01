@@ -1,7 +1,7 @@
 import { DeviceRepository } from "@/features/device/domain/repositories/device-repository";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
-import { DeviceModel } from "@/features/device/domain/entities/device-types";
-import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-source/remote";
+import { DeviceModel } from "@/features/device/domain/entities/device-model";
+import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-source/remote-device-data-source";
 import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositories-implementation/device-repository-impl";
 import {
   BaseErrorModel,

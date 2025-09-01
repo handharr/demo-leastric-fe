@@ -1,16 +1,17 @@
-export type ErrorType =
-  | "VALIDATION"
-  | "NETWORK"
-  | "SERVER"
-  | "CLIENT"
-  | "AUTHENTICATION"
-  | "UNEXPECTED";
+export enum ErrorType {
+  VALIDATION = "VALIDATION",
+  NETWORK = "NETWORK",
+  SERVER = "SERVER",
+  CLIENT = "CLIENT",
+  AUTHENTICATION = "AUTHENTICATION",
+  UNEXPECTED = "UNEXPECTED",
+}
 
 export const validErrorTypes: ErrorType[] = [
-  "VALIDATION",
-  "NETWORK",
-  "SERVER",
-  "CLIENT",
-  "AUTHENTICATION",
-  "UNEXPECTED",
+  ErrorType.VALIDATION,
+  ErrorType.NETWORK,
+  ErrorType.SERVER,
+  ErrorType.CLIENT,
+  ErrorType.AUTHENTICATION,
+  ErrorType.UNEXPECTED,
 ];

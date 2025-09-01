@@ -9,6 +9,7 @@ import {
   isErrorModel,
 } from "@/shared/domain/entities/base-error-model";
 import { mapValidationErrorsToRecord } from "@/shared/utils/helpers/validation-helpers";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class ResetPasswordUseCase {
   constructor(private authRepository: AuthRepository) {}
@@ -27,7 +28,7 @@ export class ResetPasswordUseCase {
     if (ResetPasswordValidator.hasErrors(validationErrors)) {
       return createErrorModel({
         message: "Password validation failed",
-        type: "VALIDATION",
+        type: ErrorType.VALIDATION,
         validationErrors: mapValidationErrorsToRecord(validationErrors),
       });
     }
@@ -45,7 +46,7 @@ export class ResetPasswordUseCase {
       return createErrorModel({
         message: "Password reset failed",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

@@ -8,6 +8,7 @@ import {
   createErrorModel,
 } from "@/shared/domain/entities/base-error-model";
 import { Logger } from "@/shared/utils/logger/logger";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class GetDeviceUseCase {
   constructor(
@@ -30,7 +31,7 @@ export class GetDeviceUseCase {
       return createErrorModel({
         message: "Failed to get device",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

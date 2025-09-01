@@ -10,6 +10,7 @@ import {
 } from "@/shared/domain/entities/base-error-model";
 import { UserModel } from "@/features/auth/domain/entities/user-model";
 import { mapValidationErrorsToRecord } from "@/shared/utils/helpers/validation-helpers";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class LoginUseCase {
   constructor(
@@ -28,7 +29,7 @@ export class LoginUseCase {
       return createErrorModel({
         message: "Validation failed",
         validationErrors: mapValidationErrorsToRecord(validationErrors),
-        type: "VALIDATION",
+        type: ErrorType.VALIDATION,
       });
     }
 
@@ -45,7 +46,7 @@ export class LoginUseCase {
       return createErrorModel({
         message: "Login failed",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

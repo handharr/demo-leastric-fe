@@ -26,7 +26,7 @@ export function createErrorModel({
   message,
   details,
   statusCode,
-  type = "UNEXPECTED",
+  type = ErrorType.UNEXPECTED,
   validationErrors,
 }: {
   message: string;
@@ -118,17 +118,17 @@ export function determineErrorType({
   switch (true) {
     case statusCode >= 400 && statusCode < 500:
       if (statusCode === 401 || statusCode === 403) {
-        return "AUTHENTICATION";
+        return ErrorType.AUTHENTICATION;
       }
       if (statusCode === 422) {
-        return "VALIDATION";
+        return ErrorType.VALIDATION;
       }
-      return "CLIENT";
+      return ErrorType.CLIENT;
 
     case statusCode >= 500:
-      return "SERVER";
+      return ErrorType.SERVER;
 
     default:
-      return "UNEXPECTED";
+      return ErrorType.UNEXPECTED;
   }
 }

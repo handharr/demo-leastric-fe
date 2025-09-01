@@ -14,6 +14,7 @@ import { UserModel } from "@/features/auth/domain/entities/user-model";
 import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 import { storage } from "@/shared/utils/helpers/storage-helper";
 import { clearLocalTokens } from "@/shared/utils/helpers/network-helper";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(private dataSource: AuthDataSource) {}
@@ -27,7 +28,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       return createErrorModel({
         message: "Email and password are required",
         details: "Missing required fields",
-        type: "VALIDATION",
+        type: ErrorType.VALIDATION,
       });
     }
 
@@ -69,7 +70,7 @@ export class AuthRepositoryImpl implements AuthRepository {
         details: optional(result.flash?.message).orDefault(
           "Authentication failed"
         ),
-        type: "AUTHENTICATION",
+        type: ErrorType.AUTHENTICATION,
       });
     }
   }
@@ -103,7 +104,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       return createErrorModel({
         message: "Token is required",
         details: "Missing token parameter",
-        type: "VALIDATION",
+        type: ErrorType.VALIDATION,
       });
     }
 
@@ -128,7 +129,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       return createErrorModel({
         message: "Token refresh failed",
         details: result.message || "Failed to refresh authentication token",
-        type: "AUTHENTICATION",
+        type: ErrorType.AUTHENTICATION,
       });
     }
   }
@@ -156,7 +157,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       return createErrorModel({
         message: "New password is required",
         details: "Missing newPassword parameter",
-        type: "VALIDATION",
+        type: ErrorType.VALIDATION,
       });
     }
 

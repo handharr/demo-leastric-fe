@@ -3,6 +3,7 @@ import { LoginFormData } from "@/features/auth/domain/params/data/login-form-dat
 import { LoginValidationErrors } from "@/features/auth/domain/entities/login-validation-errors";
 import { LoginUseCase } from "@/features/auth/domain/use-cases/login-use-case";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export interface UseLoginFormReturn {
   formData: LoginFormData;
@@ -55,7 +56,7 @@ export function useLoginForm(
 
         if (isErrorModel(result)) {
           // Handle different error types
-          if (result.type === "VALIDATION") {
+          if (result.type === ErrorType.VALIDATION) {
             // Parse validation errors from details
             try {
               const emailError = result.validationErrors?.email;

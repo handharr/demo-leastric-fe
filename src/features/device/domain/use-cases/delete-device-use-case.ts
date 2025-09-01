@@ -5,7 +5,8 @@ import {
 import { DeviceRepository } from "@/features/device/domain/repositories/device-repository";
 import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositories-implementation/device-repository-impl";
 import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-source/remote-device-data-source";
-import { GetDevicePathParams } from "../params/path-params";
+import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class DeleteDeviceUseCase {
   constructor(
@@ -27,7 +28,7 @@ export class DeleteDeviceUseCase {
       return createErrorModel({
         message: "Failed to delete device",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

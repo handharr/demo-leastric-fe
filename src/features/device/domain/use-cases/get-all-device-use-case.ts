@@ -7,6 +7,7 @@ import { DeviceModel } from "@/features/device/domain/entities/device-model";
 import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-source/remote-device-data-source";
 import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositories-implementation/device-repository-impl";
 import { Logger } from "@/shared/utils/logger/logger";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class GetAllDevicesUseCase {
   constructor(
@@ -25,7 +26,7 @@ export class GetAllDevicesUseCase {
       return createErrorModel({
         message: "Failed to get all devices",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

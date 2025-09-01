@@ -7,6 +7,7 @@ import { CreateDeviceFormData } from "@/features/device/domain/params/data-param
 import { DeviceModel } from "@/features/device/domain/entities/device-model";
 import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositories-implementation/device-repository-impl";
 import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-source/remote-device-data-source";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class CreateDeviceUseCase {
   constructor(
@@ -28,7 +29,7 @@ export class CreateDeviceUseCase {
       return createErrorModel({
         message: "Failed to create device",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

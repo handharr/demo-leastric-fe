@@ -6,6 +6,7 @@ import { ResetPasswordValidator } from "@/features/auth/presentation/validation/
 import { AuthRepositoryImpl } from "@/features/auth/infrastructure/repositories-implementation/auth-repository-impl";
 import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export interface UseResetPasswordFormReturn {
   formData: ResetPasswordPageModel;
@@ -86,7 +87,7 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
         });
 
         if (isErrorModel(result)) {
-          if (result.type === "VALIDATION") {
+          if (result.type === ErrorType.VALIDATION) {
             try {
               const newPasswordErrors = result.validationErrors?.newPassword;
               const confirmPasswordErrors =

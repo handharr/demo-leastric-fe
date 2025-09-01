@@ -19,6 +19,7 @@ import {
   mapCreateDeviceFormDataToDto,
   mapUpdateDeviceFormDataToDto,
 } from "@/features/device/domain/mapper/device-params-mapper";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class DeviceRepositoryImpl implements DeviceRepository {
   constructor(private dataSource: DeviceDataSource) {}
@@ -56,7 +57,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
       return createErrorModel({
         message: "Unexpected error",
         details: optional(result.flash?.message).orDefault("Unexpected error"),
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }
@@ -90,7 +91,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     return createErrorModel({
       message: "Unexpected error",
       details: optional(result.flash?.message).orDefault("Unexpected error"),
-      type: "UNEXPECTED",
+      type: ErrorType.UNEXPECTED,
     });
   }
 
@@ -125,7 +126,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     return createErrorModel({
       message: "Unexpected error",
       details: optional(result.flash?.message).orDefault("Unexpected error"),
-      type: "UNEXPECTED",
+      type: ErrorType.UNEXPECTED,
     });
   }
 
@@ -163,7 +164,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     return createErrorModel({
       message: "Unexpected error",
       details: optional(result.flash?.message).orDefault("Unexpected error"),
-      type: "UNEXPECTED",
+      type: ErrorType.UNEXPECTED,
     });
   }
 
@@ -187,7 +188,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     return createErrorModel({
       message: "Unexpected error",
       details: optional(result.flash?.message).orDefault("Unexpected error"),
-      type: "UNEXPECTED",
+      type: ErrorType.UNEXPECTED,
     });
   }
 }

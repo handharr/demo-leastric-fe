@@ -8,6 +8,7 @@ import {
   createErrorModel,
 } from "@/shared/domain/entities/base-error-model";
 import { UpdateDeviceFormData } from "@/features/device/domain/params/data-params";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class UpdateDeviceUseCase {
   constructor(
@@ -34,7 +35,7 @@ export class UpdateDeviceUseCase {
       return createErrorModel({
         message: "Failed to update device",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

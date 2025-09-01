@@ -73,14 +73,14 @@ export default function Layout({
   };
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-col">
-      <span className="items-center justify-center text-2xl font-bold text-gray-800">
+    <div className="flex min-h-screen flex-col gap-[16px]">
+      <span className="items-center justify-center text-2xl font-bold text-typography-headline">
         Setting
       </span>
       {/* Main content will be rendered here */}
-      <div className="flex bg-neutral-50 p-6">
+      <div className="flex bg-neutral-50 gap-[16px]">
         {/* Sidebar */}
-        <aside className="w-full max-w-xs bg-white rounded-xl border border-[#E5E7EB] flex flex-col p-6 gap-8 self-start">
+        <aside className="w-full max-w-xs bg-white rounded-xl border border-[#E5E7EB] flex flex-col p-[20px] gap-8 self-start">
           {/* User Info */}
           <div className="flex flex-col items-center gap-2">
             <div className="w-16 h-16 rounded-full bg-[#E6F4EA] flex items-center justify-center text-2xl font-semibold text-[#2a6335]">
@@ -124,8 +124,8 @@ export default function Layout({
           </nav>
         </aside>
         {/* Content */}
-        <main className="flex-1 flex flex-col px-8 py-2">
-          <div className="bg-white rounded-xl border border-[#E5E7EB] p-8 min-h-[400px]">
+        <main className="flex-1 flex flex-col">
+          <div className="bg-white rounded-xl border border-[#E5E7EB] p-[20px]">
             {children}
           </div>
         </main>

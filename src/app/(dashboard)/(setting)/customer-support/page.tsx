@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function CustomerSupportPage() {
   return (
-    <div className="bg-white rounded-xl border border-[#E5E7EB] p-8">
+    <div className="bg-white gap-[16px]">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
         Customer Support
       </h2>
@@ -34,15 +34,15 @@ export default function CustomerSupportPage() {
 
       {/* Support Actions */}
       <div className="flex flex-wrap gap-4 mb-6">
-        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-5 py-3 font-medium text-gray-800 hover:bg-gray-50 transition">
+        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-[16px] py-[10px] font-medium text-gray-800 hover:bg-gray-50 transition">
           <span className="text-lg">📞</span>
           Call Leastric Support
         </button>
-        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-5 py-3 font-medium text-gray-800 hover:bg-gray-50 transition">
+        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-[16px] py-[10px] font-medium text-gray-800 hover:bg-gray-50 transition">
           <span className="text-lg">💬</span>
           Chat with WhatsApp
         </button>
-        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-5 py-3 font-medium text-gray-800 hover:bg-gray-50 transition">
+        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-[16px] py-[10px] font-medium text-gray-800 hover:bg-gray-50 transition">
           <span className="text-lg">✉️</span>
           Send an Email
         </button>

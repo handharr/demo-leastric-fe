@@ -7,7 +7,10 @@ import {
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
-import { DeviceModel } from "@/features/device/domain/entities/device-model";
+import {
+  DeviceModel,
+  GetDevicesModel,
+} from "@/features/device/domain/entities/device-model";
 import {
   CreateDeviceFormData,
   UpdateDeviceFormData,
@@ -62,7 +65,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     }
   }
 
-  async getAllDevices(): Promise<DeviceModel[] | BaseErrorModel> {
+  async getAllDevices(): Promise<GetDevicesModel | BaseErrorModel> {
     const result = await this.dataSource.getAllDevices();
 
     Logger.info("DeviceRepositoryImpl", "getAllDevices", result);
@@ -75,7 +78,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     if (result.flash?.type === "success" && result.data?.devices) {
       const devices = optional(result.data?.devices).orEmpty();
       Logger.info("DeviceRepositoryImpl", "getAllDevices success", devices);
-      return devices.map((device) => ({
+      const mappedDevices = devices.map((device) => ({
         id: optional(device.id).orZero(),
         deviceName: optional(device.deviceName).orEmpty(),
         deviceType: getDeviceType(optional(device.deviceType).orEmpty()),
@@ -84,6 +87,18 @@ export class DeviceRepositoryImpl implements DeviceRepository {
         subLocation: optional(device.subLocation).orEmpty(),
         detailLocation: optional(device.detailLocation).orEmpty(),
       }));
+
+      return {
+        devices: mappedDevices,
+        pagination: {
+          page: optional(result.meta?.page).orZero(),
+          take: optional(result.meta?.take).orZero(),
+          itemCount: optional(result.meta?.itemCount).orZero(),
+          pageCount: optional(result.meta?.pageCount).orZero(),
+          hasPreviousPage: optional(result.meta?.hasPreviousPage).orFalse(),
+          hasNextPage: optional(result.meta?.hasNextPage).orFalse(),
+        },
+      };
     }
 
     Logger.error("DeviceRepositoryImpl", "getAllDevices error", result);

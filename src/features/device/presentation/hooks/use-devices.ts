@@ -34,7 +34,7 @@ export function useDevices() {
       if (isErrorModel(result)) {
         setError(result.message);
       } else {
-        setDevices(result);
+        setDevices(result.devices);
       }
     } catch (e: unknown) {
       setError(

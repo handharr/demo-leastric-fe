@@ -101,7 +101,9 @@ export function EditDeviceModal({
       onSubmit={handleSubmit}
     >
       <div>
-        <label className="block text-sm font-medium mb-1">Device name</label>
+        <label className="block text-sm font-medium mb-1">
+          Device name <span className="text-typography-negative">*</span>
+        </label>
         <input
           className="w-full border rounded px-3 py-2"
           value={deviceName}
@@ -118,7 +120,9 @@ export function EditDeviceModal({
         />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Locations</label>
+        <label className="block text-sm font-medium mb-1">
+          Locations <span className="text-typography-negative">*</span>
+        </label>
         <input
           className="w-full border rounded px-3 py-2"
           value={location}

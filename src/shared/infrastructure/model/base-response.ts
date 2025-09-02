@@ -4,4 +4,12 @@ export interface BaseResponse<T> {
     type?: string;
     message?: string;
   };
+  meta?: {
+    page?: number;
+    take?: number;
+    itemCount?: number;
+    pageCount?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+  };
 }

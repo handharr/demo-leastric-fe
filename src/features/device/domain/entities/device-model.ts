@@ -1,3 +1,4 @@
+import { PaginationModel } from "@/shared/domain/entities/models-interface";
 export enum DeviceType {
   SinglePhase = "single_phase",
   ThreePhase = "three_phase",
@@ -14,6 +15,11 @@ export interface DeviceModel {
   power?: string;
   status?: string;
   phase?: string;
+}
+
+export interface GetDevicesModel {
+  devices: DeviceModel[];
+  pagination: PaginationModel;
 }
 
 export const deviceModelDummies = [

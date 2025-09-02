@@ -1,4 +1,7 @@
-import { DeviceModel } from "@/features/device/domain/entities/device-model";
+import {
+  DeviceModel,
+  GetDevicesModel,
+} from "@/features/device/domain/entities/device-model";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
 import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import {
@@ -12,7 +15,7 @@ export interface DeviceRepository {
   }: {
     pathParam: GetDevicePathParams;
   }): Promise<DeviceModel | BaseErrorModel>;
-  getAllDevices(): Promise<DeviceModel[] | BaseErrorModel>;
+  getAllDevices(): Promise<GetDevicesModel | BaseErrorModel>;
   createDevice({
     deviceData,
   }: {

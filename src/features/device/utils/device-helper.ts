@@ -13,9 +13,9 @@ export function getDeviceTypeLabel(deviceType: DeviceType): string {
 
 export function getDeviceType(stringType: string): DeviceType {
   switch (stringType) {
-    case "Single Phase":
+    case DeviceType.SinglePhase:
       return DeviceType.SinglePhase;
-    case "Three Phase":
+    case DeviceType.ThreePhase:
       return DeviceType.ThreePhase;
     default:
       throw new Error(`Unknown device type: ${stringType}`);

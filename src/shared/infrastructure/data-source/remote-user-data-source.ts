@@ -6,7 +6,7 @@ import {
 import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 import { UpdateUserDto } from "@/shared/infrastructure/params/dto";
 import { UserDataSource } from "@/shared/infrastructure/data-source/user-data-source";
-import { UserResponse } from "../model/user-response";
+import { GetUserResponse } from "@/shared/infrastructure/model/user-response";
 
 export class RemoteUserDataSource implements UserDataSource {
   private apiClient: ApiClient;
@@ -20,7 +20,7 @@ export class RemoteUserDataSource implements UserDataSource {
     }
   }
 
-  getUserDetails(): Promise<BaseResponse<UserResponse> | BaseErrorResponse> {
+  getUserDetails(): Promise<BaseResponse<GetUserResponse> | BaseErrorResponse> {
     return this.apiClient.get("/v1/me");
   }
 

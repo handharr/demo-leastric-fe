@@ -6,3 +6,7 @@ export interface UserResponse {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface GetUserResponse {
+  user: UserResponse;
+}

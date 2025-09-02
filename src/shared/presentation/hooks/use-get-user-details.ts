@@ -5,6 +5,7 @@ import {
   BaseErrorModel,
   isErrorModel,
 } from "@/shared/domain/entities/base-error-model";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export const useGetUserDetails = () => {
   const [userDetails, setUserDetails] = useState<UserModel | null>(null);
@@ -26,7 +27,7 @@ export const useGetUserDetails = () => {
       setError({
         message: "Unexpected error occurred",
         details: err instanceof Error ? err.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     } finally {
       setLoading(false);

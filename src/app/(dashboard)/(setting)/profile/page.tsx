@@ -1,11 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useGetUserDetails } from "@/shared/presentation/hooks/use-get-user-details";
 
 export default function ProfilePage() {
   const [fullName, setFullName] = useState("Jono Sujono Mangunkusom");
   const [email, setEmail] = useState("Jonosujono@gmail.com");
   const [phone, setPhone] = useState("");
+  const { userDetails, loading, error } = useGetUserDetails();
+
+  useEffect(() => {
+    if (userDetails) {
+      setFullName(userDetails.name);
+      setEmail(userDetails.email);
+      setPhone(userDetails.phoneNumber);
+    }
+  }, [userDetails]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="flex flex-col w-full gap-[16px]">

@@ -6,6 +6,7 @@ import {
 } from "@/shared/domain/entities/base-error-model";
 import { Logger } from "@/shared/utils/logger/logger";
 import { UserRepositoryImpl } from "@/shared/infrastructure/repositories-implementation/user-repository-impl";
+import { ErrorType } from "../enum/base-enum";
 
 export class GetUserDetailsUseCase {
   constructor(
@@ -30,7 +31,7 @@ export class GetUserDetailsUseCase {
       return createErrorModel({
         message: "Error retrieving user details",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

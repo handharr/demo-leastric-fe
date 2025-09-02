@@ -10,6 +10,7 @@ import { isErrorResponse } from "@/shared/infrastructure/model/base-error-respon
 import { UserRepository } from "@/shared/domain/repositories/user-repository";
 import { UserDataSource } from "@/shared/infrastructure/data-source/user-data-source";
 import { RemoteUserDataSource } from "@/shared/infrastructure/data-source/remote-user-data-source";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export class UserRepositoryImpl implements UserRepository {
   constructor(
@@ -19,17 +20,24 @@ export class UserRepositoryImpl implements UserRepository {
   async getUserDetails(): Promise<UserModel | BaseErrorModel> {
     const result = await this.dataSource.getUserDetails();
 
+    Logger.info("UserRepositoryImpl", "Retrieved user details:", result);
+
     if (isErrorResponse(result)) {
+      Logger.error(
+        "UserRepositoryImpl",
+        "Error retrieving user details:",
+        result
+      );
       return mapErrorResponseToModel({ response: result });
     }
 
     return {
-      id: optional(result.data?.id).orZero(),
-      email: optional(result.data?.email).orEmpty(),
-      name: optional(result.data?.name).orEmpty(),
-      phoneNumber: optional(result.data?.phoneNumber).orEmpty(),
-      createdAt: optional(result.data?.createdAt).orEmpty(),
-      updatedAt: optional(result.data?.updatedAt).orEmpty(),
+      id: optional(result.data?.user?.id).orZero(),
+      email: optional(result.data?.user?.email).orEmpty(),
+      name: optional(result.data?.user?.name).orEmpty(),
+      phoneNumber: optional(result.data?.user?.phoneNumber).orEmpty(),
+      createdAt: optional(result.data?.user?.createdAt).orEmpty(),
+      updatedAt: optional(result.data?.user?.updatedAt).orEmpty(),
     };
   }
 
@@ -39,7 +47,14 @@ export class UserRepositoryImpl implements UserRepository {
     const dto = mapUpdateUserFormDataToDto(userData);
     const result = await this.dataSource.updateUserDetails({ userData: dto });
 
+    Logger.info("UserRepositoryImpl", "Updated user details:", result);
+
     if (isErrorResponse(result)) {
+      Logger.error(
+        "UserRepositoryImpl",
+        "Error updating user details:",
+        result
+      );
       return mapErrorResponseToModel({ response: result });
     }
 

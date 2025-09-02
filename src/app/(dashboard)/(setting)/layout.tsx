@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 // Dummy user data for sidebar
 const user = {
@@ -49,6 +50,13 @@ export default function Layout({
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const pathname = usePathname();
+
+  // Sync activeMenu with current path
+  useEffect(() => {
+    const found = MENU_ITEMS.find((item) => pathname.startsWith(item.route));
+    setActiveIndex(found ? MENU_ITEMS.indexOf(found) : 0);
+  }, [pathname]);
 
   const handleMenuClick = useCallback(
     (item: SettingMenuItem) => {
@@ -101,7 +109,7 @@ export default function Layout({
               <button
                 key={item.label}
                 className={clsx(
-                  "flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors",
+                  "flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer text-left transition-colors",
                   idx === activeIndex
                     ? "bg-[#E6F4EA] text-brand-primary font-semibold"
                     : "hover:bg-gray-100 text-typography-headline"

@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import SidebarMenuItem from "@/shared/presentation/components/sidebar-menu-item";
 import { SidebarMenuItemProps } from "@/shared/presentation/types/ui";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { PopupProvider } from "@/shared/presentation/hooks/top-popup-context";
+import { usePathname } from "next/navigation";
 
 // Constants - moved outside component to prevent recreation
 const MENU_ITEMS: SidebarMenuItemProps[] = [
@@ -76,9 +76,7 @@ const Breadcrumb = ({
   <div className="hidden lg:flex items-center gap-2">
     <span className="text-[#909090] text-sm">Dashboard</span>
     <span className="text-[#909090]">/</span>
-    <span className="text-[#909090] text-sm">
-      {optional(activeMenu?.label).orEmpty().toLowerCase()}
-    </span>
+    <span className="text-[#909090] text-sm">{activeMenu?.label || ""}</span>
   </div>
 );
 
@@ -89,9 +87,26 @@ export default function Layout({
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeMenu, setActiveMenu] = useState<SidebarMenuItemProps | null>(
-    MENU_ITEMS[0]
+    null
   );
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Sync activeMenu with current path
+  useEffect(() => {
+    const found = MENU_ITEMS.find((item) => pathname.startsWith(item.route));
+    if (!found) {
+      const settingRoutes = ["/profile", "/security", "/customer-support"];
+      const isSettingRoute = settingRoutes.some((route) =>
+        pathname.startsWith(route)
+      );
+      console.log("Found setting route:", isSettingRoute);
+      console.log("Current pathname:", pathname);
+      setActiveMenu(isSettingRoute ? MENU_ITEMS[4] : MENU_ITEMS[0]);
+    } else {
+      setActiveMenu(found);
+    }
+  }, [pathname]);
 
   // Memoized handlers to prevent unnecessary re-renders
   const toggleSidebar = useCallback(() => {

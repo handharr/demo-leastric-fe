@@ -1,5 +1,42 @@
 import Image from "next/image";
 
+type SupportButtonProps = {
+  icon?: string; // path to icon image
+  emoji?: string; // for emoji icon
+  alt?: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+};
+
+export function SupportButton({
+  icon,
+  emoji,
+  alt,
+  children,
+  onClick,
+  className = "",
+}: SupportButtonProps) {
+  return (
+    <button
+      className={`flex items-center gap-2 cursor-pointer border border-[#D1D5DB] rounded-lg font-medium text-typography-headline hover:bg-gray-50 transition ${className}`}
+      onClick={onClick}
+    >
+      {icon && (
+        <Image
+          src={icon}
+          alt={alt || ""}
+          width={20}
+          height={20}
+          className="w-[20px] h-[20px]"
+        />
+      )}
+      {emoji && <span className="text-lg">{emoji}</span>}
+      {children}
+    </button>
+  );
+}
+
 export default function CustomerSupportPage() {
   return (
     <div className="bg-white gap-[16px]">
@@ -22,7 +59,7 @@ export default function CustomerSupportPage() {
         <div>
           <span className="inline-block">
             <Image
-              src="/support-illustration.png"
+              src="/resources/images/illustration/help-center-2.png"
               alt="Support"
               width={64}
               height={64}
@@ -34,36 +71,53 @@ export default function CustomerSupportPage() {
 
       {/* Support Actions */}
       <div className="flex flex-wrap gap-4 mb-6">
-        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-[16px] py-[10px] font-medium text-gray-800 hover:bg-gray-50 transition">
-          <span className="text-lg">📞</span>
+        <SupportButton
+          icon="/resources/icons/communication/telephone.svg"
+          alt="Call"
+          className="px-[16px] py-[10px]"
+        >
           Call Leastric Support
-        </button>
-        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-[16px] py-[10px] font-medium text-gray-800 hover:bg-gray-50 transition">
-          <span className="text-lg">💬</span>
+        </SupportButton>
+        <SupportButton
+          icon="/resources/icons/general/whatsapp.svg"
+          alt="Chat"
+          className="px-[16px] py-[10px]"
+        >
           Chat with WhatsApp
-        </button>
-        <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-[16px] py-[10px] font-medium text-gray-800 hover:bg-gray-50 transition">
-          <span className="text-lg">✉️</span>
+        </SupportButton>
+        <SupportButton
+          icon="/resources/icons/communication/email.svg"
+          alt="Email"
+          className="px-[16px] py-[10px]"
+        >
           Send an Email
-        </button>
+        </SupportButton>
       </div>
 
       {/* Policies */}
       <div>
         <div className="font-semibold text-gray-700 mb-3">Policies</div>
         <div className="flex flex-wrap gap-4">
-          <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-5 py-3 font-medium text-gray-800 hover:bg-gray-50 transition">
-            <span className="text-lg">❓</span>
+          <SupportButton
+            icon="/resources/icons/menu/question-circle.svg"
+            alt="FAQ"
+            className="px-5 py-3"
+          >
             FAQ
-          </button>
-          <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-5 py-3 font-medium text-gray-800 hover:bg-gray-50 transition">
-            <span className="text-lg">📄</span>
+          </SupportButton>
+          <SupportButton
+            icon="/resources/icons/document/list-2.svg"
+            className="px-5 py-3"
+          >
             Terms &amp; Conditions
-          </button>
-          <button className="flex items-center gap-2 border border-[#D1D5DB] rounded-lg px-5 py-3 font-medium text-gray-800 hover:bg-gray-50 transition">
-            <span className="text-lg">🔒</span>
+          </SupportButton>
+          <SupportButton
+            icon="/resources/icons/security/shield-info.svg"
+            alt="Terms"
+            className="px-5 py-3"
+          >
             Privacy Policy
-          </button>
+          </SupportButton>
         </div>
       </div>
     </div>

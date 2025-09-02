@@ -40,12 +40,17 @@ export function useDevices() {
     }));
   }, [pagination.hasPreviousPage]);
 
-  const goToPage = useCallback((page: number) => {
-    setPagination((prev) => ({
-      ...prev,
-      page: page,
-    }));
-  }, []);
+  const goToPage = useCallback(
+    (page: number) => {
+      if (page < 1 || page > pagination.pageCount) return;
+      if (page === pagination.page) return;
+      setPagination((prev) => ({
+        ...prev,
+        page: page,
+      }));
+    },
+    [pagination.pageCount, pagination.page]
+  );
 
   const fetchDevices = useCallback(async () => {
     setLoading(true);

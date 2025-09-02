@@ -35,7 +35,7 @@ export function Pagination({
         </span>
         <div className="flex items-center gap-1 overflow-x-auto">
           <button
-            className="p-1 rounded hover:bg-gray-200"
+            className="cursor-pointer p-1 rounded hover:bg-gray-200"
             onClick={() => onPreviousPage()}
             disabled={page === 1}
           >
@@ -46,7 +46,7 @@ export function Pagination({
           {pageNumbers.map((n) => (
             <button
               key={n}
-              className={`px-2 py-1 rounded ${
+              className={`cursor-pointer px-2 py-1 rounded ${
                 n === page
                   ? "bg-green-100 border border-brand-secondary text-brand-primary"
                   : "hover:bg-gray-200"
@@ -57,7 +57,7 @@ export function Pagination({
             </button>
           ))}
           <button
-            className="p-1 rounded hover:bg-gray-200"
+            className="cursor-pointer p-1 rounded hover:bg-gray-200"
             onClick={() => onNextPage()}
             disabled={page === totalPages}
           >

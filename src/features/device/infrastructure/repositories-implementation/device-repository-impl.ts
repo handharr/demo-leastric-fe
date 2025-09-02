@@ -23,6 +23,7 @@ import {
   mapUpdateDeviceFormDataToDto,
 } from "@/features/device/domain/mapper/device-params-mapper";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { GetAllDevicesQueryParams } from "@/features/device/domain/params/query-params";
 
 export class DeviceRepositoryImpl implements DeviceRepository {
   constructor(private dataSource: DeviceDataSource) {}
@@ -65,8 +66,14 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     }
   }
 
-  async getAllDevices(): Promise<GetDevicesModel | BaseErrorModel> {
-    const result = await this.dataSource.getAllDevices();
+  async getAllDevices({
+    queryParam,
+  }: {
+    queryParam: GetAllDevicesQueryParams;
+  }): Promise<GetDevicesModel | BaseErrorModel> {
+    const result = await this.dataSource.getAllDevices({
+      params: { ...queryParam },
+    });
 
     Logger.info("DeviceRepositoryImpl", "getAllDevices", result);
 

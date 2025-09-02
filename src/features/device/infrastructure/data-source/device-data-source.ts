@@ -39,7 +39,9 @@ export interface DeviceDataSource {
     deviceData: CreateDeviceDto;
   }): Promise<BaseResponse<CreateDeviceResponse> | BaseErrorResponse>;
 
-  getAllDevices(): Promise<
-    BaseResponse<GetDevicesResponse> | BaseErrorResponse
-  >;
+  getAllDevices({
+    params,
+  }: {
+    params?: Record<string, unknown>;
+  }): Promise<BaseResponse<GetDevicesResponse> | BaseErrorResponse>;
 }

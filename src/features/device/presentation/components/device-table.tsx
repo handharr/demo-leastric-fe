@@ -2,11 +2,7 @@ import { StatusBadge } from "@/shared/presentation/components/status-badge";
 import { useDevices } from "@/features/device/presentation/hooks/use-devices";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { EditDeviceModal } from "@/features/device/presentation/components/edit-device-modal";
-import { useState } from "react";
-import {
-  PaginationModel,
-  Pagination,
-} from "@/shared/presentation/components/pagination";
+import { Pagination } from "@/shared/presentation/components/pagination";
 import {
   EmptyData,
   EmptyDataState,
@@ -14,12 +10,16 @@ import {
 import { getDeviceTypeLabel } from "@/features/device/utils/device-helper";
 
 export function DeviceTable() {
-  const { devices, loading, error, fetchDevices } = useDevices();
-  const [pagination, setPagination] = useState<PaginationModel>({
-    total: 10,
-    page: 1,
-    pageSize: 10,
-  });
+  const {
+    devices,
+    loading,
+    error,
+    pagination,
+    fetchDevices,
+    nextPage,
+    previousPage,
+    goToPage,
+  } = useDevices();
 
   if (loading) {
     return (
@@ -29,7 +29,7 @@ export function DeviceTable() {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-40 text-red-500">
+      <div className="flex justify-center items-center h-40 text-typography-negative">
         {error}
       </div>
     );
@@ -80,7 +80,9 @@ export function DeviceTable() {
       {/* Pagination */}
       <Pagination
         model={pagination}
-        onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
+        onPageChange={(page) => goToPage(page)}
+        onPreviousPage={previousPage}
+        onNextPage={nextPage}
       />
     </div>
   );

@@ -7,6 +7,7 @@ import {
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { Logger } from "@/shared/utils/logger/logger";
+import { PaginationModel } from "@/shared/domain/entities/models-interface";
 
 const useDummy = false;
 
@@ -14,6 +15,37 @@ export function useDevices() {
   const [devices, setDevices] = useState<DeviceModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationModel>({
+    page: 1,
+    take: 10,
+    itemCount: 10,
+    pageCount: 1,
+    hasPreviousPage: false,
+    hasNextPage: false,
+  });
+
+  const nextPage = useCallback(() => {
+    if (!pagination.hasNextPage) return;
+    setPagination((prev) => ({
+      ...prev,
+      page: prev.page + 1,
+    }));
+  }, [pagination.hasNextPage]);
+
+  const previousPage = useCallback(() => {
+    if (!pagination.hasPreviousPage) return;
+    setPagination((prev) => ({
+      ...prev,
+      page: Math.max(prev.page - 1, 1),
+    }));
+  }, [pagination.hasPreviousPage]);
+
+  const goToPage = useCallback((page: number) => {
+    setPagination((prev) => ({
+      ...prev,
+      page: page,
+    }));
+  }, []);
 
   const fetchDevices = useCallback(async () => {
     setLoading(true);
@@ -27,7 +59,14 @@ export function useDevices() {
 
     try {
       const useCase = new GetAllDevicesUseCase();
-      const result = await useCase.execute();
+      const result = await useCase.execute({
+        queryParam: {
+          sortOrder: "ASC",
+          page: pagination.page,
+          take: pagination.take,
+          size: pagination.take,
+        },
+      });
 
       Logger.info("useDevices", "execute", result);
 
@@ -35,6 +74,7 @@ export function useDevices() {
         setError(result.message);
       } else {
         setDevices(result.devices);
+        setPagination(result.pagination);
       }
     } catch (e: unknown) {
       setError(
@@ -43,11 +83,20 @@ export function useDevices() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pagination.page, pagination.take]);
 
   useEffect(() => {
     fetchDevices();
   }, [fetchDevices]);
 
-  return { devices, loading, error, fetchDevices };
+  return {
+    devices,
+    loading,
+    error,
+    pagination,
+    fetchDevices,
+    nextPage,
+    previousPage,
+    goToPage,
+  };
 }

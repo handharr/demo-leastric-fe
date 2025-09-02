@@ -8,6 +8,7 @@ import {
   CreateDeviceFormData,
   UpdateDeviceFormData,
 } from "@/features/device/domain/params/data-params";
+import { GetAllDevicesQueryParams } from "@/features/device/domain/params/query-params";
 
 export interface DeviceRepository {
   getDevice({
@@ -15,7 +16,11 @@ export interface DeviceRepository {
   }: {
     pathParam: GetDevicePathParams;
   }): Promise<DeviceModel | BaseErrorModel>;
-  getAllDevices(): Promise<GetDevicesModel | BaseErrorModel>;
+  getAllDevices({
+    queryParam,
+  }: {
+    queryParam: GetAllDevicesQueryParams;
+  }): Promise<GetDevicesModel | BaseErrorModel>;
   createDevice({
     deviceData,
   }: {

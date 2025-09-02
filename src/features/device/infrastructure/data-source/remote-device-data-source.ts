@@ -109,12 +109,15 @@ export class RemoteDeviceDataSource implements DeviceDataSource {
     }
   }
 
-  async getAllDevices(): Promise<
-    BaseResponse<GetDevicesResponse> | BaseErrorResponse
-  > {
+  async getAllDevices({
+    params,
+  }: {
+    params?: Record<string, unknown>;
+  }): Promise<BaseResponse<GetDevicesResponse> | BaseErrorResponse> {
     try {
       return await this.apiClient.get<BaseResponse<GetDevicesResponse>>(
-        `v1/devices`
+        `v1/devices`,
+        { params }
       );
     } catch (error) {
       return this.apiClient.handleError(

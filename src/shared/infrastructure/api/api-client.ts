@@ -488,43 +488,61 @@ export class ApiClient {
   /**
    * HTTP Methods
    */
-  async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    return this.executeWithRetry(() => this.axiosInstance.get<T>(url, config));
+  async get<T>(
+    url: string,
+    params?: Record<string, unknown>,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    const mergedConfig = { ...(config || {}), params };
+    return this.executeWithRetry(() =>
+      this.axiosInstance.get<T>(url, mergedConfig)
+    );
   }
 
   async post<T>(
     url: string,
     data?: unknown,
+    params?: Record<string, unknown>,
     config?: AxiosRequestConfig
   ): Promise<T> {
+    const mergedConfig = { ...(config || {}), params };
     return this.executeWithRetry(() =>
-      this.axiosInstance.post<T>(url, data, config)
+      this.axiosInstance.post<T>(url, data, mergedConfig)
     );
   }
 
   async put<T>(
     url: string,
     data?: unknown,
+    params?: Record<string, unknown>,
     config?: AxiosRequestConfig
   ): Promise<T> {
+    const mergedConfig = { ...(config || {}), params };
     return this.executeWithRetry(() =>
-      this.axiosInstance.put<T>(url, data, config)
+      this.axiosInstance.put<T>(url, data, mergedConfig)
     );
   }
 
   async patch<T>(
     url: string,
     data?: unknown,
+    params?: Record<string, unknown>,
     config?: AxiosRequestConfig
   ): Promise<T> {
+    const mergedConfig = { ...(config || {}), params };
     return this.executeWithRetry(() =>
-      this.axiosInstance.patch<T>(url, data, config)
+      this.axiosInstance.patch<T>(url, data, mergedConfig)
     );
   }
 
-  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async delete<T>(
+    url: string,
+    params?: Record<string, unknown>,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    const mergedConfig = { ...(config || {}), params };
     return this.executeWithRetry(() =>
-      this.axiosInstance.delete<T>(url, config)
+      this.axiosInstance.delete<T>(url, mergedConfig)
     );
   }
 

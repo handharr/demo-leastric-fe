@@ -8,6 +8,7 @@ import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-so
 import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositories-implementation/device-repository-impl";
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { GetAllDevicesQueryParams } from "@/features/device/domain/params/query-params";
 
 export class GetAllDevicesUseCase {
   constructor(
@@ -16,9 +17,13 @@ export class GetAllDevicesUseCase {
     )
   ) {}
 
-  async execute(): Promise<GetDevicesModel | BaseErrorModel> {
+  async execute({
+    queryParam,
+  }: {
+    queryParam: GetAllDevicesQueryParams;
+  }): Promise<GetDevicesModel | BaseErrorModel> {
     try {
-      const devices = await this.deviceRepository.getAllDevices();
+      const devices = await this.deviceRepository.getAllDevices({ queryParam });
       Logger.info("GetAllDevicesUseCase", "execute success");
       return devices;
     } catch (error) {

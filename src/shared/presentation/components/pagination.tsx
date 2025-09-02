@@ -1,20 +1,27 @@
-export interface PaginationModel {
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
+// export interface PaginationModel {
+//   total: number;
+//   page: number;
+//   pageSize: number;
+// }
+import { PaginationModel } from "@/shared/domain/entities/models-interface";
 interface PaginationProps {
   model: PaginationModel;
   onPageChange: (page: number) => void;
+  onPreviousPage: () => void;
+  onNextPage: () => void;
 }
 
-export function Pagination({ model, onPageChange }: PaginationProps) {
-  const { total, page, pageSize } = model;
-  const totalPages = Math.ceil(total / pageSize);
+export function Pagination({
+  model,
+  onPageChange,
+  onPreviousPage,
+  onNextPage,
+}: PaginationProps) {
+  const { itemCount, page, take } = model;
+  const totalPages = Math.ceil(itemCount / take);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const start = (page - 1) * pageSize + 1;
-  const end = Math.min(page * pageSize, total);
+  const start = (page - 1) * take + 1;
+  const end = Math.min(page * take, itemCount);
 
   return (
     <div className="w-full bg-gray-50 border-t rounded-b-xl">
@@ -24,12 +31,12 @@ export function Pagination({ model, onPageChange }: PaginationProps) {
           <b>
             {start}-{end}
           </b>{" "}
-          of <b>{total}</b> data
+          of <b>{itemCount}</b> data
         </span>
         <div className="flex items-center gap-1 overflow-x-auto">
           <button
             className="p-1 rounded hover:bg-gray-200"
-            onClick={() => onPageChange(page - 1)}
+            onClick={() => onPreviousPage()}
             disabled={page === 1}
           >
             <span className={page === 1 ? "text-gray-400" : "text-gray-600"}>
@@ -51,7 +58,7 @@ export function Pagination({ model, onPageChange }: PaginationProps) {
           ))}
           <button
             className="p-1 rounded hover:bg-gray-200"
-            onClick={() => onPageChange(page + 1)}
+            onClick={() => onNextPage()}
             disabled={page === totalPages}
           >
             <span

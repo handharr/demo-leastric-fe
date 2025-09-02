@@ -2,12 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useGetUserDetails } from "@/shared/presentation/hooks/use-get-user-details";
+import { useUpdateUserDetails } from "@/shared/presentation/hooks/use-update-user-details";
+import {
+  EmptyData,
+  EmptyDataState,
+} from "@/shared/presentation/components/empty-data";
 
 export default function ProfilePage() {
   const [fullName, setFullName] = useState("Jono Sujono Mangunkusom");
   const [email, setEmail] = useState("Jonosujono@gmail.com");
   const [phone, setPhone] = useState("");
-  const { userDetails, loading, error } = useGetUserDetails();
+  const { userDetails, loading, error, fetchUserDetails } = useGetUserDetails();
+  const {
+    updateUserDetails,
+    loading: updating,
+    error: updateError,
+    success,
+    resetState,
+  } = useUpdateUserDetails();
 
   useEffect(() => {
     if (userDetails) {
@@ -15,10 +27,26 @@ export default function ProfilePage() {
       setEmail(userDetails.email);
       setPhone(userDetails.phoneNumber);
     }
-  }, [userDetails]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+    if (success) {
+      // Handle success case
+      fetchUserDetails();
+      resetState();
+    }
+  }, [userDetails, success, fetchUserDetails, resetState]);
+
+  if (loading) {
+    return (
+      <EmptyData message="Loading profile..." state={EmptyDataState.LOADING} />
+    );
+  }
+
+  if (error || updateError)
+    return (
+      <div className="flex justify-center items-center h-40 text-typography-negative">
+        {error?.message || updateError?.message}
+      </div>
+    );
 
   return (
     <div className="flex flex-col w-full gap-[16px]">
@@ -27,7 +55,12 @@ export default function ProfilePage() {
         className="grid grid-cols-1 md:grid-cols-2 gap-[16px]"
         onSubmit={(e) => {
           e.preventDefault();
-          // handle save
+          updateUserDetails({
+            id: userDetails?.id,
+            email,
+            name: fullName,
+            phoneNumber: phone,
+          });
         }}
       >
         <div className="col-span-2">
@@ -61,7 +94,10 @@ export default function ProfilePage() {
           <input
             className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-brand-primary"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              const onlyNums = e.target.value.replace(/\D/g, "");
+              setPhone(onlyNums);
+            }}
             type="tel"
             placeholder="Enter your phone number"
           />
@@ -69,9 +105,10 @@ export default function ProfilePage() {
         <div className="col-span-2 flex justify-end">
           <button
             type="submit"
-            className="bg-brand-primary text-white px-8 py-2 rounded-md font-medium hover:bg-brand-primary transition"
+            className="cursor-pointer bg-brand-primary text-white px-8 py-2 rounded-md font-medium hover:bg-brand-primary transition"
+            disabled={updating}
           >
-            Save
+            {updating ? "Saving..." : "Save"}
           </button>
         </div>
       </form>

@@ -38,5 +38,5 @@ export const useGetUserDetails = () => {
     fetchUserDetails();
   }, [fetchUserDetails]);
 
-  return { userDetails, loading, error };
+  return { userDetails, loading, error, fetchUserDetails };
 };

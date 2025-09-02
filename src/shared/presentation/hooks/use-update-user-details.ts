@@ -8,10 +8,16 @@ export function useUpdateUserDetails() {
   const [error, setError] = useState<BaseErrorModel | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
 
+  const resetState = useCallback(() => {
+    setLoading(false);
+    setError(null);
+    setSuccess(null);
+  }, []);
+
   const updateUserDetails = useCallback(
     async (userData: UpdateUserFormData) => {
+      resetState();
       setLoading(true);
-      setError(null);
       setSuccess(null);
 
       const useCase = new UpdateUserDetailsUseCase();
@@ -27,7 +33,7 @@ export function useUpdateUserDetails() {
       }
       setLoading(false);
     },
-    []
+    [resetState]
   );
 
   return {
@@ -35,5 +41,6 @@ export function useUpdateUserDetails() {
     loading,
     error,
     success,
+    resetState,
   };
 }

@@ -15,6 +15,9 @@ import { isErrorResponse } from "@/shared/infrastructure/model/base-error-respon
 import { storage } from "@/shared/utils/helpers/storage-helper";
 import { clearLocalTokens } from "@/shared/utils/helpers/network-helper";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { UpdatePasswordModel } from "../../domain/entities/auth-model";
+import { mapUpdatePasswordFormDataToDto } from "../../domain/mapper/auth-params-mapper";
+import { UpdatePasswordFormData } from "../../domain/params/data/auth-form-data";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(private dataSource: AuthDataSource) {}
@@ -171,5 +174,25 @@ export class AuthRepositoryImpl implements AuthRepository {
       success: optional(result.success).orFalse(),
       message: optional(result.message).orEmpty(),
     } as ResetPasswordModel;
+  }
+
+  async updatePassword({
+    params,
+  }: {
+    params: UpdatePasswordFormData;
+  }): Promise<UpdatePasswordModel | BaseErrorModel> {
+    const dto = mapUpdatePasswordFormDataToDto(params);
+    const result = await this.dataSource.updatePassword({
+      updatePasswordData: dto,
+    });
+
+    if (isErrorResponse(result)) {
+      return mapErrorResponseToModel({ response: result });
+    }
+
+    return {
+      success: result.flash?.type === "success",
+      message: optional(result.data?.message).orEmpty(),
+    } as UpdatePasswordModel;
   }
 }

@@ -11,6 +11,8 @@ import {
   ApiClient,
   createAuthApiClient,
 } from "@/shared/infrastructure/api/api-client";
+import { UpdatePasswordResponse } from "../../model/auth-response";
+import { UpdatePasswordDto } from "../../params/auth-dto";
 
 export class RemoteAuthDataSource implements AuthDataSource {
   private apiClient: ApiClient;
@@ -117,6 +119,24 @@ export class RemoteAuthDataSource implements AuthDataSource {
       return this.apiClient.handleError(
         error as AxiosError<BaseErrorResponse>,
         "Password reset failed. Please try again."
+      );
+    }
+  }
+
+  async updatePassword({
+    updatePasswordData,
+  }: {
+    updatePasswordData: UpdatePasswordDto;
+  }): Promise<BaseResponse<UpdatePasswordResponse> | BaseErrorResponse> {
+    try {
+      return await this.apiClient.post<BaseResponse<UpdatePasswordResponse>>(
+        "/v1/update-password",
+        updatePasswordData
+      );
+    } catch (error) {
+      return this.apiClient.handleError(
+        error as AxiosError<BaseErrorResponse>,
+        "Password update failed. Please try again."
       );
     }
   }

@@ -4,6 +4,8 @@ import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-password-data";
 import { UserModel } from "@/features/auth/domain/entities/user-model";
 import { ResetPasswordModel } from "@/features/auth/domain/entities/reset-password-model";
+import { UpdatePasswordModel } from "../entities/auth-model";
+import { UpdatePasswordFormData } from "../params/data/auth-form-data";
 
 export interface AuthRepository {
   login({ data }: { data: LoginFormData }): Promise<UserModel | BaseErrorModel>;
@@ -23,4 +25,10 @@ export interface AuthRepository {
   }: {
     params: ResetPasswordData;
   }): Promise<ResetPasswordModel | BaseErrorModel>;
+
+  updatePassword({
+    params,
+  }: {
+    params: UpdatePasswordFormData;
+  }): Promise<UpdatePasswordModel | BaseErrorModel>;
 }

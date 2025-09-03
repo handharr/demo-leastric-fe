@@ -5,6 +5,8 @@ import { ResetPasswordResponse } from "@/features/auth/infrastructure/model/rese
 import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-password-data";
 import { BaseResponse } from "@/shared/infrastructure/model/base-response";
 import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { UpdatePasswordDto } from "@/features/auth/infrastructure/params/auth-dto";
+import { UpdatePasswordResponse } from "@/features/auth/infrastructure/model/auth-response";
 
 export interface AuthDataSource {
   login({
@@ -34,4 +36,16 @@ export interface AuthDataSource {
   }: {
     params: ResetPasswordData;
   }): Promise<ResetPasswordResponse | BaseErrorResponse>;
+
+  resetPassword({
+    params,
+  }: {
+    params: ResetPasswordData;
+  }): Promise<ResetPasswordResponse | BaseErrorResponse>;
+
+  updatePassword({
+    updatePasswordData,
+  }: {
+    updatePasswordData: UpdatePasswordDto;
+  }): Promise<BaseResponse<UpdatePasswordResponse> | BaseErrorResponse>;
 }

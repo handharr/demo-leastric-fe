@@ -12,12 +12,10 @@ import {
   GetDevicesResponse,
   UpdateDeviceResponse,
 } from "@/features/device/infrastructure/model/device-response";
-import {
-  CreateDeviceFormData,
-  UpdateDeviceFormData,
-} from "@/features/device/domain/params/data-params";
+import { CreateDeviceFormData } from "@/features/device/domain/params/data-params";
 import { DeviceDataSource } from "@/features/device/infrastructure/data-source/device-data-source";
 import { Logger } from "@/shared/utils/logger/logger";
+import { UpdateDeviceDto } from "../params/device-dto";
 
 export class RemoteDeviceDataSource implements DeviceDataSource {
   private apiClient: ApiClient;
@@ -59,7 +57,7 @@ export class RemoteDeviceDataSource implements DeviceDataSource {
     deviceData,
   }: {
     deviceId: number;
-    deviceData: UpdateDeviceFormData;
+    deviceData: UpdateDeviceDto;
   }): Promise<BaseResponse<UpdateDeviceResponse> | BaseErrorResponse> {
     try {
       return await this.apiClient.patch<BaseResponse<UpdateDeviceResponse>>(

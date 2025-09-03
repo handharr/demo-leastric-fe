@@ -36,8 +36,9 @@ export default function SecurityPage() {
     currentPassword.length > 0;
 
   return (
-    <div className="flex flex-col gap-[16px] w-full max-w-2xl">
+    <div className="flex flex-col gap-[16px] w-full">
       <h2 className="text-xl font-semibold mb-2">Security</h2>
+      {/* Current Password and Forgot Password */}
       <div>
         <label className="block text-sm font-medium mb-1">
           Current Password
@@ -61,15 +62,17 @@ export default function SecurityPage() {
               {showCurrent ? <span>🙈</span> : <span>👁️</span>}
             </button>
           </div>
-          <a
-            href="#"
-            className="text-brand-primary text-sm font-medium ml-2 hover:underline whitespace-nowrap"
-          >
-            Forgot Password?
-          </a>
+          <div className="flex-1">
+            <a
+              href="#"
+              className="text-brand-primary text-sm font-medium ml-2 hover:underline whitespace-nowrap"
+            >
+              Forgot Password?
+            </a>
+          </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">New password</label>
           <div className="relative">

@@ -72,7 +72,7 @@ export default function DevicePage() {
       />
 
       {/* Device Table */}
-      <DeviceTable />
+      <DeviceTable search={search} />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { GetAllDevicesUseCase } from "@/features/device/domain/use-cases/get-all-device-use-case";
 import {
   DeviceModel,
@@ -52,47 +52,47 @@ export function useDevices() {
     [pagination.pageCount, pagination.page]
   );
 
-  const fetchDevices = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchDevices = useCallback(
+    async ({ search }: { search: string }) => {
+      setLoading(true);
+      setError(null);
 
-    if (useDummy) {
-      setDevices(deviceModelDummies);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const useCase = new GetAllDevicesUseCase();
-      const result = await useCase.execute({
-        queryParam: {
-          sortOrder: "ASC",
-          page: pagination.page,
-          take: pagination.take,
-          size: pagination.take,
-        },
-      });
-
-      Logger.info("useDevices", "execute", result);
-
-      if (isErrorModel(result)) {
-        setError(result.message);
-      } else {
-        setDevices(result.devices);
-        setPagination(result.pagination);
+      if (useDummy) {
+        setDevices(deviceModelDummies);
+        setLoading(false);
+        return;
       }
-    } catch (e: unknown) {
-      setError(
-        optional((e as Error)?.message).orDefault("Failed to fetch devices")
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [pagination.page, pagination.take]);
 
-  useEffect(() => {
-    fetchDevices();
-  }, [fetchDevices]);
+      try {
+        const useCase = new GetAllDevicesUseCase();
+        const result = await useCase.execute({
+          queryParam: {
+            sortOrder: "ASC",
+            page: pagination.page,
+            take: pagination.take,
+            name: search,
+            size: pagination.take,
+          },
+        });
+
+        Logger.info("useDevices", "execute", result);
+
+        if (isErrorModel(result)) {
+          setError(result.message);
+        } else {
+          setDevices(result.devices);
+          setPagination(result.pagination);
+        }
+      } catch (e: unknown) {
+        setError(
+          optional((e as Error)?.message).orDefault("Failed to fetch devices")
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [pagination.page, pagination.take]
+  );
 
   return {
     devices,

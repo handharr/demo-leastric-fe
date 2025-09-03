@@ -1,5 +1,10 @@
 "use client";
 import { useState } from "react";
+import {
+  ChangePasswordValidator,
+  type ChangePasswordFields,
+} from "@/features/setting/presentation/validator/change-password-validator";
+import Image from "next/image";
 
 export default function SecurityPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -9,31 +14,15 @@ export default function SecurityPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Password validation rules
-  const validations = [
-    {
-      label: "Password must at least 8 character minimal",
-      valid: newPassword.length >= 8,
-    },
-    {
-      label: "Password must include capital letter",
-      valid: /[A-Z]/.test(newPassword),
-    },
-    {
-      label: "Password must include Number",
-      valid: /\d/.test(newPassword),
-    },
-    {
-      label: "Password must include special character (*, !, @, #, %)",
-      valid: /[*!@#%]/.test(newPassword),
-    },
-  ];
+  // Get validation result
+  const fields: ChangePasswordFields = {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  };
 
-  const isFormValid =
-    validations.every((v) => v.valid) &&
-    newPassword === confirmPassword &&
-    newPassword.length > 0 &&
-    currentPassword.length > 0;
+  const validationResult = ChangePasswordValidator.validate(fields);
+  const { isValid: isFormValid, errors, passwordRules = [] } = validationResult;
 
   return (
     <div className="flex flex-col gap-[16px] w-full">
@@ -47,19 +36,33 @@ export default function SecurityPage() {
           <div className="relative flex-1">
             <input
               type={showCurrent ? "text" : "password"}
-              className="w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-green-200"
+              className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
+                errors.currentPassword
+                  ? "border-red-300 focus:ring-red-200"
+                  : "focus:ring-green-200"
+              }`}
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Enter current password"
             />
             <button
               type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+              className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
               onClick={() => setShowCurrent((v) => !v)}
               tabIndex={-1}
               aria-label={showCurrent ? "Hide password" : "Show password"}
             >
-              {showCurrent ? <span>🙈</span> : <span>👁️</span>}
+              <Image
+                src={
+                  showCurrent
+                    ? "/resources/icons/security/eye-closed.svg"
+                    : "/resources/icons/security/eye-open.svg"
+                }
+                alt={showCurrent ? "Hide password" : "Show password"}
+                width={20}
+                height={20}
+                className="text-gray-400 hover:text-gray-600"
+              />
             </button>
           </div>
           <div className="flex-1">
@@ -71,6 +74,9 @@ export default function SecurityPage() {
             </a>
           </div>
         </div>
+        {errors.currentPassword && (
+          <p className="text-red-500 text-sm mt-1">{errors.currentPassword}</p>
+        )}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
@@ -78,19 +84,33 @@ export default function SecurityPage() {
           <div className="relative">
             <input
               type={showNew ? "text" : "password"}
-              className="w-full border rounded-md px-4 py-2 pr-10 focus:outline-none"
+              className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
+                errors.newPassword
+                  ? "border-red-300 focus:ring-red-200"
+                  : "focus:ring-green-200"
+              }`}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password"
             />
             <button
               type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+              className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
               onClick={() => setShowNew((v) => !v)}
               tabIndex={-1}
               aria-label={showNew ? "Hide password" : "Show password"}
             >
-              {showNew ? <span>🙈</span> : <span>👁️</span>}
+              <Image
+                src={
+                  showNew
+                    ? "/resources/icons/security/eye-closed.svg"
+                    : "/resources/icons/security/eye-open.svg"
+                }
+                alt={showNew ? "Hide password" : "Show password"}
+                width={20}
+                height={20}
+                className="text-gray-400 hover:text-gray-600"
+              />
             </button>
           </div>
         </div>
@@ -101,33 +121,52 @@ export default function SecurityPage() {
           <div className="relative">
             <input
               type={showConfirm ? "text" : "password"}
-              className="w-full border rounded-md px-4 py-2 pr-10 focus:outline-none"
+              className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
+                errors.confirmPassword
+                  ? "border-red-300 focus:ring-red-200"
+                  : "focus:ring-green-200"
+              }`}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Re-enter new password"
             />
             <button
               type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+              className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
               onClick={() => setShowConfirm((v) => !v)}
               tabIndex={-1}
               aria-label={showConfirm ? "Hide password" : "Show password"}
             >
-              {showConfirm ? <span>🙈</span> : <span>👁️</span>}
+              <Image
+                src={
+                  showConfirm
+                    ? "/resources/icons/security/eye-closed.svg"
+                    : "/resources/icons/security/eye-open.svg"
+                }
+                alt={showConfirm ? "Hide password" : "Show password"}
+                width={20}
+                height={20}
+                className="text-gray-400 hover:text-gray-600"
+              />
             </button>
           </div>
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.confirmPassword}
+            </p>
+          )}
         </div>
       </div>
       <ul className="mt-2 mb-4 space-y-1 text-sm">
-        {validations.map((v, i) => (
+        {passwordRules.map((rule) => (
           <li
-            key={i}
+            key={rule.id}
             className={`flex items-center gap-2 ${
-              v.valid ? "text-brand-primary" : "text-gray-400"
+              rule.isValid ? "text-brand-primary" : "text-gray-400"
             }`}
           >
             <span>
-              {v.valid ? (
+              {rule.isValid ? (
                 <svg width="16" height="16" fill="none">
                   <circle cx="8" cy="8" r="8" fill="#2a6335" />
                   <path
@@ -151,12 +190,12 @@ export default function SecurityPage() {
                 </svg>
               )}
             </span>
-            {v.label}
+            {rule.message}
           </li>
         ))}
       </ul>
       <button
-        className="bg-brand-primary text-white px-6 py-2 rounded-md font-semibold disabled:bg-gray-200 disabled:text-gray-400 transition"
+        className="cursor-pointer bg-brand-primary text-white px-6 py-2 rounded-md font-semibold disabled:bg-gray-200 disabled:text-gray-400 transition"
         disabled={!isFormValid}
       >
         Update Password

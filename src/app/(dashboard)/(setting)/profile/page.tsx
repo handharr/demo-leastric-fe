@@ -76,7 +76,7 @@ export default function ProfilePage() {
             placeholder="Enter your full name"
           />
         </div>
-        <div>
+        <div className="col-span-2 lg:col-span-1">
           <label className="block text-sm font-medium mb-1">
             Email <span className="text-typography-negative">*</span>
           </label>
@@ -89,7 +89,7 @@ export default function ProfilePage() {
             placeholder="Enter your email"
           />
         </div>
-        <div>
+        <div className="col-span-2 lg:col-span-1">
           <label className="block text-sm font-medium mb-1">Phone Number</label>
           <input
             className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-brand-primary"

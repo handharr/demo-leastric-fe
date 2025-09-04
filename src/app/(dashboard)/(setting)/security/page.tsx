@@ -76,7 +76,7 @@ export default function SecurityPage() {
         <label className="block text-sm font-medium mb-1">
           Current Password
         </label>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
           <div className="relative flex-1">
             <input
               type={showCurrent ? "text" : "password"}
@@ -110,10 +110,10 @@ export default function SecurityPage() {
               />
             </button>
           </div>
-          <div className="flex-1">
+          <div className="sm:flex-1">
             <a
               href="#"
-              className="text-brand-primary text-sm font-medium ml-2 hover:underline whitespace-nowrap"
+              className="text-brand-primary text-sm font-medium sm:ml-2 hover:underline whitespace-nowrap"
             >
               Forgot Password?
             </a>
@@ -251,7 +251,7 @@ export default function SecurityPage() {
       </ul>
 
       <button
-        className="cursor-pointer bg-brand-primary text-white px-6 py-2 rounded-md font-semibold disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition"
+        className="cursor-pointer bg-brand-primary text-white px-6 py-2 rounded-md font-semibold disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition w-full sm:w-auto"
         disabled={!isFormValid || isLoading}
         onClick={handleUpdatePassword}
       >

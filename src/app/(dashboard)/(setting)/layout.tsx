@@ -42,7 +42,7 @@ const MENU_ITEMS: SettingMenuItem[] = [
   },
 ];
 
-export default function Layout({
+export default function SettingLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -50,6 +50,7 @@ export default function Layout({
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showContent, setShowContent] = useState(false);
   const pathname = usePathname();
 
   // Sync activeMenu with current path
@@ -65,10 +66,15 @@ export default function Layout({
         return;
       }
       setActiveIndex(MENU_ITEMS.indexOf(item));
+      setShowContent(true); // Show content when menu item is clicked on mobile
       router.push(item.route);
     },
     [router]
   );
+
+  const handleBackToMenu = () => {
+    setShowContent(false);
+  };
 
   const handleLogout = () => {
     setShowLogoutDialog(false);
@@ -85,10 +91,16 @@ export default function Layout({
       <span className="items-center justify-center text-2xl font-bold text-typography-headline">
         Setting
       </span>
-      {/* Main content will be rendered here */}
-      <div className="flex bg-neutral-50 gap-[16px]">
+      {/* Setting layout and children */}
+      <div className="flex bg-neutral-50 gap-[16px] relative">
         {/* Sidebar */}
-        <aside className="w-full max-w-xs bg-white rounded-xl border border-[#E5E7EB] flex flex-col p-[20px] gap-8 self-start">
+        <aside
+          className={clsx(
+            "w-full md:max-w-xs bg-white rounded-xl border border-[#E5E7EB] flex flex-col p-[20px] gap-8 self-start transition-transform duration-300",
+            "md:block md:translate-x-0",
+            showContent ? "hidden md:block" : "block"
+          )}
+        >
           {/* User Info */}
           <div className="flex flex-col items-center gap-2">
             <div className="w-16 h-16 rounded-full bg-[#E6F4EA] flex items-center justify-center text-2xl font-semibold text-[#2a6335]">
@@ -131,13 +143,42 @@ export default function Layout({
             ))}
           </nav>
         </aside>
+
         {/* Content */}
-        <main className="flex-1 flex flex-col">
+        <main
+          className={clsx(
+            "flex-1 flex flex-col transition-transform duration-300",
+            "md:block",
+            showContent ? "block" : "hidden md:block"
+          )}
+        >
+          {/* Back button for mobile */}
+          <div className="md:hidden mb-4">
+            <button
+              onClick={handleBackToMenu}
+              className="flex items-center gap-2 text-brand-primary hover:text-brand-primary/80 transition-colors"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              <span className="text-sm font-medium">Back to Settings</span>
+            </button>
+          </div>
           <div className="bg-white rounded-xl border border-[#E5E7EB] p-[20px]">
             {children}
           </div>
         </main>
       </div>
+
       {/* Logout Dialog */}
       {showLogoutDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">

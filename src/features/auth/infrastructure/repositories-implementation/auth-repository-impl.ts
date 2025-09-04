@@ -15,12 +15,15 @@ import { isErrorResponse } from "@/shared/infrastructure/model/base-error-respon
 import { storage } from "@/shared/utils/helpers/storage-helper";
 import { clearLocalTokens } from "@/shared/utils/helpers/network-helper";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
-import { UpdatePasswordModel } from "../../domain/entities/auth-model";
-import { mapUpdatePasswordFormDataToDto } from "../../domain/mapper/auth-params-mapper";
-import { UpdatePasswordFormData } from "../../domain/params/data/auth-form-data";
+import { UpdatePasswordModel } from "@/features/auth/domain/entities/auth-model";
+import { mapUpdatePasswordFormDataToDto } from "@/features/auth/domain/mapper/auth-params-mapper";
+import { UpdatePasswordFormData } from "@/features/auth/domain/params/data/auth-form-data";
+import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
 
 export class AuthRepositoryImpl implements AuthRepository {
-  constructor(private dataSource: AuthDataSource) {}
+  constructor(
+    private dataSource: AuthDataSource = new RemoteAuthDataSource()
+  ) {}
 
   async login({
     data,
@@ -177,11 +180,11 @@ export class AuthRepositoryImpl implements AuthRepository {
   }
 
   async updatePassword({
-    params,
+    formData,
   }: {
-    params: UpdatePasswordFormData;
+    formData: UpdatePasswordFormData;
   }): Promise<UpdatePasswordModel | BaseErrorModel> {
-    const dto = mapUpdatePasswordFormDataToDto(params);
+    const dto = mapUpdatePasswordFormDataToDto(formData);
     const result = await this.dataSource.updatePassword({
       updatePasswordData: dto,
     });

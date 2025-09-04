@@ -27,8 +27,8 @@ export interface AuthRepository {
   }): Promise<ResetPasswordModel | BaseErrorModel>;
 
   updatePassword({
-    params,
+    formData,
   }: {
-    params: UpdatePasswordFormData;
+    formData: UpdatePasswordFormData;
   }): Promise<UpdatePasswordModel | BaseErrorModel>;
 }

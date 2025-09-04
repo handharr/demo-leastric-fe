@@ -1,10 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChangePasswordValidator,
   type ChangePasswordFields,
 } from "@/features/setting/presentation/validator/change-password-validator";
+import { useUpdatePassword } from "@/features/auth/presentation/hooks/use-update-password";
+import { UpdatePasswordFormData } from "@/features/auth/domain/params/data/auth-form-data";
 import Image from "next/image";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
 
 export default function SecurityPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -13,6 +19,11 @@ export default function SecurityPage() {
   const [showNew, setShowNew] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
+  const { showPopup } = usePopup();
+
+  // Use the custom hook
+  const { error, isLoading, isSuccess, isError, updatePassword, reset } =
+    useUpdatePassword();
 
   // Get validation result
   const fields: ChangePasswordFields = {
@@ -24,9 +35,42 @@ export default function SecurityPage() {
   const validationResult = ChangePasswordValidator.validate(fields);
   const { isValid: isFormValid, errors, passwordRules = [] } = validationResult;
 
+  // Handle form submission
+  const handleUpdatePassword = async () => {
+    if (!isFormValid) return;
+
+    const formData: UpdatePasswordFormData = {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+    };
+
+    await updatePassword(formData);
+  };
+
+  // Reset form on success
+  useEffect(() => {
+    if (isSuccess) {
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      reset();
+      showPopup("Password updated successfully!", PopupType.SUCCESS);
+      console.log("Password updated successfully!");
+    }
+  }, [isSuccess, reset, showPopup]);
+
   return (
     <div className="flex flex-col gap-[16px] w-full">
       <h2 className="text-xl font-semibold mb-2">Security</h2>
+
+      {/* Show API error if exists */}
+      {isError && error && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
+          <p className="text-typography-negative text-sm">{error.message}</p>
+        </div>
+      )}
+
       {/* Current Password and Forgot Password */}
       <div>
         <label className="block text-sm font-medium mb-1">
@@ -37,13 +81,14 @@ export default function SecurityPage() {
             <input
               type={showCurrent ? "text" : "password"}
               className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
-                errors.currentPassword
+                errors.currentPassword || (isError && error?.statusCode === 401)
                   ? "border-red-300 focus:ring-red-200"
                   : "focus:ring-green-200"
               }`}
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Enter current password"
+              disabled={isLoading}
             />
             <button
               type="button"
@@ -77,7 +122,14 @@ export default function SecurityPage() {
         {errors.currentPassword && (
           <p className="text-red-500 text-sm mt-1">{errors.currentPassword}</p>
         )}
+        {/* Show current password error from API */}
+        {isError && error?.statusCode === 401 && (
+          <p className="text-red-500 text-sm mt-1">
+            Current password is incorrect
+          </p>
+        )}
       </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">New password</label>
@@ -92,6 +144,7 @@ export default function SecurityPage() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password"
+              disabled={isLoading}
             />
             <button
               type="button"
@@ -129,6 +182,7 @@ export default function SecurityPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Re-enter new password"
+              disabled={isLoading}
             />
             <button
               type="button"
@@ -157,6 +211,7 @@ export default function SecurityPage() {
           )}
         </div>
       </div>
+
       <ul className="mt-2 mb-4 space-y-1 text-sm">
         {passwordRules.map((rule) => (
           <li
@@ -194,11 +249,13 @@ export default function SecurityPage() {
           </li>
         ))}
       </ul>
+
       <button
-        className="cursor-pointer bg-brand-primary text-white px-6 py-2 rounded-md font-semibold disabled:bg-gray-200 disabled:text-gray-400 transition"
-        disabled={!isFormValid}
+        className="cursor-pointer bg-brand-primary text-white px-6 py-2 rounded-md font-semibold disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition"
+        disabled={!isFormValid || isLoading}
+        onClick={handleUpdatePassword}
       >
-        Update Password
+        {isLoading ? "Updating..." : "Update Password"}
       </button>
     </div>
   );

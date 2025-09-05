@@ -59,9 +59,25 @@ export function ActiveFiltersContainer<T extends FilterState>({
             key={key}
             label={config.label}
             value={display}
-            onRemove={() =>
-              onChange({ ...filters, [key]: config.defaultValue })
-            }
+            onRemove={() => {
+              if (config.type === FilterType.Multi) {
+                onChange({
+                  ...filters,
+                  multiSelection: {
+                    ...filters.multiSelection,
+                    [key]: config.defaultValue,
+                  },
+                });
+              } else {
+                onChange({
+                  ...filters,
+                  singleSelection: {
+                    ...filters.singleSelection,
+                    [key]: config.defaultValue,
+                  },
+                });
+              }
+            }}
           />
         );
       })}

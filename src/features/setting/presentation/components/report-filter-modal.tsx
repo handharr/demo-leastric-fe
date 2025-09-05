@@ -21,7 +21,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import {
   getDefaultFilters,
-  isDefaultFilters,
+  hasActiveFilters,
 } from "@/shared/utils/helpers/filter-helper";
 
 export interface ReportFilterState extends FilterState {
@@ -63,8 +63,7 @@ export function ReportFilterModal({
   );
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  // const hasActiveFilters = !isDefaultFilters(filter);
-  const hasActiveFilters = isDefaultFilters({
+  const hasActiveReportFilters = hasActiveFilters({
     filters: filter,
     meta: reportFilterMeta,
   });
@@ -108,7 +107,7 @@ export function ReportFilterModal({
         onClick={handleOpen}
         className={clsx(
           "flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold cursor-pointer transition-colors",
-          hasActiveFilters
+          hasActiveReportFilters
             ? "bg-leastric-primary/10 border-leastric-primary text-leastric-primary"
             : "border-default-border text-typography-headline hover:bg-gray-50"
         )}
@@ -121,9 +120,9 @@ export function ReportFilterModal({
         />
         Filter
       </button>
-      {hasActiveFilters && (
+      {hasActiveReportFilters && (
         <button
-          className="text-leastric-primary font-semibold text-sm hover:underline"
+          className="cursor-pointer text-leastric-primary font-semibold text-sm hover:underline"
           onClick={handleReset}
           type="button"
         >

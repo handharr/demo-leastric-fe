@@ -23,7 +23,7 @@ export function FilterModalFooter({
         </button>
         <button
           onClick={onApply}
-          className="px-6 py-2.5 bg-leastric-primary text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+          className="cursor-pointer px-6 py-2.5 bg-leastric-primary text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
         >
           Apply
         </button>

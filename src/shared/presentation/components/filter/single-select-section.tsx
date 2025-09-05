@@ -1,11 +1,29 @@
 import Image from "next/image";
-import { FilterOption } from "@/shared/presentation/types/filter-ui";
+import {
+  FilterOption,
+  FilterState,
+} from "@/shared/presentation/types/filter-ui";
 
 export const getSingleSelectLabel = (
   options: FilterOption[],
   selectedId: string,
   allLabel: string
 ) => options.find((o) => o.id === selectedId)?.label || allLabel;
+
+export const handleSingleSelect =
+  <T extends FilterState>({
+    currentState,
+    key,
+  }: {
+    currentState: T;
+    key: keyof T["singleSelection"];
+  }) =>
+  ({ id }: { id: string }) => {
+    return {
+      ...currentState,
+      singleSelection: { ...currentState.singleSelection, [key]: id },
+    };
+  };
 
 export function SingleSelectSection({
   title,

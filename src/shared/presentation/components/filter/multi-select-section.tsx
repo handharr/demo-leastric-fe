@@ -14,6 +14,22 @@ export const getMultiSelectLabel = (
   return `${selectedIds.length} ${itemLabel} selected`;
 };
 
+export const createMultiSelectHandler =
+  <T extends Record<string, string[]>>(
+    setState: React.Dispatch<React.SetStateAction<T>>,
+    key: keyof T
+  ) =>
+  (id: string) => {
+    setState((prev) => {
+      if (id === "all") return { ...prev, [key]: [] };
+      const arr = prev[key];
+      return {
+        ...prev,
+        [key]: arr.includes(id) ? arr.filter((v) => v !== id) : [...arr, id],
+      };
+    });
+  };
+
 export function MultiSelectSection({
   title,
   options,

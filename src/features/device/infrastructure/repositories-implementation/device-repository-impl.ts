@@ -78,13 +78,17 @@ export class DeviceRepositoryImpl implements DeviceRepository {
     Logger.info("DeviceRepositoryImpl", "getAllDevices", result);
 
     if (isErrorResponse(result)) {
-      Logger.info("DeviceRepositoryImpl", "getAllDevices", result);
+      Logger.info("DeviceRepositoryImpl", "getAllDevices error", result);
       return mapErrorResponseToModel({ response: result });
     }
 
     if (result.flash?.type === "success" && result.data?.devices) {
       const devices = optional(result.data?.devices).orEmpty();
-      Logger.info("DeviceRepositoryImpl", "getAllDevices success", devices);
+      Logger.info(
+        "DeviceRepositoryImpl",
+        "getAllDevices success with devices:",
+        devices
+      );
       const mappedDevices = devices.map((device) => ({
         id: optional(device.id).orZero(),
         deviceName: optional(device.deviceName).orEmpty(),
@@ -95,11 +99,17 @@ export class DeviceRepositoryImpl implements DeviceRepository {
         detailLocation: optional(device.detailLocation).orEmpty(),
       }));
 
+      Logger.info(
+        "DeviceRepositoryImpl",
+        "getAllDevices success pagination",
+        result.meta
+      );
+
       return {
         devices: mappedDevices,
         pagination: {
-          page: optional(result.meta?.page).orZero(),
-          take: optional(result.meta?.take).orZero(),
+          page: Number(optional(result.meta?.page).orEmpty()),
+          take: Number(optional(result.meta?.take).orEmpty()),
           itemCount: optional(result.meta?.itemCount).orZero(),
           pageCount: optional(result.meta?.pageCount).orZero(),
           hasPreviousPage: optional(result.meta?.hasPreviousPage).orFalse(),

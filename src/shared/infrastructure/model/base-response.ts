@@ -5,8 +5,8 @@ export interface BaseResponse<T> {
     message?: string;
   };
   meta?: {
-    page?: number;
-    take?: number;
+    page?: string;
+    take?: string;
     itemCount?: number;
     pageCount?: number;
     hasPreviousPage?: boolean;

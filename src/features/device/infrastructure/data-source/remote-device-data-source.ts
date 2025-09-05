@@ -113,14 +113,15 @@ export class RemoteDeviceDataSource implements DeviceDataSource {
     params?: Record<string, unknown>;
   }): Promise<BaseResponse<GetDevicesResponse> | BaseErrorResponse> {
     try {
-      // const headers: {
-      //   "Cache-Control": "no-cache, no-store, must-revalidate";
-      //   Pragma: "no-cache";
-      //   Expires: "0";
-      // };
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
       return await this.apiClient.get<BaseResponse<GetDevicesResponse>>(
         `v1/devices`,
-        { params }
+        params,
+        { headers }
       );
     } catch (error) {
       return this.apiClient.handleError(

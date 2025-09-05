@@ -15,7 +15,7 @@ import {
 import { CreateDeviceFormData } from "@/features/device/domain/params/data-params";
 import { DeviceDataSource } from "@/features/device/infrastructure/data-source/device-data-source";
 import { Logger } from "@/shared/utils/logger/logger";
-import { UpdateDeviceDto } from "../params/device-dto";
+import { UpdateDeviceDto } from "@/features/device/infrastructure/params/device-dto";
 
 export class RemoteDeviceDataSource implements DeviceDataSource {
   private apiClient: ApiClient;
@@ -113,6 +113,11 @@ export class RemoteDeviceDataSource implements DeviceDataSource {
     params?: Record<string, unknown>;
   }): Promise<BaseResponse<GetDevicesResponse> | BaseErrorResponse> {
     try {
+      // const headers: {
+      //   "Cache-Control": "no-cache, no-store, must-revalidate";
+      //   Pragma: "no-cache";
+      //   Expires: "0";
+      // };
       return await this.apiClient.get<BaseResponse<GetDevicesResponse>>(
         `v1/devices`,
         { params }

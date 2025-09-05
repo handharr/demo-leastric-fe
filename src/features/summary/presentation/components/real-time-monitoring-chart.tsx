@@ -107,7 +107,7 @@ export function RealTimeMonitoringChart({
   return (
     <TilePrimary
       title="Real-Time Monitoring"
-      description="This is for description"
+      description="Track your electricity usage in real-time"
       className={className}
     >
       {isEmpty ? <EmptyData /> : contents}

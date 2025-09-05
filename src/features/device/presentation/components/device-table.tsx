@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { StatusBadge } from "@/shared/presentation/components/status-badge";
 import { useDevices } from "@/features/device/presentation/hooks/use-devices";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
@@ -20,35 +19,10 @@ export function DeviceTable({ search = "" }: DeviceTableProps) {
     loading,
     error,
     pagination,
-    fetchDevices,
     nextPage,
     previousPage,
     goToPage,
-  } = useDevices();
-
-  // Fetch devices on initial mount with empty search
-  useEffect(() => {
-    fetchDevices({ search: "" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Debounce logic for search
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-    debounceTimeout.current = setTimeout(() => {
-      fetchDevices({ search });
-    }, 400); // 400ms debounce
-
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [search, fetchDevices]);
+  } = useDevices({ search });
 
   if (loading) {
     return (
@@ -98,10 +72,7 @@ export function DeviceTable({ search = "" }: DeviceTableProps) {
                 </td>
                 <td className="px-4 py-3">{d.location}</td>
                 <td className="px-4 py-3">
-                  <EditDeviceModal
-                    device={d}
-                    onSuccessUpdate={() => fetchDevices({ search })}
-                  />
+                  <EditDeviceModal device={d} />
                 </td>
               </tr>
             ))}

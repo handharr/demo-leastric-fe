@@ -23,6 +23,7 @@ export interface ApiClientConfig {
   retryOptions?: RetryOptions;
   onAuthFailure?: () => void;
   refreshTokenEndpoint?: string; // Allow custom refresh endpoint
+  disableCache?: boolean; // Option to disable caching headers
 }
 
 export interface TokenRefreshHandler {
@@ -66,6 +67,7 @@ export class ApiClient {
       },
       onAuthFailure: config.onAuthFailure || this.defaultAuthFailureHandler,
       refreshTokenEndpoint: config.refreshTokenEndpoint || "/v1/refresh",
+      disableCache: config.disableCache ?? false,
     };
 
     this.axiosInstance = axios.create({
@@ -73,6 +75,11 @@ export class ApiClient {
       timeout: this.config.timeout,
       headers: {
         "Content-Type": "application/json",
+        ...(this.config.disableCache && {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        }),
       },
     });
 

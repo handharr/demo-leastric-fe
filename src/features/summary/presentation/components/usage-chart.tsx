@@ -47,8 +47,8 @@ interface UsageChartProps {
 }
 
 export function UsageChart({
-  title = "This Month's Est. Usage",
-  description = "This is for description",
+  title = "Electricity Usage",
+  description = "Your electricity consumption trends.",
   className = "",
   data,
   comparedData,

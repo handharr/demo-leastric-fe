@@ -19,7 +19,7 @@ export function ElectricUsageHistoryTable({
   return (
     <TilePrimary
       title="Electricity Usage History"
-      description="This is for description"
+      description="Overview of electricity consumption trends."
       topRightContent={<ShowMoreElectricUsageModalButton data={data} />}
     >
       <div className="overflow-x-auto">

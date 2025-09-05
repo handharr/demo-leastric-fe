@@ -15,8 +15,7 @@ export const FilterChip: React.FC<FilterChipProps> = ({
       className
     )}
   >
-    {label}
-    {value && <span className="ml-2">{value}</span>}
+    {label}:{value && <span className="ml-2">{value}</span>}
     <button
       className="ml-2 text-gray-400 hover:text-gray-600 cursor-pointer"
       onClick={onRemove}

@@ -29,40 +29,42 @@ export function ActiveFiltersContainer<T extends FilterState>({
   if (!hasActive) return null;
 
   return (
-    <div className="px-6 pt-6 pb-4 border-b border-gray-200">
-      <div className="flex flex-wrap gap-3">
-        {Object.entries(meta).map(([key, config]) => {
-          const value = filters[key as keyof T];
-          const isActive = isFilterActive({
-            filters,
-            config,
-            metaKey: key as keyof FilterMetas,
-          });
+    <div className="flex flex-wrap gap-3">
+      {Object.entries(meta).map(([key, config]) => {
+        const isActive = isFilterActive({
+          filters,
+          config,
+          metaKey: key as keyof FilterMetas,
+        });
+        if (!isActive) return null;
 
-          if (!isActive) return null;
+        let display: React.ReactNode = "";
 
-          let display: React.ReactNode =
-            value !== undefined && value !== null ? String(value) : "";
-          if (config.type === FilterType.Multi && Array.isArray(value)) {
-            display = (
-              <span className="inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
-                {value.length}
-              </span>
-            );
-          }
+        if (config.type === FilterType.Single) {
+          const value = filters.singleSelection?.[key as string];
+          display = value !== undefined && value !== null ? String(value) : "";
+        }
 
-          return (
-            <FilterChip
-              key={key}
-              label={config.label}
-              value={display}
-              onRemove={() =>
-                onChange({ ...filters, [key]: config.defaultValue })
-              }
-            />
+        if (config.type === FilterType.Multi) {
+          const value = filters.multiSelection?.[key as string];
+          display = (
+            <span className="inline-flex items-center justify-center w-6 h-6 bg-leastric-primary text-white text-xs font-medium rounded-full">
+              {value?.length}
+            </span>
           );
-        })}
-      </div>
+        }
+
+        return (
+          <FilterChip
+            key={key}
+            label={config.label}
+            value={display}
+            onRemove={() =>
+              onChange({ ...filters, [key]: config.defaultValue })
+            }
+          />
+        );
+      })}
     </div>
   );
 }

@@ -84,8 +84,6 @@ export function isFilterActive({
   config: FilterMeta;
   metaKey: keyof FilterMetas;
 }) {
-  if (!config) return false;
-
   if (config.type === FilterType.Single) {
     const value = filters.singleSelection?.[metaKey as string];
     return value && value !== config.defaultValue;

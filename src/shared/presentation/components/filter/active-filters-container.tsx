@@ -61,21 +61,23 @@ export function ActiveFiltersContainer<T extends FilterState>({
             value={display}
             onRemove={() => {
               if (config.type === FilterType.Multi) {
-                onChange({
+                const newFilter = {
                   ...filters,
                   multiSelection: {
                     ...filters.multiSelection,
                     [key]: config.defaultValue,
                   },
-                });
+                };
+                onChange(newFilter);
               } else {
-                onChange({
+                const newFilter = {
                   ...filters,
                   singleSelection: {
                     ...filters.singleSelection,
                     [key]: config.defaultValue,
                   },
-                });
+                };
+                onChange(newFilter);
               }
             }}
           />

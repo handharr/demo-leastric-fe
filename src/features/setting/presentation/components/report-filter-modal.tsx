@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   FilterOption,
   FilterModalPropsNew,
@@ -57,9 +57,10 @@ export function ReportFilterModal({
   onApply,
   onReset,
 }: FilterModalPropsNew<ReportFilterState>) {
+  console.log("debugTest currentState", currentState);
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<ReportFilterState>(
-    reportFilterDefaultValue
+    currentState ?? reportFilterDefaultValue()
   );
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
@@ -79,6 +80,10 @@ export function ReportFilterModal({
     [filter]
   );
 
+  useEffect(() => {
+    setFilter(currentState ?? reportFilterDefaultValue());
+  }, [currentState]);
+
   const handleApply = useCallback(() => {
     onApply(filter);
     onClose?.();
@@ -86,13 +91,13 @@ export function ReportFilterModal({
   }, [filter, onApply, onClose]);
 
   const handleReset = useCallback(() => {
-    setFilter(reportFilterDefaultValue);
+    setFilter(reportFilterDefaultValue());
     setActiveSection(null);
     onReset(reportFilterDefaultValue());
   }, [onReset]);
 
   const handleOpen = useCallback(() => {
-    setFilter(currentState ?? reportFilterDefaultValue);
+    setFilter(currentState ?? reportFilterDefaultValue());
     setIsOpen(true);
   }, [currentState]);
 

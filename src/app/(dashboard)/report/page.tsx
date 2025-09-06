@@ -1,5 +1,6 @@
 "use client";
 
+import { ReportTable } from "@/features/report/components/report-table";
 import {
   reportFilterDefaultValue,
   reportFilterMeta,
@@ -39,9 +40,12 @@ export default function ReportPage() {
       {/* Active Filters */}
       <ActiveFiltersContainer
         filters={activeFilters}
-        onChange={setActiveFilters}
+        onChange={(newFilters) => setActiveFilters(newFilters)}
         meta={reportFilterMeta}
       />
+
+      {/* Report Table */}
+      <ReportTable />
     </div>
   );
 }

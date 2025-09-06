@@ -56,10 +56,9 @@ export default function ProfilePage() {
         onSubmit={(e) => {
           e.preventDefault();
           updateUserDetails({
-            id: userDetails?.id,
             email,
             name: fullName,
-            phoneNumber: phone,
+            phoneNumber: phone.length > 0 ? phone : undefined,
           });
         }}
       >

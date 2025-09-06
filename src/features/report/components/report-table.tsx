@@ -1,6 +1,25 @@
 import { Pagination } from "@/shared/presentation/components/pagination";
+import { useState } from "react";
+import Image from "next/image";
+
+const tableData = [
+  { id: 0, month: "January", year: "2025", deviceName: "Device 1" },
+  { id: 1, month: "February", year: "2025", deviceName: "Device 1" },
+  { id: 2, month: "March", year: "2025", deviceName: "Device 1" },
+  { id: 3, month: "April", year: "2025", deviceName: "Device 1" },
+  { id: 4, month: "May", year: "2025", deviceName: "Device 1" },
+  { id: 5, month: "June", year: "2025", deviceName: "Device 1" },
+  { id: 6, month: "July", year: "2025", deviceName: "Device 1" },
+  { id: 7, month: "August", year: "2025", deviceName: "Device 1" },
+  { id: 8, month: "September", year: "2025", deviceName: "Device 1" },
+  { id: 9, month: "October", year: "2025", deviceName: "Device 1" },
+  { id: 10, month: "November", year: "2025", deviceName: "Device 1" },
+  { id: 11, month: "December", year: "2025", deviceName: "Device 1" },
+];
 
 export function ReportTable() {
+  const [selectedIds, setSelectedIds] = useState<number[]>([2, 3, 4]); // March, April, May selected by default
+
   const pagination = {
     page: 1,
     take: 10,
@@ -8,6 +27,18 @@ export function ReportTable() {
     pageCount: 5,
     hasPreviousPage: false,
     hasNextPage: true,
+  };
+
+  const handleRowSelect = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    setSelectedIds((prev) =>
+      prev.length === tableData.length ? [] : tableData.map((row) => row.id)
+    );
   };
 
   const goToPage = (page: number) => {
@@ -22,8 +53,99 @@ export function ReportTable() {
     console.log("Go to next page");
   };
 
+  const isAllSelected = selectedIds.length === tableData.length;
+
   return (
-    <div>
+    <div className="w-full">
+      {/* Table */}
+      <div className="bg-white rounded-lg border border-gray-200 mb-4">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-4 py-3 text-left">
+                <button
+                  onClick={handleSelectAll}
+                  className="flex items-center justify-center cursor-pointer w-5 h-5 focus:outline-none rounded"
+                >
+                  <Image
+                    src={
+                      isAllSelected
+                        ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                        : "/resources/icons/checkbox/checkbox-default.svg"
+                    }
+                    alt={isAllSelected ? "Unselect all" : "Select all"}
+                    width={20}
+                    height={20}
+                    className="w-5 h-5"
+                  />
+                </button>
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                Month
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                Year
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                Device Name
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {tableData.map((row) => (
+              <tr key={row.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3">
+                  <button
+                    onClick={() => handleRowSelect(row.id)}
+                    className="flex items-center justify-center cursor-pointer w-5 h-5 focus:outline-none rounded"
+                  >
+                    <Image
+                      src={
+                        selectedIds.includes(row.id)
+                          ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                          : "/resources/icons/checkbox/checkbox-default.svg"
+                      }
+                      alt={
+                        selectedIds.includes(row.id)
+                          ? "Unselect row"
+                          : "Select row"
+                      }
+                      width={20}
+                      height={20}
+                      className="w-5 h-5"
+                    />
+                  </button>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">{row.month}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">{row.year}</td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {row.deviceName}
+                </td>
+                <td className="px-4 py-3">
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 16L7 11L8.41 9.59L12 13.17L15.59 9.59L17 11L12 16Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       {/* Pagination */}
       <Pagination
         model={pagination}

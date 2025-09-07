@@ -89,7 +89,13 @@ export function MultiSelectSection<T extends FilterState>({
   meta,
   onUpdateFilters,
 }: MultiSelectSectionProps<T>) {
-  const selectedIds = filters.multiSelection?.[filterKey] || [];
+  const selectedAllId = meta.multipleSelectionConfig?.selectedAllId;
+  let selectedIds = filters.multiSelection?.[filterKey] || [];
+
+  // Check if selectedIds includes the "all" option then include all options
+  if (selectedAllId && selectedIds.includes(selectedAllId)) {
+    selectedIds = options.map((option) => option.id);
+  }
 
   return (
     <div className="p-4">

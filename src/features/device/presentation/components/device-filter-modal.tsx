@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   FilterOption,
-  FilterModalProps,
+  FilterModalPropsNew,
   FilterType,
+  FilterState,
+  FilterMetas,
 } from "@/shared/presentation/types/filter-ui";
 import {
   SingleSelectSection,
   getSingleSelectLabel,
+  handleSingleSelect,
 } from "@/shared/presentation/components/filter/single-select-section";
 import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
@@ -16,45 +19,24 @@ import { FilterModalFooter } from "@/shared/presentation/components/filter/filte
 import { FilterModal } from "@/shared/presentation/components/filter/filter-modal";
 import Image from "next/image";
 import clsx from "clsx";
+import {
+  getDefaultFilters,
+  hasActiveFilters,
+} from "@/shared/utils/helpers/filter-helper";
 
-export interface DeviceFilterState {
-  location: string;
-  subLocation: string;
-  detailLocations: string[];
-  units: string[];
-  [key: string]: unknown;
+export interface DeviceFilterState extends FilterState {
+  singleSelection: {
+    location: string;
+  };
 }
 
-export const deviceFilterMeta = {
+export const deviceFilterMeta: FilterMetas = {
   location: {
+    label: "Location",
     type: FilterType.Single,
     defaultValue: "all",
-  },
-  subLocation: {
-    type: FilterType.Single,
-    defaultValue: "all",
-  },
-  detailLocations: {
-    label: "Detail location",
-    type: FilterType.Multi,
-    defaultValue: [],
-  },
-  units: {
-    label: "Unit",
-    type: FilterType.Multi,
-    defaultValue: ["watt"],
   },
 };
-
-export function isDefaultFilters(filters: DeviceFilterState) {
-  return (
-    filters.location === "all" &&
-    filters.subLocation === "all" &&
-    filters.detailLocations.length === 0 &&
-    filters.units.length === 1 &&
-    filters.units[0] === "watt"
-  );
-}
 
 const locations: FilterOption[] = [
   { id: "all", label: "All locations" },
@@ -65,31 +47,42 @@ const locations: FilterOption[] = [
   { id: "location-e", label: "Location E" },
 ];
 
-const resetValue = {
-  location: "all",
-  subLocation: "all",
-  detailLocations: [],
-  units: ["watt"],
-};
+export function deviceFilterDefaultValue(): DeviceFilterState {
+  return getDefaultFilters(deviceFilterMeta);
+}
 
 export function DeviceFilterModal({
   currentState,
   onClose,
   onApply,
   onReset,
-}: FilterModalProps<DeviceFilterState>) {
+}: FilterModalPropsNew<DeviceFilterState>) {
+  console.log("debugTest currentState", currentState);
   const [isOpen, setIsOpen] = useState(false);
-  const [filter, setFilter] = useState<DeviceFilterState>(resetValue);
+  const [filter, setFilter] = useState<DeviceFilterState>(
+    currentState ?? deviceFilterDefaultValue()
+  );
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const hasActiveFilters = !isDefaultFilters(filter);
+  const hasActiveDeviceFilters = hasActiveFilters({
+    filters: filter,
+    meta: deviceFilterMeta,
+  });
 
-  const handleSingleSelect = useCallback(
-    (key: keyof DeviceFilterState) => (id: string) => {
-      setFilter((prev) => ({ ...prev, [key]: id }));
+  const handleSingleSelectLocation = useCallback(
+    (id: string) => {
+      const newState = handleSingleSelect<DeviceFilterState>({
+        currentState: filter,
+        key: "location",
+      })({ id });
+      setFilter(newState);
     },
-    []
+    [filter]
   );
+
+  useEffect(() => {
+    setFilter(currentState ?? deviceFilterDefaultValue());
+  }, [currentState]);
 
   const handleApply = useCallback(() => {
     onApply(filter);
@@ -98,13 +91,13 @@ export function DeviceFilterModal({
   }, [filter, onApply, onClose]);
 
   const handleReset = useCallback(() => {
-    setFilter(resetValue);
+    setFilter(deviceFilterDefaultValue());
     setActiveSection(null);
-    onReset(resetValue);
+    onReset(deviceFilterDefaultValue());
   }, [onReset]);
 
   const handleOpen = useCallback(() => {
-    setFilter(currentState ?? resetValue);
+    setFilter(currentState ?? deviceFilterDefaultValue());
     setIsOpen(true);
   }, [currentState]);
 
@@ -119,7 +112,7 @@ export function DeviceFilterModal({
         onClick={handleOpen}
         className={clsx(
           "flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold cursor-pointer transition-colors",
-          hasActiveFilters
+          hasActiveDeviceFilters
             ? "bg-leastric-primary/10 border-leastric-primary text-leastric-primary"
             : "border-default-border text-typography-headline hover:bg-gray-50"
         )}
@@ -132,9 +125,9 @@ export function DeviceFilterModal({
         />
         Filter
       </button>
-      {hasActiveFilters && (
+      {hasActiveDeviceFilters && (
         <button
-          className="text-leastric-primary font-semibold text-sm hover:underline"
+          className="cursor-pointer text-leastric-primary font-semibold text-sm hover:underline"
           onClick={handleReset}
           type="button"
         >
@@ -155,7 +148,7 @@ export function DeviceFilterModal({
         title="Location"
         description={getSingleSelectLabel(
           locations,
-          filter.location,
+          filter.singleSelection.location,
           "All locations"
         )}
         active={activeSection === "location"}
@@ -171,8 +164,8 @@ export function DeviceFilterModal({
         <SingleSelectSection
           title="Location"
           options={locations}
-          selectedId={filter.location}
-          onSelect={handleSingleSelect("location")}
+          selectedId={filter.singleSelection.location}
+          onSelect={handleSingleSelectLocation}
         />
       )}
       {!activeSection && <FilterNoActiveSection />}

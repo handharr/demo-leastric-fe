@@ -5,19 +5,17 @@ import Image from "next/image";
 import {
   DeviceFilterState,
   DeviceFilterModal,
+  deviceFilterDefaultValue,
   deviceFilterMeta,
 } from "@/features/device/presentation/components/device-filter-modal";
 import { DeviceTable } from "@/features/device/presentation/components/device-table";
-import { ActiveFilterChips } from "@/shared/presentation/components/active-filter-chips";
+import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
 
 export default function DevicePage() {
   const [search, setSearch] = useState("");
-  const [activeFilters, setActiveFilters] = useState<DeviceFilterState>({
-    location: "all",
-    subLocation: "all",
-    detailLocations: [],
-    units: ["watt"],
-  });
+  const [activeFilters, setActiveFilters] = useState<DeviceFilterState>(
+    deviceFilterDefaultValue()
+  );
 
   const handleFilterApply = (filters: DeviceFilterState) => {
     setActiveFilters(filters);
@@ -64,10 +62,10 @@ export default function DevicePage() {
         />
       </div>
 
-      {/* Active Filters Chips */}
-      <ActiveFilterChips<DeviceFilterState>
+      {/* Active Filters */}
+      <ActiveFiltersContainer
         filters={activeFilters}
-        onChange={setActiveFilters}
+        onChange={(newFilters) => setActiveFilters(newFilters)}
         meta={deviceFilterMeta}
       />
 

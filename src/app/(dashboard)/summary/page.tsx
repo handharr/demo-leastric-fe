@@ -8,7 +8,7 @@ import { ElectricUsageHistoryTable } from "@/features/summary/presentation/compo
 import {
   SummaryFilterModal,
   SummaryFilterState,
-  filterDefaultValue,
+  summaryFilterDefaultValue,
   summaryFilterMeta,
 } from "@/features/summary/presentation/components/summary-filter-modal";
 import {
@@ -17,11 +17,12 @@ import {
   electricUsageHistoryDummies,
   realTimeDataDummies,
 } from "@/features/summary/presentation/data/dummies";
-import { ActiveFilterChips } from "@/shared/presentation/components/active-filter-chips";
+import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
 
 export default function SummaryPage() {
-  const [activeFilters, setActiveFilters] =
-    useState<SummaryFilterState>(filterDefaultValue);
+  const [activeFilters, setActiveFilters] = useState<SummaryFilterState>(
+    summaryFilterDefaultValue()
+  );
 
   // Sample data points for the chart
   const chartData = chartDataDummies;
@@ -63,10 +64,10 @@ export default function SummaryPage() {
         </button>
       </div>
 
-      {/* Active Filters Chips */}
-      <ActiveFilterChips<SummaryFilterState>
+      {/* Active Filters */}
+      <ActiveFiltersContainer
         filters={activeFilters}
-        onChange={setActiveFilters}
+        onChange={(newFilters) => setActiveFilters(newFilters)}
         meta={summaryFilterMeta}
       />
 

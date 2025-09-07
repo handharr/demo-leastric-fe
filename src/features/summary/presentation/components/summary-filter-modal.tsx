@@ -8,10 +8,7 @@ import {
   FilterState,
   FilterMetas,
 } from "@/shared/presentation/types/filter-ui";
-import {
-  SingleSelectSection,
-  handleSingleSelect,
-} from "@/shared/presentation/components/filter/single-select-section";
+import { SingleSelectSection } from "@/shared/presentation/components/filter/single-select-section";
 import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
 import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
@@ -70,17 +67,6 @@ export function SummaryFilterModal({
     filters: filter,
     meta: summaryFilterMeta,
   });
-
-  const handleSingleSelectLocation = useCallback(
-    (id: string) => {
-      const newState = handleSingleSelect<SummaryFilterState>({
-        currentState: filter,
-        key: "location",
-      })({ id });
-      setFilter(newState);
-    },
-    [filter]
-  );
 
   useEffect(() => {
     setFilter(currentState ?? summaryFilterDefaultValue());
@@ -168,11 +154,12 @@ export function SummaryFilterModal({
   const rightContent = (
     <>
       {activeSection === "location" && (
-        <SingleSelectSection
-          title="Location"
+        <SingleSelectSection<SummaryFilterState>
+          filterKey="location"
+          filters={filter}
+          meta={summaryFilterMeta.location}
           options={locations}
-          selectedId={filter.singleSelection.location}
-          onSelect={handleSingleSelectLocation}
+          onUpdateFilters={setFilter}
         />
       )}
       {!activeSection && <FilterNoActiveSection />}

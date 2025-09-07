@@ -19,6 +19,7 @@ import {
   hasActiveFilters,
 } from "@/shared/utils/helpers/filter-helper";
 import { MultiSelectSection } from "@/shared/presentation/components/filter/multi-select-section";
+import { SingleSelectSection } from "@/shared/presentation/components/filter/single-select-section";
 
 export interface ReportFilterState extends FilterState {
   multiSelection: {
@@ -36,6 +37,15 @@ export const reportFilterMeta: FilterMetas = {
       selectedAllId: "all",
     },
   },
+  years: {
+    label: "Year",
+    type: FilterType.Single,
+    defaultValue: "2025",
+    singleSelectionConfig: {
+      selectedAllLabel: "All years",
+      selectedAllId: "all",
+    },
+  },
 };
 
 const filterDevicesOptions: FilterOption[] = [
@@ -45,6 +55,16 @@ const filterDevicesOptions: FilterOption[] = [
   { id: "device-c", label: "Device C" },
   { id: "device-d", label: "Device D" },
   { id: "device-e", label: "Device E" },
+];
+
+const filterYearsOptions: FilterOption[] = [
+  { id: "2025", label: "2025" },
+  { id: "2024", label: "2024" },
+  { id: "2023", label: "2023" },
+  { id: "2022", label: "2022" },
+  { id: "2021", label: "2021" },
+  { id: "2020", label: "2020" },
+  { id: "2019", label: "2019" },
 ];
 
 export function reportFilterDefaultValue(): ReportFilterState {
@@ -140,9 +160,7 @@ export function ReportFilterModal({
           filterKey={filterKey}
           meta={meta}
           options={
-            filterKey === "devices"
-              ? filterDevicesOptions
-              : ([] as FilterOption[])
+            filterKey === "devices" ? filterDevicesOptions : filterYearsOptions
           }
           active={activeSection === filterKey}
           onClick={() => setActiveSection(filterKey)}
@@ -162,6 +180,15 @@ export function ReportFilterModal({
           meta={reportFilterMeta.devices}
           options={filterDevicesOptions}
           onUpdateFilters={(newFilters) => setFilter(newFilters)}
+        />
+      )}
+      {activeSection === "years" && (
+        <SingleSelectSection<ReportFilterState>
+          filterKey="years"
+          filters={filter}
+          meta={reportFilterMeta.years}
+          options={filterYearsOptions}
+          onUpdateFilters={setFilter}
         />
       )}
       {!activeSection && <FilterNoActiveSection />}

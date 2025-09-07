@@ -17,7 +17,7 @@ export function FilterModalFooter({
       <div className="flex gap-3">
         <button
           onClick={onClose}
-          className="px-6 py-2.5 border border-gray-300 rounded-lg text-typography-headline font-medium hover:bg-gray-50 transition-colors"
+          className="px-6 py-2.5 border border-gray-300 rounded-lg text-typography-headline font-medium hover:bg-gray-50 transition-colors cursor-pointer"
         >
           Cancel
         </button>

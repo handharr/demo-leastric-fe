@@ -13,40 +13,47 @@ export const getSingleSelectLabel = ({
   options: FilterOption[];
   selectedId: string;
   meta: FilterMeta;
-}) =>
+}): string =>
   options.find((o) => o.id === selectedId)?.label ||
-  meta.singleSelectionConfig?.selectedAllLabel ||
+  (meta.defaultValue as string) ||
   "All";
 
-export const handleSingleSelect =
-  <T extends FilterState>({
-    currentState,
-    key,
-  }: {
-    currentState: T;
-    key: keyof T["singleSelection"];
-  }) =>
-  ({ id }: { id: string }) => {
-    return {
-      ...currentState,
-      singleSelection: { ...currentState.singleSelection, [key]: id },
-    };
-  };
-
-export function SingleSelectSection({
-  title,
-  options,
-  selectedId,
-  onSelect,
+export const handleSingleSelect = <T extends FilterState>({
+  filterKey,
+  id,
+  currentFilter,
 }: {
-  title: string;
+  filterKey: string;
+  id: string;
+  currentFilter: T;
+}): T => {
+  return {
+    ...currentFilter,
+    singleSelection: { ...currentFilter.singleSelection, [filterKey]: id },
+  };
+};
+
+interface SingleSelectSectionProps<T extends FilterState> {
+  filterKey: string;
+  filters: T;
+  meta: FilterMeta;
   options: FilterOption[];
-  selectedId: string;
-  onSelect: (id: string) => void;
-}) {
+  onUpdateFilters: (newFilters: T) => void;
+}
+
+export function SingleSelectSection<T extends FilterState>({
+  filterKey,
+  filters,
+  meta,
+  options,
+  onUpdateFilters,
+}: SingleSelectSectionProps<T>) {
+  const selectedId = filters.singleSelection?.[filterKey] || "";
   return (
     <div className="p-4">
-      <h3 className="font-medium text-typography-headline mb-4">{title}</h3>
+      <h3 className="font-medium text-typography-headline mb-4">
+        {meta.label}
+      </h3>
       <div className="space-y-2">
         {options.map((option) => (
           <div
@@ -56,7 +63,14 @@ export function SingleSelectSection({
                 ? "bg-green-50 text-leastric-primary"
                 : "hover:bg-gray-50"
             }`}
-            onClick={() => onSelect(option.id)}
+            onClick={() => {
+              const newFilters = handleSingleSelect<T>({
+                filterKey,
+                id: option.id,
+                currentFilter: filters,
+              });
+              onUpdateFilters(newFilters);
+            }}
           >
             <div className="flex items-center justify-between">
               <span className="text-sm">{option.label}</span>

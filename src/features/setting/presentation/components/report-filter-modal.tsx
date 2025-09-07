@@ -18,10 +18,7 @@ import {
   getDefaultFilters,
   hasActiveFilters,
 } from "@/shared/utils/helpers/filter-helper";
-import {
-  getMultiSelectLabel,
-  MultiSelectSection,
-} from "@/shared/presentation/components/filter/multi-select-section";
+import { MultiSelectSection } from "@/shared/presentation/components/filter/multi-select-section";
 
 export interface ReportFilterState extends FilterState {
   multiSelection: {
@@ -93,9 +90,10 @@ export function ReportFilterModal({
   }, [currentState]);
 
   const handleClose = useCallback(() => {
+    setFilter(currentState ?? reportFilterDefaultValue());
     setIsOpen(false);
     onClose?.();
-  }, [onClose]);
+  }, [onClose, currentState]);
 
   const filterButton = (
     <div className="flex items-center gap-4">
@@ -135,17 +133,23 @@ export function ReportFilterModal({
           Filter
         </h2>
       </div>
-      <FilterCategoryItem
-        title={reportFilterMeta.devices.label}
-        description={getMultiSelectLabel({
-          selectedIds: filter.multiSelection.devices || [],
-          options: filterDevicesOptions,
-          meta: reportFilterMeta.devices,
-        })}
-        active={activeSection === "devices"}
-        onClick={() => setActiveSection("devices")}
-        showBottomBorder={false}
-      />
+      {/* Filters Category Section */}
+      {Object.entries(reportFilterMeta).map(([filterKey, meta]) => (
+        <FilterCategoryItem
+          key={filterKey}
+          filterKey={filterKey}
+          meta={meta}
+          options={
+            filterKey === "devices"
+              ? filterDevicesOptions
+              : ([] as FilterOption[])
+          }
+          active={activeSection === filterKey}
+          onClick={() => setActiveSection(filterKey)}
+          showBottomBorder={false}
+          filterState={filter}
+        />
+      ))}
     </div>
   );
 

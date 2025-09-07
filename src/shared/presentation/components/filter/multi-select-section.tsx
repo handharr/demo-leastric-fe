@@ -14,7 +14,7 @@ export const getMultiSelectLabel = ({
   options: FilterOption[];
   meta: FilterMeta;
 }): string => {
-  if (selectedIds.length === 0)
+  if (selectedIds.includes(meta.multipleSelectionConfig?.selectedAllId || ""))
     return meta.multipleSelectionConfig?.selectedAllLabel || "All";
   if (selectedIds.length === 1) {
     return (

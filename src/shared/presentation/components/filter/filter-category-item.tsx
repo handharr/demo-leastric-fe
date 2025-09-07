@@ -1,14 +1,53 @@
 import Image from "next/image";
-import { FilterCategoryItemProps } from "@/shared/presentation/types/filter-ui";
+import { getMultiSelectLabel } from "@/shared/presentation/components/filter/multi-select-section";
+import {
+  FilterMeta,
+  FilterOption,
+  FilterState,
+  FilterType,
+} from "@/shared/presentation/types/filter-ui";
+import { getSingleSelectLabel } from "./single-select-section";
 
-export function FilterCategoryItem({
-  title,
-  description,
+export interface FilterCategoryItemProps<T extends FilterState> {
+  filterKey: string;
+  meta: FilterMeta;
+  active: boolean;
+  onClick: () => void;
+  className?: string;
+  showBottomBorder?: boolean;
+  options: FilterOption[];
+  filterState?: T;
+}
+
+export function FilterCategoryItem<T extends FilterState>({
+  filterKey,
+  meta,
   active,
   onClick,
   className = "",
   showBottomBorder = true,
-}: FilterCategoryItemProps) {
+  options,
+  filterState,
+}: FilterCategoryItemProps<T>) {
+  console.log("debugTest render FilterCategoryItem", {
+    filterKey,
+    filterState,
+  });
+  let descriptionText = "";
+  if (meta.type === FilterType.Single) {
+    descriptionText = getSingleSelectLabel({
+      options: options,
+      selectedId: filterState?.singleSelection?.[filterKey] || "",
+      meta: meta,
+    });
+  } else if (meta.type === FilterType.Multi) {
+    descriptionText = getMultiSelectLabel({
+      selectedIds: filterState?.multiSelection?.[filterKey] || [],
+      options: options,
+      meta: meta,
+    });
+  }
+
   return (
     <div
       className={`
@@ -21,8 +60,8 @@ export function FilterCategoryItem({
     >
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-medium text-typography-headline">{title}</h3>
-          <p className="text-sm text-gray-500">{description}</p>
+          <h3 className="font-medium text-typography-headline">{meta.label}</h3>
+          <p className="text-sm text-gray-500">{descriptionText}</p>
         </div>
         <Image
           src="/resources/icons/arrow/chevron-right.svg"

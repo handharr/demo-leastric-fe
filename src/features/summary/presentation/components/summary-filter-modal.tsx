@@ -10,7 +10,6 @@ import {
 } from "@/shared/presentation/types/filter-ui";
 import {
   SingleSelectSection,
-  getSingleSelectLabel,
   handleSingleSelect,
 } from "@/shared/presentation/components/filter/single-select-section";
 import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
@@ -35,6 +34,10 @@ export const summaryFilterMeta: FilterMetas = {
     label: "Location",
     type: FilterType.Single,
     defaultValue: "all",
+    singleSelectionConfig: {
+      selectedAllLabel: "All locations",
+      selectedAllId: "all",
+    },
   },
 };
 
@@ -101,9 +104,10 @@ export function SummaryFilterModal({
   }, [currentState]);
 
   const handleClose = useCallback(() => {
+    setFilter(currentState ?? summaryFilterDefaultValue());
     setIsOpen(false);
     onClose?.();
-  }, [onClose]);
+  }, [onClose, currentState]);
 
   const filterButton = (
     <div className="flex items-center gap-4">
@@ -143,17 +147,21 @@ export function SummaryFilterModal({
           Filter
         </h2>
       </div>
-      <FilterCategoryItem
-        title="Location"
-        description={getSingleSelectLabel(
-          locations,
-          filter.singleSelection.location,
-          "All locations"
-        )}
-        active={activeSection === "location"}
-        onClick={() => setActiveSection("location")}
-        showBottomBorder={false}
-      />
+      {/* Filters Category Section */}
+      {Object.entries(summaryFilterMeta).map(([filterKey, meta]) => (
+        <FilterCategoryItem
+          key={filterKey}
+          filterKey={filterKey}
+          meta={meta}
+          options={
+            filterKey === "location" ? locations : ([] as FilterOption[])
+          }
+          active={activeSection === filterKey}
+          onClick={() => setActiveSection(filterKey)}
+          showBottomBorder={false}
+          filterState={filter}
+        />
+      ))}
     </div>
   );
 

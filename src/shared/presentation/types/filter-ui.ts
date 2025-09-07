@@ -15,6 +15,10 @@ export interface FilterMeta {
     selectedAllLabel?: string;
     selectedAllId?: string;
   };
+  singleSelectionConfig?: {
+    selectedAllLabel?: string;
+    selectedAllId?: string;
+  };
 }
 
 export interface FilterMetas {
@@ -38,15 +42,6 @@ export interface FilterProps {
   leftContent: React.ReactNode;
   rightContent: React.ReactNode;
   footer: React.ReactNode;
-}
-
-export interface FilterCategoryItemProps {
-  title: string;
-  description: string;
-  active: boolean;
-  onClick: () => void;
-  className?: string;
-  showBottomBorder?: boolean;
 }
 
 export interface FilterModalFooterProps {

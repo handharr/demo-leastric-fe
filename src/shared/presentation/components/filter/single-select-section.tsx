@@ -1,14 +1,22 @@
 import Image from "next/image";
 import {
+  FilterMeta,
   FilterOption,
   FilterState,
 } from "@/shared/presentation/types/filter-ui";
 
-export const getSingleSelectLabel = (
-  options: FilterOption[],
-  selectedId: string,
-  allLabel: string
-) => options.find((o) => o.id === selectedId)?.label || allLabel;
+export const getSingleSelectLabel = ({
+  options,
+  selectedId,
+  meta,
+}: {
+  options: FilterOption[];
+  selectedId: string;
+  meta: FilterMeta;
+}) =>
+  options.find((o) => o.id === selectedId)?.label ||
+  meta.singleSelectionConfig?.selectedAllLabel ||
+  "All";
 
 export const handleSingleSelect =
   <T extends FilterState>({

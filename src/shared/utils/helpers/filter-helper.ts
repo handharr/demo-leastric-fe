@@ -52,12 +52,15 @@ export function getActiveFilters({
 
   Object.entries(meta).forEach(([key, config]) => {
     const value = filters[key as keyof FilterState];
-    const isActive =
-      config.type === FilterType.Single
-        ? value !== config.defaultValue
-        : Array.isArray(value) &&
-          value.length > 0 &&
-          JSON.stringify(value) !== JSON.stringify(config.defaultValue);
+    let isActive: boolean = false;
+
+    if (config.type === FilterType.Single && typeof value === "string") {
+      isActive = value !== config.defaultValue;
+    } else if (config.type === FilterType.Multi && Array.isArray(value)) {
+      isActive =
+        value.length > 0 &&
+        JSON.stringify(value) !== JSON.stringify(config.defaultValue);
+    }
 
     if (isActive) {
       if (config.type === FilterType.Single && typeof value === "string") {

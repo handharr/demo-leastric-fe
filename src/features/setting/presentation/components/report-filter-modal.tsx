@@ -8,11 +8,6 @@ import {
   FilterState,
   FilterMetas,
 } from "@/shared/presentation/types/filter-ui";
-import {
-  SingleSelectSection,
-  getSingleSelectLabel,
-  handleSingleSelect,
-} from "@/shared/presentation/components/filter/single-select-section";
 import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
 import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
@@ -23,28 +18,36 @@ import {
   getDefaultFilters,
   hasActiveFilters,
 } from "@/shared/utils/helpers/filter-helper";
+import {
+  getMultiSelectLabel,
+  MultiSelectSection,
+} from "@/shared/presentation/components/filter/multi-select-section";
 
 export interface ReportFilterState extends FilterState {
-  singleSelection: {
-    location: string;
+  multiSelection: {
+    devices: string[];
   };
 }
 
 export const reportFilterMeta: FilterMetas = {
-  location: {
-    label: "Location",
-    type: FilterType.Single,
-    defaultValue: "all",
+  devices: {
+    label: "Device",
+    type: FilterType.Multi,
+    defaultValue: ["all"],
+    multipleSelectionConfig: {
+      selectedAllLabel: "All devices",
+      selectedAllId: "all",
+    },
   },
 };
 
-const locations: FilterOption[] = [
-  { id: "all", label: "All locations" },
-  { id: "location-a", label: "Location A" },
-  { id: "location-b", label: "Location B" },
-  { id: "location-c", label: "Location C" },
-  { id: "location-d", label: "Location D" },
-  { id: "location-e", label: "Location E" },
+const filterDevicesOptions: FilterOption[] = [
+  { id: "all", label: "All devices" },
+  { id: "device-a", label: "Device A" },
+  { id: "device-b", label: "Device B" },
+  { id: "device-c", label: "Device C" },
+  { id: "device-d", label: "Device D" },
+  { id: "device-e", label: "Device E" },
 ];
 
 export function reportFilterDefaultValue(): ReportFilterState {
@@ -57,28 +60,16 @@ export function ReportFilterModal({
   onApply,
   onReset,
 }: FilterModalPropsNew<ReportFilterState>) {
-  console.log("debugTest currentState", currentState);
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<ReportFilterState>(
     currentState ?? reportFilterDefaultValue()
   );
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const hasActiveReportFilters = hasActiveFilters({
+  const hasActiveDeviceFilters = hasActiveFilters({
     filters: filter,
     meta: reportFilterMeta,
   });
-
-  const handleSingleSelectLocation = useCallback(
-    (id: string) => {
-      const newState = handleSingleSelect<ReportFilterState>({
-        currentState: filter,
-        key: "location",
-      })({ id });
-      setFilter(newState);
-    },
-    [filter]
-  );
 
   useEffect(() => {
     setFilter(currentState ?? reportFilterDefaultValue());
@@ -112,7 +103,7 @@ export function ReportFilterModal({
         onClick={handleOpen}
         className={clsx(
           "flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold cursor-pointer transition-colors",
-          hasActiveReportFilters
+          hasActiveDeviceFilters
             ? "bg-leastric-primary/10 border-leastric-primary text-leastric-primary"
             : "border-default-border text-typography-headline hover:bg-gray-50"
         )}
@@ -125,7 +116,7 @@ export function ReportFilterModal({
         />
         Filter
       </button>
-      {hasActiveReportFilters && (
+      {hasActiveDeviceFilters && (
         <button
           className="cursor-pointer text-leastric-primary font-semibold text-sm hover:underline"
           onClick={handleReset}
@@ -145,14 +136,14 @@ export function ReportFilterModal({
         </h2>
       </div>
       <FilterCategoryItem
-        title="Location"
-        description={getSingleSelectLabel(
-          locations,
-          filter.singleSelection.location,
-          "All locations"
-        )}
-        active={activeSection === "location"}
-        onClick={() => setActiveSection("location")}
+        title={reportFilterMeta.devices.label}
+        description={getMultiSelectLabel({
+          selectedIds: filter.multiSelection.devices || [],
+          options: filterDevicesOptions,
+          meta: reportFilterMeta.devices,
+        })}
+        active={activeSection === "devices"}
+        onClick={() => setActiveSection("devices")}
         showBottomBorder={false}
       />
     </div>
@@ -160,12 +151,13 @@ export function ReportFilterModal({
 
   const rightContent = (
     <>
-      {activeSection === "location" && (
-        <SingleSelectSection
-          title="Location"
-          options={locations}
-          selectedId={filter.singleSelection.location}
-          onSelect={handleSingleSelectLocation}
+      {activeSection === "devices" && (
+        <MultiSelectSection<ReportFilterState>
+          filterKey="devices"
+          filters={filter}
+          meta={reportFilterMeta.devices}
+          options={filterDevicesOptions}
+          onUpdateFilters={(newFilters) => setFilter(newFilters)}
         />
       )}
       {!activeSection && <FilterNoActiveSection />}

@@ -8,9 +8,13 @@ export interface FilterOption {
 }
 
 export interface FilterMeta {
-  label?: string;
+  label: string;
   type: FilterType;
-  defaultValue: unknown;
+  defaultValue: string | string[];
+  multipleSelectionConfig?: {
+    selectedAllLabel?: string;
+    selectedAllId?: string;
+  };
 }
 
 export interface FilterMetas {
@@ -21,14 +25,6 @@ export enum FilterType {
   Single = "single",
   Multi = "multi",
 }
-
-export interface FilterModalProps<TFilterState = Record<string, unknown>> {
-  currentState?: TFilterState;
-  onClose?: () => void;
-  onApply: (filters: TFilterState) => void;
-  onReset: (filters: TFilterState) => void;
-}
-
 export interface FilterModalPropsNew<TFilterState extends FilterState> {
   currentState?: TFilterState;
   onClose?: () => void;

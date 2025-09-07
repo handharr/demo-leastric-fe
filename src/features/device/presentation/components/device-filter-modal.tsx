@@ -57,7 +57,6 @@ export function DeviceFilterModal({
   onApply,
   onReset,
 }: FilterModalPropsNew<DeviceFilterState>) {
-  console.log("debugTest currentState", currentState);
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<DeviceFilterState>(
     currentState ?? deviceFilterDefaultValue()

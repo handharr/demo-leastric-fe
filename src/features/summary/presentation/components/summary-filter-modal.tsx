@@ -57,7 +57,6 @@ export function SummaryFilterModal({
   onApply,
   onReset,
 }: FilterModalPropsNew<SummaryFilterState>) {
-  console.log("debugTest currentState", currentState);
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState<SummaryFilterState>(
     currentState ?? summaryFilterDefaultValue()

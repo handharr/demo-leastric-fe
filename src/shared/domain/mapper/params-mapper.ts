@@ -7,7 +7,7 @@ export const mapUpdateUserFormDataToDto = (
   return {
     id: formData.id,
     email: formData.email,
-    name: formData.name,
+    fullName: formData.fullName,
     phoneNumber: formData.phoneNumber,
     createdAt: formData.createdAt,
     updatedAt: formData.updatedAt,

@@ -6,6 +6,7 @@ import {
 } from "@/shared/domain/entities/base-error-model";
 import { UserRepositoryImpl } from "@/shared/infrastructure/repositories-implementation/user-repository-impl";
 import { Logger } from "@/shared/utils/logger/logger";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 export class UpdateUserDetailsUseCase {
   constructor(
@@ -32,7 +33,7 @@ export class UpdateUserDetailsUseCase {
       return createErrorModel({
         message: "Failed to update user details",
         details: error instanceof Error ? error.message : "Unknown error",
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       });
     }
   }

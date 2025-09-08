@@ -3,10 +3,7 @@
 import { useEffect, useState } from "react";
 import { useGetUserDetails } from "@/shared/presentation/hooks/use-get-user-details";
 import { useUpdateUserDetails } from "@/shared/presentation/hooks/use-update-user-details";
-import {
-  EmptyData,
-  EmptyDataState,
-} from "@/shared/presentation/components/empty-data";
+import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 
 export default function ProfilePage() {
   const [fullName, setFullName] = useState("Jono Sujono Mangunkusom");
@@ -36,9 +33,7 @@ export default function ProfilePage() {
   }, [userDetails, success, fetchUserDetails, resetState]);
 
   if (loading) {
-    return (
-      <EmptyData message="Loading profile..." state={EmptyDataState.LOADING} />
-    );
+    return <LoadingSpinner size="md" className="h-40" />;
   }
 
   if (error || updateError)
@@ -57,7 +52,7 @@ export default function ProfilePage() {
           e.preventDefault();
           updateUserDetails({
             email,
-            name: fullName,
+            fullName: fullName,
             phoneNumber: phone.length > 0 ? phone : undefined,
           });
         }}
@@ -104,8 +99,13 @@ export default function ProfilePage() {
         <div className="col-span-2 flex justify-end">
           <button
             type="submit"
-            className="cursor-pointer bg-brand-primary text-white px-8 py-2 rounded-md font-medium hover:bg-brand-primary transition"
-            disabled={updating}
+            className="cursor-pointer bg-brand-primary text-white px-8 py-2 rounded-md font-medium hover:bg-brand-primary transition disabled:bg-neutral-disabled"
+            disabled={
+              updating ||
+              (fullName === userDetails?.name &&
+                email === userDetails?.email &&
+                phone === (userDetails?.phoneNumber || ""))
+            }
           >
             {updating ? "Saving..." : "Save"}
           </button>

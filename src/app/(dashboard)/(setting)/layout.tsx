@@ -96,13 +96,13 @@ export default function SettingLayout({
         {/* Sidebar */}
         <aside
           className={clsx(
-            "w-full md:max-w-xs bg-white rounded-xl border border-[#E5E7EB] flex flex-col p-[20px] gap-8 self-start transition-transform duration-300",
+            "w-full md:max-w-xs bg-white rounded-xl border border-[#E5E7EB] flex flex-col p-[20px] self-start transition-transform duration-300",
             "md:block md:translate-x-0",
             showContent ? "hidden md:block" : "block"
           )}
         >
           {/* User Info */}
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 pb-[16px]">
             <div className="w-16 h-16 rounded-full bg-[#E6F4EA] flex items-center justify-center text-2xl font-semibold text-[#2a6335]">
               {user.name
                 .split(" ")
@@ -115,6 +115,7 @@ export default function SettingLayout({
             </div>
             <div className="text-sm text-gray-500">{user.email}</div>
           </div>
+
           {/* Menu */}
           <nav className="flex flex-col gap-1">
             {MENU_ITEMS.map((item, idx) => (

@@ -126,18 +126,13 @@ export function ReportTable() {
                 </td>
                 <td className="px-4 py-3">
                   <button className="text-gray-400 hover:text-gray-600">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12 16L7 11L8.41 9.59L12 13.17L15.59 9.59L17 11L12 16Z"
-                        fill="currentColor"
-                      />
-                    </svg>
+                    <Image
+                      src="/resources/icons/arrow/download.svg"
+                      alt="Edit"
+                      width={16}
+                      height={16}
+                      className="w-[16px] h-[16px]"
+                    />
                   </button>
                 </td>
               </tr>

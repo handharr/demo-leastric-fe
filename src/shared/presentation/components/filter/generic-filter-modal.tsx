@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   FilterType,
   FilterState,
@@ -9,7 +9,6 @@ import {
 import { FilterCategoryItem } from "@/shared/presentation/components/filter/filter-category-item";
 import { FilterNoActiveSection } from "@/shared/presentation/components/filter/filter-no-active-section";
 import { FilterModalFooter } from "@/shared/presentation/components/filter/filter-modal-footer";
-import { FilterModal } from "@/shared/presentation/components/filter/filter-modal";
 import Image from "next/image";
 import clsx from "clsx";
 import { hasActiveFilters } from "@/shared/utils/helpers/filter-helper";
@@ -42,6 +41,7 @@ export function GenericFilterModal<T extends FilterState>({
   const [activeSection, setActiveSection] = useState<keyof FilterMetas | null>(
     null
   );
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const hasActiveFiltersValue = hasActiveFilters({
     filters: filter,
@@ -166,17 +166,20 @@ export function GenericFilterModal<T extends FilterState>({
   );
 
   return (
-    <>
+    <div ref={containerRef} className="relative">
       {filterButton}
       {isOpen && (
-        <FilterModal
-          isOpen={isOpen}
-          onClose={handleClose}
-          leftContent={leftContent}
-          rightContent={rightContent}
-          footer={footer}
-        />
+        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[800px] max-w-4xl">
+          <div className="flex">
+            {/* Left sidebar */}
+            <div className="w-80 border-r border-gray-200">{leftContent}</div>
+            {/* Right content */}
+            <div className="flex-1 min-h-[400px]">{rightContent}</div>
+          </div>
+          {/* Footer */}
+          <div className="border-t border-gray-200">{footer}</div>
+        </div>
       )}
-    </>
+    </div>
   );
 }

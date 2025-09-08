@@ -29,10 +29,6 @@ export function FilterCategoryItem<T extends FilterState>({
   options,
   filterState,
 }: FilterCategoryItemProps<T>) {
-  console.log("debugTest render FilterCategoryItem", {
-    filterKey,
-    filterState,
-  });
   let descriptionText = "";
   if (meta.type === FilterType.Single) {
     descriptionText = getSingleSelectLabel({

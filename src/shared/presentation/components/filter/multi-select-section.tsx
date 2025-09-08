@@ -42,11 +42,13 @@ export const handleMultiSelect = <T extends FilterState>({
   let newSelectedIds = currentFilter.multiSelection?.[filterKey] || [];
   const selectedAllId = filterMeta.multipleSelectionConfig?.selectedAllId;
   if (id === selectedAllId) {
-    // If "all" is selected, select all options
-    newSelectedIds =
-      newSelectedIds.length === options.length
-        ? []
-        : options.map((option) => option.id);
+    // If "all" is selected, remove another options
+    if (newSelectedIds.includes(selectedAllId || "")) {
+      // If "all" is already selected, unselect it
+      newSelectedIds = [];
+    } else {
+      newSelectedIds = [selectedAllId || ""];
+    }
   } else {
     // Toggle individual selection
     if (newSelectedIds.includes(id)) {
@@ -54,11 +56,9 @@ export const handleMultiSelect = <T extends FilterState>({
     } else {
       newSelectedIds = [...newSelectedIds, id];
     }
-    // If all individual options are selected, include "all"
-    console.log("debugTest after toggle", { newSelectedIds, options });
-    if (selectedAllId && newSelectedIds.length === options.length - 1) {
-      newSelectedIds = [...newSelectedIds, selectedAllId];
-    } else {
+
+    // Ensure "all" is not selected if not all individual options are selected
+    if (!(newSelectedIds.length === options.length - 1)) {
       // Ensure "all" is not selected if not all individual options are selected
       newSelectedIds = newSelectedIds.filter(
         (selectedId) => selectedId !== selectedAllId
@@ -89,14 +89,7 @@ export function MultiSelectSection<T extends FilterState>({
   meta,
   onUpdateFilters,
 }: MultiSelectSectionProps<T>) {
-  const selectedAllId = meta.multipleSelectionConfig?.selectedAllId;
-  let selectedIds = filters.multiSelection?.[filterKey] || [];
-
-  // Check if selectedIds includes the "all" option then include all options
-  if (selectedAllId && selectedIds.includes(selectedAllId)) {
-    selectedIds = options.map((option) => option.id);
-  }
-
+  const selectedIds = filters.multiSelection?.[filterKey] || [];
   return (
     <div className="p-4">
       <h3 className="font-medium text-typography-headline mb-4">

@@ -35,47 +35,32 @@ export function hasActiveFilters({
   filters: FilterState;
   meta: FilterMetas;
 }) {
-  return !isDefaultFilters({ filters, meta });
+  return (
+    !isDefaultFilters({ filters, meta }) &&
+    isHasSomeFilterItemActive({ filters, metas: meta })
+  );
 }
 
-export function getActiveFilters({
+export function isHasSomeFilterItemActive({
   filters,
-  meta,
+  metas,
 }: {
   filters: FilterState;
-  meta: FilterMetas;
-}) {
-  const activeFilters: FilterState = {
-    singleSelection: {},
-    multiSelection: {},
-  };
-
-  Object.entries(meta).forEach(([key, config]) => {
-    const value = filters[key as keyof FilterState];
-    let isActive: boolean = false;
-
-    if (config.type === FilterType.Single && typeof value === "string") {
-      isActive = value !== config.defaultValue;
-    } else if (config.type === FilterType.Multi && Array.isArray(value)) {
-      isActive =
+  metas: FilterMetas;
+}): boolean {
+  return Object.entries(metas).some(([key, meta]) => {
+    if (meta.type === FilterType.Single) {
+      const value = filters.singleSelection?.[key as string];
+      return (value && value !== meta.defaultValue) || false;
+    } else {
+      const value = filters.multiSelection?.[key as string];
+      return (
+        Array.isArray(value) &&
         value.length > 0 &&
-        JSON.stringify(value) !== JSON.stringify(config.defaultValue);
-    }
-
-    if (isActive) {
-      if (config.type === FilterType.Single && typeof value === "string") {
-        if (activeFilters.singleSelection) {
-          activeFilters.singleSelection[key] = value;
-        }
-      } else if (config.type === FilterType.Multi && Array.isArray(value)) {
-        if (activeFilters.multiSelection) {
-          activeFilters.multiSelection[key] = value;
-        }
-      }
+        JSON.stringify(value) !== JSON.stringify(meta.defaultValue)
+      );
     }
   });
-
-  return activeFilters;
 }
 
 export function isFilterActive({

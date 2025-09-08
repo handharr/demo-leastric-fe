@@ -26,11 +26,6 @@ const MENU_ITEMS: SidebarMenuItemProps[] = [
     route: "/device",
   },
   {
-    label: "Appliance",
-    iconSource: "/resources/icons/device/electronic",
-    route: "/appliance",
-  },
-  {
     label: "Setting",
     iconSource: "/resources/icons/system/setting",
     route: "/profile",

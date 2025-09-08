@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from "react";
 import {
-  FilterOption,
   FilterModalPropsNew,
   FilterType,
   FilterState,
@@ -36,6 +35,14 @@ export const reportFilterMeta: FilterMetas = {
       selectedAllLabel: "All devices",
       selectedAllId: "all",
     },
+    options: [
+      { id: "all", label: "All devices" },
+      { id: "device-a", label: "Device A" },
+      { id: "device-b", label: "Device B" },
+      { id: "device-c", label: "Device C" },
+      { id: "device-d", label: "Device D" },
+      { id: "device-e", label: "Device E" },
+    ],
   },
   years: {
     label: "Year",
@@ -45,27 +52,17 @@ export const reportFilterMeta: FilterMetas = {
       selectedAllLabel: "All years",
       selectedAllId: "all",
     },
+    options: [
+      { id: "2025", label: "2025" },
+      { id: "2024", label: "2024" },
+      { id: "2023", label: "2023" },
+      { id: "2022", label: "2022" },
+      { id: "2021", label: "2021" },
+      { id: "2020", label: "2020" },
+      { id: "2019", label: "2019" },
+    ],
   },
 };
-
-const filterDevicesOptions: FilterOption[] = [
-  { id: "all", label: "All devices" },
-  { id: "device-a", label: "Device A" },
-  { id: "device-b", label: "Device B" },
-  { id: "device-c", label: "Device C" },
-  { id: "device-d", label: "Device D" },
-  { id: "device-e", label: "Device E" },
-];
-
-const filterYearsOptions: FilterOption[] = [
-  { id: "2025", label: "2025" },
-  { id: "2024", label: "2024" },
-  { id: "2023", label: "2023" },
-  { id: "2022", label: "2022" },
-  { id: "2021", label: "2021" },
-  { id: "2020", label: "2020" },
-  { id: "2019", label: "2019" },
-];
 
 export function reportFilterDefaultValue(): ReportFilterState {
   return getDefaultFilters(reportFilterMeta);
@@ -81,7 +78,9 @@ export function ReportFilterModal({
   const [filter, setFilter] = useState<ReportFilterState>(
     currentState ?? reportFilterDefaultValue()
   );
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<keyof FilterMetas | null>(
+    null
+  );
 
   const hasActiveDeviceFilters = hasActiveFilters({
     filters: filter,
@@ -159,9 +158,7 @@ export function ReportFilterModal({
           key={filterKey}
           filterKey={filterKey}
           meta={meta}
-          options={
-            filterKey === "devices" ? filterDevicesOptions : filterYearsOptions
-          }
+          options={meta.options}
           active={activeSection === filterKey}
           onClick={() => setActiveSection(filterKey)}
           showBottomBorder={false}
@@ -173,23 +170,26 @@ export function ReportFilterModal({
 
   const rightContent = (
     <>
-      {activeSection === "devices" && (
-        <MultiSelectSection<ReportFilterState>
-          filterKey="devices"
-          filters={filter}
-          meta={reportFilterMeta.devices}
-          options={filterDevicesOptions}
-          onUpdateFilters={(newFilters) => setFilter(newFilters)}
-        />
-      )}
-      {activeSection === "years" && (
-        <SingleSelectSection<ReportFilterState>
-          filterKey="years"
-          filters={filter}
-          meta={reportFilterMeta.years}
-          options={filterYearsOptions}
-          onUpdateFilters={setFilter}
-        />
+      {Object.entries(reportFilterMeta).map(([filterKey, meta]) =>
+        activeSection === filterKey && meta.type === FilterType.Multi ? (
+          <MultiSelectSection<ReportFilterState>
+            key={filterKey}
+            filterKey={filterKey as keyof ReportFilterState["multiSelection"]}
+            filters={filter}
+            meta={meta}
+            options={meta.options}
+            onUpdateFilters={(newFilters) => setFilter(newFilters)}
+          />
+        ) : activeSection === filterKey && meta.type === FilterType.Single ? (
+          <SingleSelectSection<ReportFilterState>
+            key={filterKey}
+            filterKey={filterKey as keyof ReportFilterState["singleSelection"]}
+            filters={filter}
+            meta={meta}
+            options={meta.options}
+            onUpdateFilters={setFilter}
+          />
+        ) : null
       )}
       {!activeSection && <FilterNoActiveSection />}
     </>

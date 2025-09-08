@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useEffect } from "react";
 import {
-  FilterOption,
   FilterModalPropsNew,
   FilterType,
   FilterState,
@@ -19,6 +18,7 @@ import {
   getDefaultFilters,
   hasActiveFilters,
 } from "@/shared/utils/helpers/filter-helper";
+import { MultiSelectSection } from "@/shared/presentation/components/filter/multi-select-section";
 
 export interface SummaryFilterState extends FilterState {
   singleSelection: {
@@ -35,17 +35,16 @@ export const summaryFilterMeta: FilterMetas = {
       selectedAllLabel: "All locations",
       selectedAllId: "all",
     },
+    options: [
+      { id: "all", label: "All locations" },
+      { id: "location-a", label: "Location A" },
+      { id: "location-b", label: "Location B" },
+      { id: "location-c", label: "Location C" },
+      { id: "location-d", label: "Location D" },
+      { id: "location-e", label: "Location E" },
+    ],
   },
 };
-
-const locations: FilterOption[] = [
-  { id: "all", label: "All locations" },
-  { id: "location-a", label: "Location A" },
-  { id: "location-b", label: "Location B" },
-  { id: "location-c", label: "Location C" },
-  { id: "location-d", label: "Location D" },
-  { id: "location-e", label: "Location E" },
-];
 
 export function summaryFilterDefaultValue(): SummaryFilterState {
   return getDefaultFilters(summaryFilterMeta);
@@ -61,7 +60,9 @@ export function SummaryFilterModal({
   const [filter, setFilter] = useState<SummaryFilterState>(
     currentState ?? summaryFilterDefaultValue()
   );
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<keyof FilterMetas | null>(
+    null
+  );
 
   const hasActiveSummaryFilters = hasActiveFilters({
     filters: filter,
@@ -139,9 +140,7 @@ export function SummaryFilterModal({
           key={filterKey}
           filterKey={filterKey}
           meta={meta}
-          options={
-            filterKey === "location" ? locations : ([] as FilterOption[])
-          }
+          options={meta.options}
           active={activeSection === filterKey}
           onClick={() => setActiveSection(filterKey)}
           showBottomBorder={false}
@@ -153,14 +152,26 @@ export function SummaryFilterModal({
 
   const rightContent = (
     <>
-      {activeSection === "location" && (
-        <SingleSelectSection<SummaryFilterState>
-          filterKey="location"
-          filters={filter}
-          meta={summaryFilterMeta.location}
-          options={locations}
-          onUpdateFilters={setFilter}
-        />
+      {Object.entries(summaryFilterMeta).map(([filterKey, meta]) =>
+        activeSection === filterKey && meta.type === FilterType.Multi ? (
+          <MultiSelectSection<SummaryFilterState>
+            key={filterKey}
+            filterKey={filterKey as keyof SummaryFilterState["multiSelection"]}
+            filters={filter}
+            meta={meta}
+            options={meta.options}
+            onUpdateFilters={(newFilters) => setFilter(newFilters)}
+          />
+        ) : activeSection === filterKey && meta.type === FilterType.Single ? (
+          <SingleSelectSection<SummaryFilterState>
+            key={filterKey}
+            filterKey={filterKey as keyof SummaryFilterState["singleSelection"]}
+            filters={filter}
+            meta={meta}
+            options={meta.options}
+            onUpdateFilters={setFilter}
+          />
+        ) : null
       )}
       {!activeSection && <FilterNoActiveSection />}
     </>

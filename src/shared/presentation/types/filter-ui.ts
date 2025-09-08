@@ -19,6 +19,7 @@ export interface FilterMeta {
     selectedAllLabel?: string;
     selectedAllId?: string;
   };
+  options: FilterOption[];
 }
 
 export interface FilterMetas {

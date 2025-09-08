@@ -12,6 +12,7 @@ import {
   EmptyData,
   EmptyDataState,
 } from "@/shared/presentation/components/empty-data";
+import Image from "next/image";
 
 type EditDeviceModalProps = {
   device: DeviceModel;
@@ -160,16 +161,13 @@ export function EditDeviceModal({
         onClick={() => setOpen(true)}
         aria-label="Edit device"
       >
-        <svg
-          className="w-4 h-4 text-gray-500"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 20h9" />
-          <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z" />
-        </svg>
+        <Image
+          src="resources/icons/document/edit.svg"
+          alt="Edit"
+          width={16}
+          height={16}
+          className="w-[16px] h-[16px]"
+        />
       </button>
       <Modal
         open={open}

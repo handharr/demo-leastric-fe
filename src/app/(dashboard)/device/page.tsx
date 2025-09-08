@@ -10,12 +10,25 @@ import {
   deviceFilterDefaultValue,
   deviceFilterMeta,
 } from "@/features/device/presentation/components/device-filter-modal";
+import { useDevices } from "@/features/device/presentation/hooks/use-devices";
+import { Pagination } from "@/shared/presentation/components/pagination";
 
 export default function DevicePage() {
-  const [search, setSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState<DeviceFilterState>(
     deviceFilterDefaultValue()
   );
+  const {
+    devices,
+    loading,
+    error,
+    pagination,
+    search,
+    nextPage,
+    previousPage,
+    goToPage,
+    reloadDevices,
+    setSearch,
+  } = useDevices();
 
   const handleFilterApply = (filters: DeviceFilterState) => {
     setActiveFilters(filters);
@@ -72,7 +85,21 @@ export default function DevicePage() {
       />
 
       {/* Device Table */}
-      <DeviceTable search={search} />
+      <div>
+        <DeviceTable
+          devices={devices}
+          loading={loading}
+          error={error}
+          onEditSuccess={() => reloadDevices()}
+        />
+        {/* Pagination */}
+        <Pagination
+          model={pagination}
+          onPageChange={(page) => goToPage(page)}
+          onPreviousPage={previousPage}
+          onNextPage={nextPage}
+        />
+      </div>
     </div>
   );
 }

@@ -11,7 +11,25 @@ import { PaginationModel } from "@/shared/domain/entities/models-interface";
 
 const useDummy = false;
 
-export function useDevices({ search = "" }: { search?: string } = {}) {
+// Custom debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+export function useDevices() {
+  const [search, setSearch] = useState("");
   const [devices, setDevices] = useState<DeviceModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +41,9 @@ export function useDevices({ search = "" }: { search?: string } = {}) {
     hasPreviousPage: false,
     hasNextPage: false,
   });
+
+  // Debounce search with 500ms delay
+  const debouncedSearch = useDebounce(search, 500);
 
   const fetchDevices = useCallback(
     async ({
@@ -63,9 +84,8 @@ export function useDevices({ search = "" }: { search?: string } = {}) {
           setError(result.message);
         } else {
           setDevices(result.devices);
-          // Only update pagination if it's different from current state
           setPagination(() => ({
-            ...result.pagination, // Ensure we keep the intended page
+            ...result.pagination,
           }));
         }
       } catch (e: unknown) {
@@ -109,23 +129,44 @@ export function useDevices({ search = "" }: { search?: string } = {}) {
     [pagination.pageCount, pagination.page]
   );
 
-  useEffect(() => {
-    // Only fetch on initial load and when search changes
+  const reloadDevices = useCallback(() => {
     fetchDevices({
       page: pagination.page,
       take: pagination.take,
-      search: search,
+      search: debouncedSearch,
       size: pagination.take,
     });
-  }, [search, pagination.page, pagination.take, fetchDevices]);
+  }, [fetchDevices, pagination.page, pagination.take, debouncedSearch]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPagination((prev) => ({
+      ...prev,
+      page: 1, // Reset to first page on new search
+    }));
+  }, [debouncedSearch]);
+
+  // Fetch devices when debounced search, page, or take changes
+  useEffect(() => {
+    fetchDevices({
+      page: pagination.page,
+      take: pagination.take,
+      search: debouncedSearch,
+      size: pagination.take,
+    });
+  }, [debouncedSearch, pagination.page, pagination.take, fetchDevices]);
 
   return {
     devices,
     loading,
     error,
     pagination,
+    search,
+    debouncedSearch, // Expose debounced search if needed
     nextPage,
     previousPage,
     goToPage,
+    reloadDevices,
+    setSearch,
   };
 }

@@ -1,19 +1,20 @@
 "use client";
 
 import { ReportTable } from "@/features/report/components/report-table";
+import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
+import { GenericFilterModal } from "@/shared/presentation/components/filter/generic-filter-modal";
 import {
   reportFilterDefaultValue,
   reportFilterMeta,
-  ReportFilterModal,
   ReportFilterState,
 } from "@/features/setting/presentation/components/report-filter-modal";
-import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
 import { useState } from "react";
 
 export default function ReportPage() {
   const [activeFilters, setActiveFilters] = useState<ReportFilterState>(
     reportFilterDefaultValue()
   );
+
   return (
     <div className="flex min-h-screen space-y-[16px] flex-col">
       {/* Header */}
@@ -23,13 +24,16 @@ export default function ReportPage() {
           By default the data shown is year-to-date
         </span>
       </div>
+
       {/* Filter and Export Section */}
       <div className="flex items-center justify-between">
         {/* Filter Modal */}
-        <ReportFilterModal
+        <GenericFilterModal<ReportFilterState>
           currentState={activeFilters}
           onApply={(newFilters) => setActiveFilters(newFilters)}
           onReset={() => setActiveFilters(reportFilterDefaultValue())}
+          filterMeta={reportFilterMeta}
+          defaultValue={reportFilterDefaultValue()}
         />
         {/* Export Button */}
         <button className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer">

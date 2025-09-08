@@ -5,8 +5,9 @@ import { SummaryCard } from "@/features/summary/presentation/components/summary-
 import { UsageChart } from "@/features/summary/presentation/components/usage-chart";
 import { RealTimeMonitoringChart } from "@/features/summary/presentation/components/real-time-monitoring-chart";
 import { ElectricUsageHistoryTable } from "@/features/summary/presentation/components/electric-usage-history-table";
+import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
+import { GenericFilterModal } from "@/shared/presentation/components/filter/generic-filter-modal";
 import {
-  SummaryFilterModal,
   SummaryFilterState,
   summaryFilterDefaultValue,
   summaryFilterMeta,
@@ -17,7 +18,6 @@ import {
   electricUsageHistoryDummies,
   realTimeDataDummies,
 } from "@/features/summary/presentation/data/dummies";
-import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
 
 export default function SummaryPage() {
   const [activeFilters, setActiveFilters] = useState<SummaryFilterState>(
@@ -54,10 +54,14 @@ export default function SummaryPage() {
       {/* Filter and Export Section */}
       <div className="flex items-center justify-between mb-[16px]">
         {/* Filter Modal */}
-        <SummaryFilterModal
+        <GenericFilterModal<SummaryFilterState>
           currentState={activeFilters}
           onApply={handleFilterApply}
           onReset={handleFilterReset}
+          filterMeta={summaryFilterMeta}
+          defaultValue={summaryFilterDefaultValue()}
+          buttonLabel="Filter"
+          clearFiltersLabel="Clear Filters"
         />
         <button className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer">
           Export
@@ -146,14 +150,11 @@ export default function SummaryPage() {
 
       {/* Real-Time Monitoring and Usage History */}
       <div className="grid grid-cols-1 lg:flex lg:flex-row gap-[16px]">
-        {/* Real-Time Monitoring Chart */}
         <RealTimeMonitoringChart
           data={realTimeData}
           currentUsage={172.45}
           className="lg:flex-3/4"
         />
-
-        {/* Electric Usage History Table */}
         <ElectricUsageHistoryTable data={electricUsageHistory} />
       </div>
     </div>

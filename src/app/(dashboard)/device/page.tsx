@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { DeviceTable } from "@/features/device/presentation/components/device-table";
+import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
+import { GenericFilterModal } from "@/shared/presentation/components/filter/generic-filter-modal";
 import {
   DeviceFilterState,
-  DeviceFilterModal,
   deviceFilterDefaultValue,
   deviceFilterMeta,
 } from "@/features/device/presentation/components/device-filter-modal";
-import { DeviceTable } from "@/features/device/presentation/components/device-table";
-import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
 
 export default function DevicePage() {
   const [search, setSearch] = useState("");
@@ -55,10 +55,12 @@ export default function DevicePage() {
           />
         </div>
         {/* Filter Modal */}
-        <DeviceFilterModal
+        <GenericFilterModal<DeviceFilterState>
           currentState={activeFilters}
           onApply={handleFilterApply}
           onReset={handleFilterReset}
+          filterMeta={deviceFilterMeta}
+          defaultValue={deviceFilterDefaultValue()}
         />
       </div>
 

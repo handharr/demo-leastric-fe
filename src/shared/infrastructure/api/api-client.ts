@@ -270,7 +270,6 @@ export class ApiClient {
    */
   private defaultAuthFailureHandler(): void {
     Logger.info("ApiClient", "Default auth failure handler - tokens cleared");
-    return;
 
     if (typeof window !== "undefined") {
       // Emit an event that components can listen to

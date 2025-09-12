@@ -5,12 +5,11 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-
-// Dummy user data for sidebar
-const user = {
-  name: "Jono Sujono",
-  email: "Jonosujono@gmail.com",
-};
+import {
+  STORAGE_KEYS,
+  StorageManager,
+} from "@/shared/utils/helpers/storage-helper";
+import { UserModel } from "@/shared/domain/entities/user-model";
 
 interface SettingMenuItem {
   label: string;
@@ -41,6 +40,46 @@ const MENU_ITEMS: SettingMenuItem[] = [
     route: "",
   },
 ];
+
+const UserProfile = () => {
+  const [userData, setUserData] = useState<UserModel | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // Mark as client-side and load user data
+    setIsClient(true);
+    const storedUserData = StorageManager.getItem<UserModel>({
+      key: STORAGE_KEYS.USER_DATA,
+    });
+    setUserData(storedUserData);
+  }, []);
+
+  // Generate initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Only show user data after client-side hydration
+  const displayName =
+    isClient && userData?.name ? userData.name : "Unknown User";
+  const initials =
+    isClient && userData?.name ? getInitials(userData.name) : "UN";
+
+  return (
+    <div className="flex flex-col items-center gap-2 pb-[16px]">
+      <div className="w-16 h-16 rounded-full bg-[#E6F4EA] flex items-center justify-center text-2xl font-semibold text-[#2a6335]">
+        {initials}
+      </div>
+      <div className="text-base font-semibold text-gray-800">{displayName}</div>
+      <div className="text-sm text-gray-500">{userData?.email}</div>
+    </div>
+  );
+};
 
 export default function SettingLayout({
   children,
@@ -102,19 +141,7 @@ export default function SettingLayout({
           )}
         >
           {/* User Info */}
-          <div className="flex flex-col items-center gap-2 pb-[16px]">
-            <div className="w-16 h-16 rounded-full bg-[#E6F4EA] flex items-center justify-center text-2xl font-semibold text-[#2a6335]">
-              {user.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()}
-            </div>
-            <div className="text-base font-semibold text-gray-800">
-              {user.name}
-            </div>
-            <div className="text-sm text-gray-500">{user.email}</div>
-          </div>
+          {<UserProfile />}
 
           {/* Menu */}
           <nav className="flex flex-col gap-1">

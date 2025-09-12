@@ -6,7 +6,11 @@ import {
 } from "@/shared/domain/entities/base-error-model";
 import { Logger } from "@/shared/utils/logger/logger";
 import { UserRepositoryImpl } from "@/shared/infrastructure/repositories-implementation/user-repository-impl";
-import { ErrorType } from "../enum/base-enum";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
+import {
+  StorageManager,
+  STORAGE_KEYS,
+} from "@/shared/utils/helpers/storage-helper";
 
 export class GetUserDetailsUseCase {
   constructor(
@@ -21,6 +25,14 @@ export class GetUserDetailsUseCase {
         "Successfully retrieved user details:",
         userDetails
       );
+      // Store user data in localStorage after successful login
+      StorageManager.setItem({
+        key: STORAGE_KEYS.USER_DATA,
+        value: userDetails,
+        options: {
+          useSessionStorage: false, // Use localStorage for persistence
+        },
+      });
       return userDetails;
     } catch (error) {
       Logger.error(

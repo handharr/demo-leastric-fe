@@ -7,6 +7,11 @@ import SidebarMenuItem from "@/shared/presentation/components/sidebar-menu-item"
 import { SidebarMenuItemProps } from "@/shared/presentation/types/ui";
 import { PopupProvider } from "@/shared/presentation/hooks/top-popup-context";
 import { usePathname } from "next/navigation";
+import {
+  STORAGE_KEYS,
+  StorageManager,
+} from "@/shared/utils/helpers/storage-helper";
+import { UserModel } from "@/shared/domain/entities/user-model";
 
 // Constants - moved outside component to prevent recreation
 const MENU_ITEMS: SidebarMenuItemProps[] = [
@@ -52,16 +57,46 @@ const Logo = ({
   />
 );
 
-const UserProfile = () => (
-  <div className="flex items-center gap-3">
-    <div className="w-8 h-8 bg-[#2a6335] rounded-full flex items-center justify-center">
-      <span className="text-white text-sm font-medium">JS</span>
+const UserProfile = () => {
+  const [userData, setUserData] = useState<UserModel | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // Mark as client-side and load user data
+    setIsClient(true);
+    const storedUserData = StorageManager.getItem<UserModel>({
+      key: STORAGE_KEYS.USER_DATA,
+    });
+    setUserData(storedUserData);
+  }, []);
+
+  // Generate initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Only show user data after client-side hydration
+  const displayName =
+    isClient && userData?.name ? userData.name : "Unknown User";
+  const initials =
+    isClient && userData?.name ? getInitials(userData.name) : "UN";
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-8 h-8 bg-[#2a6335] rounded-full flex items-center justify-center">
+        <span className="text-white text-sm font-medium">{initials}</span>
+      </div>
+      <span className="text-[#333333] text-sm font-medium hidden sm:block">
+        {displayName}
+      </span>
     </div>
-    <span className="text-[#333333] text-sm font-medium hidden sm:block">
-      Jono Sujono
-    </span>
-  </div>
-);
+  );
+};
 
 const Breadcrumb = ({
   activeMenu,

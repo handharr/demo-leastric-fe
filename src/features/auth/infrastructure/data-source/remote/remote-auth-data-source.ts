@@ -11,8 +11,8 @@ import {
   ApiClient,
   createAuthApiClient,
 } from "@/shared/infrastructure/api/api-client";
-import { UpdatePasswordResponse } from "../../model/auth-response";
-import { UpdatePasswordDto } from "../../params/auth-dto";
+import { UpdatePasswordResponse } from "@/features/auth/infrastructure/model/auth-response";
+import { UpdatePasswordDto } from "@/features/auth/infrastructure/params/auth-dto";
 
 export class RemoteAuthDataSource implements AuthDataSource {
   private apiClient: ApiClient;

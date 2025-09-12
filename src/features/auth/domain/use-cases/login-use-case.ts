@@ -8,9 +8,13 @@ import {
   isErrorModel,
   createErrorModel,
 } from "@/shared/domain/entities/base-error-model";
-import { UserModel } from "@/features/auth/domain/entities/user-model";
+import { UserModel } from "@/shared/domain/entities/user-model";
 import { mapValidationErrorsToRecord } from "@/shared/utils/helpers/validation-helpers";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
+import {
+  StorageManager,
+  STORAGE_KEYS,
+} from "@/shared/utils/helpers/storage-helper";
 
 export class LoginUseCase {
   constructor(
@@ -39,6 +43,15 @@ export class LoginUseCase {
       if (isErrorModel(result)) {
         return result;
       }
+
+      // Store user data in localStorage after successful login
+      StorageManager.setItem({
+        key: STORAGE_KEYS.USER_DATA,
+        value: result,
+        options: {
+          useSessionStorage: false, // Use localStorage for persistence
+        },
+      });
 
       return result;
     } catch (error) {

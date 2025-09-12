@@ -10,7 +10,7 @@ import {
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
-import { UserModel } from "@/features/auth/domain/entities/user-model";
+import { UserModel } from "@/shared/domain/entities/user-model";
 import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 import { storage } from "@/shared/utils/helpers/storage-helper";
 import { clearLocalTokens } from "@/shared/utils/helpers/network-helper";

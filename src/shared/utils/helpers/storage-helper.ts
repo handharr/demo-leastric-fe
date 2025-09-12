@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   USER_PREFERENCES: "userPreferences",
   THEME: "theme",
   LANGUAGE: "language",
+  USER_DATA: "userData",
 } as const;
 
 // Type for storage keys

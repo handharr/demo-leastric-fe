@@ -13,6 +13,7 @@ import {
   EmptyDataState,
 } from "@/shared/presentation/components/empty-data";
 import Image from "next/image";
+import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 
 type EditDeviceModalProps = {
   device: DeviceModel;
@@ -176,10 +177,7 @@ export function EditDeviceModal({
         description=""
       >
         {loadingDevice ? (
-          <EmptyData
-            message="Loading device..."
-            state={EmptyDataState.LOADING}
-          />
+          <LoadingSpinner size="md" className="h-40 w-40" />
         ) : errorDevice ? (
           <EmptyData message={errorDevice} state={EmptyDataState.ERROR} />
         ) : fetchedDevice ? (

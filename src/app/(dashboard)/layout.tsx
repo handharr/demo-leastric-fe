@@ -11,6 +11,7 @@ import {
   useUser,
 } from "@/shared/presentation/hooks/user-context";
 import { usePathname } from "next/navigation";
+import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
 
 // Constants - moved outside component to prevent recreation
 const MENU_ITEMS: SidebarMenuItemProps[] = [
@@ -96,7 +97,7 @@ const Breadcrumb = ({
   </div>
 );
 
-export default function Layout({
+export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -123,6 +124,13 @@ export default function Layout({
       setActiveMenu(found);
     }
   }, [pathname]);
+
+  useEffect(() => {
+    // Check AuthHelper for authentication status
+    if (!AuthHelper.isAuthenticated()) {
+      router.push("/login");
+    }
+  }, [router]);
 
   // Memoized handlers to prevent unnecessary re-renders
   const toggleSidebar = useCallback(() => {

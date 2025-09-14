@@ -17,7 +17,7 @@ import { UpdatePasswordModel } from "@/features/auth/domain/entities/auth-model"
 import { mapUpdatePasswordFormDataToDto } from "@/features/auth/domain/mapper/auth-params-mapper";
 import { UpdatePasswordFormData } from "@/features/auth/domain/params/data/auth-form-data";
 import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
-import { AuthHelper } from "../../domain/utils/auth-helper";
+import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(
@@ -78,24 +78,16 @@ export class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  async logout(): Promise<void | BaseErrorModel> {
+  async logout(): Promise<boolean | BaseErrorModel> {
     const result = await this.dataSource.logout();
 
     if (isErrorResponse(result)) {
       // Convert BaseErrorResponse to BaseErrorModel
       const errorModel = mapErrorResponseToModel({ response: result });
-
-      // Still clear local tokens even if API call fails
-      if (typeof window !== "undefined") {
-        AuthHelper.clearAllUserData();
-      }
       return errorModel;
     }
 
-    // Clear local tokens on successful logout
-    if (typeof window !== "undefined") {
-      AuthHelper.clearAllUserData();
-    }
+    return result.flash?.type === "success";
   }
 
   async refreshToken({

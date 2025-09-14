@@ -11,7 +11,10 @@ import {
   ApiClient,
   createAuthApiClient,
 } from "@/shared/infrastructure/api/api-client";
-import { UpdatePasswordResponse } from "@/features/auth/infrastructure/model/auth-response";
+import {
+  LogoutResponse,
+  UpdatePasswordResponse,
+} from "@/features/auth/infrastructure/model/auth-response";
 import { UpdatePasswordDto } from "@/features/auth/infrastructure/params/auth-dto";
 
 export class RemoteAuthDataSource implements AuthDataSource {
@@ -49,9 +52,11 @@ export class RemoteAuthDataSource implements AuthDataSource {
     }
   }
 
-  async logout(): Promise<void | BaseErrorResponse> {
+  async logout(): Promise<BaseResponse<LogoutResponse> | BaseErrorResponse> {
     try {
-      await this.apiClient.post("/auth/logout");
+      return await this.apiClient.post<BaseResponse<LogoutResponse>>(
+        "/v1/logout"
+      );
     } catch (error) {
       console.error("Logout error:", error);
       return this.apiClient.handleError(

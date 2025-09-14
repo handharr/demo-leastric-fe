@@ -10,7 +10,7 @@ import { UpdatePasswordFormData } from "../params/data/auth-form-data";
 export interface AuthRepository {
   login({ data }: { data: LoginFormData }): Promise<UserModel | BaseErrorModel>;
 
-  logout(): Promise<void | BaseErrorModel>;
+  logout(): Promise<boolean | BaseErrorModel>;
 
   refreshToken({
     token,

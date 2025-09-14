@@ -6,6 +6,13 @@ import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/shared/presentation/hooks/user-context";
+import { Logger } from "@/shared/utils/logger/logger";
+import { useLogout } from "@/features/auth/presentation/hooks/use-logout";
+import {
+  PopupType,
+  usePopup,
+} from "@/shared/presentation/hooks/top-popup-context";
+import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 
 interface SettingMenuItem {
   label: string;
@@ -70,10 +77,17 @@ export default function SettingLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
+  const { showPopup } = usePopup();
   const [activeIndex, setActiveIndex] = useState(0);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const pathname = usePathname();
+  const {
+    isLoading: isLoggingOut,
+    error: logoutError,
+    logout,
+    clearError,
+  } = useLogout();
 
   // Sync activeMenu with current path
   useEffect(() => {
@@ -98,15 +112,23 @@ export default function SettingLayout({
     setShowContent(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setShowLogoutDialog(false);
-    // TODO: Add your logout logic here (e.g., signOut())
-    router.push("/auth/login");
+    await logout();
   };
 
   const handleCancelLogout = () => {
     setShowLogoutDialog(false);
+    clearError();
   };
+
+  useEffect(() => {
+    if (logoutError) {
+      Logger.error("Logout failed", logoutError);
+      showPopup(`Logout failed: ${logoutError}`, PopupType.ERROR);
+      clearError();
+    }
+  }, [logoutError, showPopup, clearError]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px]">
@@ -208,7 +230,13 @@ export default function SettingLayout({
                 className="flex-1 bg-[#2a6335] rounded-xl py-3 text-lg font-medium text-white hover:bg-[#215027] transition"
                 onClick={handleLogout}
               >
-                Logout
+                {isLoggingOut ? (
+                  <div className="flex justify-center">
+                    <LoadingSpinner size="md" className="h-40 w-40" />
+                  </div>
+                ) : (
+                  "Logout"
+                )}
               </button>
             </div>
           </div>

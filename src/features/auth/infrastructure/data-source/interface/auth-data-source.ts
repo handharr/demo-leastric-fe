@@ -6,7 +6,10 @@ import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-pass
 import { BaseResponse } from "@/shared/infrastructure/model/base-response";
 import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 import { UpdatePasswordDto } from "@/features/auth/infrastructure/params/auth-dto";
-import { UpdatePasswordResponse } from "@/features/auth/infrastructure/model/auth-response";
+import {
+  LogoutResponse,
+  UpdatePasswordResponse,
+} from "@/features/auth/infrastructure/model/auth-response";
 
 export interface AuthDataSource {
   login({
@@ -17,7 +20,7 @@ export interface AuthDataSource {
     password: string;
   }): Promise<BaseResponse<LoginResponse> | BaseErrorResponse>;
 
-  logout(): Promise<void | BaseErrorResponse>;
+  logout(): Promise<BaseResponse<LogoutResponse> | BaseErrorResponse>;
 
   refreshToken({
     token,

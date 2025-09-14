@@ -219,12 +219,12 @@ export class AuthHelper {
   /**
    * Set user data in storage
    */
-  static setUserData<T>({
+  static setUserData({
     userData,
     useSessionStorage = false,
     expiryInMinutes,
   }: {
-    userData: T;
+    userData: UserModel;
     useSessionStorage?: boolean;
     expiryInMinutes?: number;
   }): void {

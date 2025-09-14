@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { GetUserDetailsUseCase } from "@/shared/domain/use-cases/get-user-details-use-case";
-import { UserModel } from "@/shared/domain/entities/user-model";
 import {
   BaseErrorModel,
   isErrorModel,
 } from "@/shared/domain/entities/base-error-model";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { useUser } from "@/shared/presentation/hooks/user-context";
 
 export const useGetUserDetails = () => {
-  const [userDetails, setUserDetails] = useState<UserModel | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { user: userDetails, updateUser } = useUser();
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<BaseErrorModel | null>(null);
 
   const fetchUserDetails = useCallback(async () => {
@@ -21,22 +21,31 @@ export const useGetUserDetails = () => {
       if (isErrorModel(result)) {
         setError(result);
       } else {
-        setUserDetails(result);
+        updateUser(result);
       }
     } catch (err) {
-      setError({
+      const errorModel = {
         message: "Unexpected error occurred",
         details: err instanceof Error ? err.message : "Unknown error",
         type: ErrorType.UNEXPECTED,
-      });
+      };
+      setError(errorModel);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [updateUser]);
 
   useEffect(() => {
-    fetchUserDetails();
-  }, [fetchUserDetails]);
+    // Only fetch if user is not already loaded from storage
+    if (!userDetails) {
+      fetchUserDetails();
+    }
+  }, [fetchUserDetails, userDetails]);
 
-  return { userDetails, loading, error, fetchUserDetails };
+  return {
+    userDetails,
+    loading,
+    error,
+    fetchUserDetails,
+  };
 };

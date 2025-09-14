@@ -5,11 +5,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import {
-  STORAGE_KEYS,
-  StorageManager,
-} from "@/shared/utils/helpers/storage-helper";
-import { UserModel } from "@/shared/domain/entities/user-model";
+import { useUser } from "@/shared/presentation/hooks/user-context";
 
 interface SettingMenuItem {
   label: string;
@@ -42,17 +38,7 @@ const MENU_ITEMS: SettingMenuItem[] = [
 ];
 
 const UserProfile = () => {
-  const [userData, setUserData] = useState<UserModel | null>(null);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    // Mark as client-side and load user data
-    setIsClient(true);
-    const storedUserData = StorageManager.getItem<UserModel>({
-      key: STORAGE_KEYS.USER_DATA,
-    });
-    setUserData(storedUserData);
-  }, []);
+  const { user: userData } = useUser();
 
   // Generate initials from name
   const getInitials = (name: string) => {
@@ -64,11 +50,8 @@ const UserProfile = () => {
       .slice(0, 2);
   };
 
-  // Only show user data after client-side hydration
-  const displayName =
-    isClient && userData?.name ? userData.name : "Unknown User";
-  const initials =
-    isClient && userData?.name ? getInitials(userData.name) : "UN";
+  const displayName = userData?.name || "Unknown User";
+  const initials = userData?.name ? getInitials(userData.name) : "UN";
 
   return (
     <div className="flex flex-col items-center gap-2 pb-[16px]">

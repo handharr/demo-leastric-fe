@@ -60,8 +60,8 @@ export function ReportTable() {
       {/* Table */}
       <div className="bg-white rounded-lg border border-gray-200 mb-4">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
+          <thead className="bg-brand-subtle-2 border-b border-gray-200">
+            <tr className="text-left text-sm font-medium text-typography-headline">
               <th className="px-4 py-3 text-left">
                 <button
                   onClick={handleSelectAll}
@@ -80,18 +80,10 @@ export function ReportTable() {
                   />
                 </button>
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                Month
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                Year
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                Device Name
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">
-                Action
-              </th>
+              <th className="px-4 py-3">Month</th>
+              <th className="px-4 py-3">Year</th>
+              <th className="px-4 py-3">Device Name</th>
+              <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">

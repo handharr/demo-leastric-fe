@@ -31,8 +31,8 @@ export function DeviceTable({
     <div className="overflow-x-auto bg-white rounded-xl shadow border">
       {/* Table */}
       <table className="min-w-full text-sm">
-        <thead>
-          <tr className="bg-gray-50 text-gray-700">
+        <thead className="bg-brand-subtle-2 border-b border-gray-200">
+          <tr className="text-typography-headline">
             <th className="px-4 py-3 text-left font-semibold">Device name</th>
             <th className="px-4 py-3 text-left font-semibold">Status</th>
             <th className="px-4 py-3 text-left font-semibold">Tariff Group</th>

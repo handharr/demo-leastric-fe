@@ -66,9 +66,11 @@ export function GenericFilterModal<T extends FilterState>({
   }, [onReset, defaultValue]);
 
   const handleOpen = useCallback(() => {
-    setFilter(currentState ?? defaultValue);
-    setIsOpen(true);
-  }, [currentState, defaultValue]);
+    if (!isOpen) {
+      setFilter(currentState ?? defaultValue);
+    }
+    setIsOpen((isOpen) => !isOpen);
+  }, [currentState, defaultValue, isOpen]);
 
   const handleClose = useCallback(() => {
     setFilter(currentState ?? defaultValue);

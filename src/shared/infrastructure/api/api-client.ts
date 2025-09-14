@@ -6,7 +6,6 @@ import axios, {
   AxiosRequestConfig,
 } from "axios";
 import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
-import { storage } from "@/shared/utils/helpers/storage-helper";
 import {
   RetryHandler,
   RetryOptions,
@@ -14,6 +13,7 @@ import {
 import { Logger } from "@/shared/utils/logger/logger";
 import { BaseResponse } from "@/shared/infrastructure/model/base-response";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
 
 export interface ApiClientConfig {
   baseURL?: string;
@@ -365,10 +365,10 @@ export class ApiClient {
       Logger.info("ApiClient", "customTokenRefreshHandler result:", result);
 
       if (result.success && result.data?.tokens) {
-        this.setAuthToken(optional(result.data.tokens.access_token).orEmpty());
-        this.setRefreshToken(
-          optional(result.data.tokens.refresh_token).orEmpty()
-        );
+        AuthHelper.setAuthTokens({
+          authToken: optional(result.data.tokens.access_token).orEmpty(),
+          refreshToken: optional(result.data.tokens.refresh_token).orEmpty(),
+        });
         this.customTokenRefreshHandler.onRefreshSuccess?.(result.data);
         Logger.info("ApiClient", "Token refresh successful", result.data);
         return true;
@@ -453,7 +453,7 @@ export class ApiClient {
   private getAuthToken(): string {
     Logger.info("ApiClient", "Getting auth token");
     if (typeof window === "undefined") return "";
-    const token = storage.getAuthToken();
+    const token = AuthHelper.getAuthToken();
     Logger.info("ApiClient", "Auth token retrieved:", token);
     return token ? `Bearer ${token}` : "";
   }
@@ -461,33 +461,16 @@ export class ApiClient {
   private getRefreshToken(): string | null {
     Logger.info("ApiClient", "Getting refresh token");
     if (typeof window === "undefined") return null;
-    const token = storage.getRefreshToken();
+    const token = AuthHelper.getRefreshToken();
     Logger.info("ApiClient", "Refresh token retrieved:", token);
     return token;
-  }
-
-  private setAuthToken(token: string): void {
-    Logger.info("ApiClient", "Setting auth token:", token);
-    if (typeof window !== "undefined") {
-      Logger.info("ApiClient", "Storing auth token");
-      storage.setAuthToken({ token });
-    }
-  }
-
-  private setRefreshToken(token: string): void {
-    Logger.info("ApiClient", "Setting refresh token:", token);
-    if (typeof window !== "undefined") {
-      Logger.info("ApiClient", "Storing refresh token");
-      storage.setRefreshToken({ token });
-    }
   }
 
   private clearTokens(): void {
     Logger.info("ApiClient", "Clearing tokens");
     if (typeof window !== "undefined") {
       Logger.info("ApiClient", "Removing auth token");
-      storage.clearAuthData();
-      storage.clearAuthData({ options: { useSessionStorage: true } });
+      AuthHelper.clearAllUserData();
     }
   }
 

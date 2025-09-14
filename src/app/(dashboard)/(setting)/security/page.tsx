@@ -71,52 +71,47 @@ export default function SecurityPage() {
         </div>
       )}
 
-      {/* Current Password and Forgot Password */}
-      <div>
-        <label className="block text-sm font-medium mb-1">
-          Current Password
-        </label>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <div className="relative flex-1">
-            <input
-              type={showCurrent ? "text" : "password"}
-              className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
-                errors.currentPassword || (isError && error?.statusCode === 401)
-                  ? "border-red-300 focus:ring-red-200"
-                  : "focus:ring-green-200"
-              }`}
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter current password"
-              disabled={isLoading}
-            />
-            <button
-              type="button"
-              className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
-              onClick={() => setShowCurrent((v) => !v)}
-              tabIndex={-1}
-              aria-label={showCurrent ? "Hide password" : "Show password"}
-            >
-              <Image
-                src={
-                  showCurrent
-                    ? "/resources/icons/security/eye-closed.svg"
-                    : "/resources/icons/security/eye-open.svg"
-                }
-                alt={showCurrent ? "Hide password" : "Show password"}
-                width={20}
-                height={20}
-                className="text-gray-400 hover:text-gray-600"
+      <div className="flex flex-col gap-[8px] w-full">
+        {/* Current Password */}
+        <div className="flex flex-col gap-[16px]">
+          <div className="flex flex-col gap-[4px]">
+            <label className="block text-sm font-medium">
+              Current Password
+            </label>
+            <div className="relative">
+              <input
+                type={showCurrent ? "text" : "password"}
+                className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
+                  errors.currentPassword ||
+                  (isError && error?.statusCode === 401)
+                    ? "border-red-300 focus:ring-red-200"
+                    : "focus:ring-brand-primary"
+                }`}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter current password"
+                disabled={isLoading}
               />
-            </button>
-          </div>
-          <div className="sm:flex-1">
-            <a
-              href="#"
-              className="text-brand-primary text-sm font-medium sm:ml-2 hover:underline whitespace-nowrap"
-            >
-              Forgot Password?
-            </a>
+              <button
+                type="button"
+                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+                onClick={() => setShowCurrent((v) => !v)}
+                tabIndex={-1}
+                aria-label={showCurrent ? "Hide password" : "Show password"}
+              >
+                <Image
+                  src={
+                    showCurrent
+                      ? "/resources/icons/security/eye-closed.svg"
+                      : "/resources/icons/security/eye-open.svg"
+                  }
+                  alt={showCurrent ? "Hide password" : "Show password"}
+                  width={20}
+                  height={20}
+                  className="text-gray-400 hover:text-gray-600"
+                />
+              </button>
+            </div>
           </div>
         </div>
         {errors.currentPassword && (
@@ -130,16 +125,27 @@ export default function SecurityPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">New password</label>
+      {/* Forgot password */}
+      <div>
+        <a
+          href="#"
+          className="text-brand-primary text-sm font-medium hover:underline whitespace-nowrap"
+        >
+          Forgot Password?
+        </a>
+      </div>
+
+      {/* New Password */}
+      <div className="flex flex-col gap-[16px]">
+        <div className="flex flex-col gap-[4px]">
+          <label className="text-sm font-medium">New password</label>
           <div className="relative">
             <input
               type={showNew ? "text" : "password"}
               className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
                 errors.newPassword
                   ? "border-red-300 focus:ring-red-200"
-                  : "focus:ring-green-200"
+                  : "focus:ring-brand-primary"
               }`}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -167,17 +173,15 @@ export default function SecurityPage() {
             </button>
           </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Confirm new password
-          </label>
+        <div className="flex flex-col gap-[4px]">
+          <label className="text-sm font-medium">Confirm new password</label>
           <div className="relative">
             <input
               type={showConfirm ? "text" : "password"}
               className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
                 errors.confirmPassword
                   ? "border-red-300 focus:ring-red-200"
-                  : "focus:ring-green-200"
+                  : "focus:ring-brand-primary"
               }`}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

@@ -12,13 +12,12 @@ import {
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { UserModel } from "@/shared/domain/entities/user-model";
 import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
-import { storage } from "@/shared/utils/helpers/storage-helper";
-import { clearLocalTokens } from "@/shared/utils/helpers/network-helper";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { UpdatePasswordModel } from "@/features/auth/domain/entities/auth-model";
 import { mapUpdatePasswordFormDataToDto } from "@/features/auth/domain/mapper/auth-params-mapper";
 import { UpdatePasswordFormData } from "@/features/auth/domain/params/data/auth-form-data";
 import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
+import { AuthHelper } from "../../domain/utils/auth-helper";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(
@@ -54,11 +53,9 @@ export class AuthRepositoryImpl implements AuthRepository {
     ) {
       // Store tokens using the new storage system with named parameters
       if (typeof window !== "undefined") {
-        storage.setAuthToken({
-          token: result.data.tokens.access_token,
-        });
-        storage.setRefreshToken({
-          token: result.data.tokens.refresh_token,
+        AuthHelper.setAuthTokens({
+          authToken: result.data.tokens.access_token,
+          refreshToken: result.data.tokens.refresh_token,
         });
       }
 
@@ -90,14 +87,14 @@ export class AuthRepositoryImpl implements AuthRepository {
 
       // Still clear local tokens even if API call fails
       if (typeof window !== "undefined") {
-        clearLocalTokens();
+        AuthHelper.clearAllUserData();
       }
       return errorModel;
     }
 
     // Clear local tokens on successful logout
     if (typeof window !== "undefined") {
-      clearLocalTokens();
+      AuthHelper.clearAllUserData();
     }
   }
 
@@ -123,7 +120,9 @@ export class AuthRepositoryImpl implements AuthRepository {
     if (result.success && result.token) {
       // Update stored token
       if (typeof window !== "undefined") {
-        storage.setAuthToken({ token: result.token });
+        AuthHelper.setAuthTokens({
+          authToken: result.token,
+        });
       }
 
       return {

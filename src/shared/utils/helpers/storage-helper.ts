@@ -220,61 +220,6 @@ export class StorageManager {
 
 // Convenience functions for common operations
 export const storage = {
-  // Auth token management
-  setAuthToken: ({
-    token,
-    options,
-  }: {
-    token: string;
-    options?: StorageOptions;
-  }) =>
-    StorageManager.setItem({
-      key: STORAGE_KEYS.AUTH_TOKEN,
-      value: token,
-      options,
-    }),
-
-  getAuthToken: ({ options }: { options?: StorageOptions } = {}):
-    | string
-    | null =>
-    StorageManager.getItem<string>({ key: STORAGE_KEYS.AUTH_TOKEN, options }),
-
-  removeAuthToken: ({ options }: { options?: StorageOptions } = {}) =>
-    StorageManager.removeItem({ key: STORAGE_KEYS.AUTH_TOKEN, options }),
-
-  // Refresh token management
-  setRefreshToken: ({
-    token,
-    options,
-  }: {
-    token: string;
-    options?: StorageOptions;
-  }) =>
-    StorageManager.setItem({
-      key: STORAGE_KEYS.REFRESH_TOKEN,
-      value: token,
-      options,
-    }),
-
-  getRefreshToken: ({ options }: { options?: StorageOptions } = {}):
-    | string
-    | null =>
-    StorageManager.getItem<string>({
-      key: STORAGE_KEYS.REFRESH_TOKEN,
-      options,
-    }),
-
-  removeRefreshToken: ({ options }: { options?: StorageOptions } = {}) =>
-    StorageManager.removeItem({ key: STORAGE_KEYS.REFRESH_TOKEN, options }),
-
-  // Clear all auth data
-  clearAuthData: ({ options }: { options?: StorageOptions } = {}) => {
-    StorageManager.removeItems({
-      keys: [STORAGE_KEYS.AUTH_TOKEN, STORAGE_KEYS.REFRESH_TOKEN],
-      options,
-    });
-  },
-
   // User preferences
   setUserPreferences: ({
     preferences,

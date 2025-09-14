@@ -20,7 +20,7 @@ export default function ReportPage() {
       {/* Header */}
       <div className="space-y-[4px]">
         <h1 className="text-2xl font-bold text-typography-headline">Report</h1>
-        <span className="text-sm text-typography-secondary">
+        <span className="text-sm text-typography-subhead">
           By default the data shown is year-to-date
         </span>
       </div>

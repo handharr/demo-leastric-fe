@@ -66,11 +66,23 @@ export function GenericFilterModal<T extends FilterState>({
   }, [onReset, defaultValue]);
 
   const handleOpen = useCallback(() => {
+    let isHasEmptyOptions = false;
+    Object.values(filterMeta).forEach((meta) => {
+      if (meta.options.length === 0) {
+        isHasEmptyOptions = true;
+      }
+    });
+
+    if (isHasEmptyOptions) {
+      return;
+    }
+
     if (!isOpen) {
       setFilter(currentState ?? defaultValue);
     }
+
     setIsOpen((isOpen) => !isOpen);
-  }, [currentState, defaultValue, isOpen]);
+  }, [currentState, defaultValue, isOpen, filterMeta]);
 
   const handleClose = useCallback(() => {
     setFilter(currentState ?? defaultValue);
@@ -170,16 +182,21 @@ export function GenericFilterModal<T extends FilterState>({
   return (
     <div ref={containerRef} className="relative">
       {filterButton}
+      {/* Filter container */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[800px] max-w-4xl">
-          <div className="flex">
+        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[800px] max-w-4xl max-h-[50vh] overflow-hidden flex flex-col">
+          <div className="flex flex-1 overflow-hidden">
             {/* Left sidebar */}
-            <div className="w-80 border-r border-gray-200">{leftContent}</div>
+            <div className="w-80 border-r border-gray-200 overflow-y-auto">
+              {leftContent}
+            </div>
             {/* Right content */}
-            <div className="flex-1 min-h-[400px]">{rightContent}</div>
+            <div className="flex-1 min-h-[400px] overflow-y-auto">
+              {rightContent}
+            </div>
           </div>
           {/* Footer */}
-          <div className="border-t border-gray-200">{footer}</div>
+          <div className="border-t border-gray-200 flex-shrink-0">{footer}</div>
         </div>
       )}
     </div>

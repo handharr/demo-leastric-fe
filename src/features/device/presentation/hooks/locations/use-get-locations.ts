@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import { GetLocationsUseCase } from "@/features/device/domain/use-cases/locations/get-locations-use-case";
 import { Logger } from "@/shared/utils/logger/logger";
@@ -52,6 +52,10 @@ export const useGetLocations = (): UseGetLocationsReturn => {
     setError(null);
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    fetchLocations();
+  }, [fetchLocations]);
 
   return {
     data,

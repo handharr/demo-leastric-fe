@@ -2,6 +2,7 @@ import {
   FilterType,
   FilterState,
   FilterMetas,
+  FilterOption,
 } from "@/shared/presentation/types/filter-ui";
 import { getDefaultFilters } from "@/shared/utils/helpers/filter-helper";
 
@@ -20,17 +21,19 @@ export const deviceFilterMeta: FilterMetas = {
       selectedAllLabel: "All locations",
       selectedAllId: "all",
     },
-    options: [
-      { id: "all", label: "All locations" },
-      { id: "location-a", label: "Location A" },
-      { id: "location-b", label: "Location B" },
-      { id: "location-c", label: "Location C" },
-      { id: "location-d", label: "Location D" },
-      { id: "location-e", label: "Location E" },
-    ],
+    options: [],
   },
 };
 
 export function deviceFilterDefaultValue(): DeviceFilterState {
   return getDefaultFilters(deviceFilterMeta);
+}
+
+export function getDeviceFiltersMeta({
+  options,
+}: { options?: FilterOption[] } = {}): FilterMetas {
+  if (options) {
+    deviceFilterMeta.location.options = options;
+  }
+  return deviceFilterMeta;
 }

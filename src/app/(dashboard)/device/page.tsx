@@ -8,10 +8,12 @@ import { GenericFilterModal } from "@/shared/presentation/components/filter/gene
 import {
   DeviceFilterState,
   deviceFilterDefaultValue,
-  deviceFilterMeta,
+  getDeviceFiltersMeta,
 } from "@/features/device/presentation/components/device-filter-modal";
 import { useDevices } from "@/features/device/presentation/hooks/use-devices";
 import { Pagination } from "@/shared/presentation/components/pagination";
+import { useGetLocations } from "@/features/device/presentation/hooks/locations/use-get-locations";
+import { FilterOption } from "@/shared/presentation/types/filter-ui";
 
 export default function DevicePage() {
   const [activeFilters, setActiveFilters] = useState<DeviceFilterState>(
@@ -29,6 +31,7 @@ export default function DevicePage() {
     reloadDevices,
     setSearch,
   } = useDevices();
+  const { data: locations } = useGetLocations();
 
   const handleFilterApply = (filters: DeviceFilterState) => {
     setActiveFilters(filters);
@@ -39,6 +42,16 @@ export default function DevicePage() {
     setActiveFilters(resetValue);
     console.log("Filters reset");
   };
+
+  const options: FilterOption[] = locations
+    ? [
+        { id: "all", label: "All locations" },
+        ...locations.map((loc: string) => ({ id: loc, label: loc })),
+      ]
+    : [];
+
+  // Update filter meta with dynamic options
+  const deviceFilterMeta = getDeviceFiltersMeta({ options });
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">

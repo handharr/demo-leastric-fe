@@ -1,16 +1,19 @@
 import { BaseResponse } from "@/shared/infrastructure/model/base-response";
 import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
 import {
-  LocationStatsResponse,
-  LocationResponse,
-} from "@/features/device/infrastructure/model/location-response";
+  GetLocationsWithStatsResponse,
+  GetLocationsResponse,
+  GetLocationsWithDetailResponse,
+} from "@/features/device/infrastructure/model/locations-response";
 
 export interface LocationDataSource {
-  getLocations(): Promise<BaseResponse<string[]> | BaseErrorResponse>;
+  getLocations(): Promise<
+    BaseResponse<GetLocationsResponse> | BaseErrorResponse
+  >;
   getLocationWithStats(): Promise<
-    BaseResponse<LocationStatsResponse[]> | BaseErrorResponse
+    BaseResponse<GetLocationsWithStatsResponse> | BaseErrorResponse
   >;
   getLocationsWithDetail(): Promise<
-    BaseResponse<LocationResponse[]> | BaseErrorResponse
+    BaseResponse<GetLocationsWithDetailResponse> | BaseErrorResponse
   >;
 }

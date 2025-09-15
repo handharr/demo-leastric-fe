@@ -21,3 +21,15 @@ export interface LocationStatsResponse {
   deviceCount?: number;
   detailLocations?: string[];
 }
+
+export interface GetLocationsResponse {
+  locations?: string[];
+}
+
+export interface GetLocationsWithStatsResponse {
+  locations?: LocationStatsResponse[];
+}
+
+export interface GetLocationsWithDetailResponse {
+  hierarchy?: LocationResponse[];
+}

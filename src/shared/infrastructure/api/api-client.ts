@@ -559,7 +559,8 @@ export class ApiClient {
         method: error.request?.method,
         path: error.request?.url,
         meta: {
-          message: "Network error. Please check your connection.",
+          message:
+            "Network error. Please check your connection or retry later.",
           error: "NETWORK_ERROR",
           statusCode: 501,
         },

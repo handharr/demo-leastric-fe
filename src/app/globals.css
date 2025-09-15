@@ -55,10 +55,13 @@
   --color-typography-headline: #333333;
   --color-typography-subhead: #6c6c6c;
   --color-default-border: #dedede;
+  --color-form-border: #cfcfcf;
   --color-neutral-shadow-lighter: #bababa;
   --color-neutral-disabled: #909090;
   --color-neutral-shadow-base: #909090;
   --color-form-disabled: #e6e6e6;
+  --color-cta-disabled: #dedede;
+  --color-typography-disabled: #a6a6a6;
 
   /* Radius */
   --radius-sm: calc(var(--radius) - 4px);

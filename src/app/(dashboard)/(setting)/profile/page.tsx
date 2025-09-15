@@ -62,7 +62,7 @@ export default function ProfilePage() {
             Full Name <span className="text-typography-negative">*</span>
           </label>
           <input
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-brand-primary"
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-form-border"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             required
@@ -75,7 +75,7 @@ export default function ProfilePage() {
             Email <span className="text-typography-negative">*</span>
           </label>
           <input
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-brand-primary"
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-form-border"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -86,7 +86,7 @@ export default function ProfilePage() {
         <div className="col-span-2 lg:col-span-1">
           <label className="block text-sm font-medium mb-1">Phone Number</label>
           <input
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-brand-primary"
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-form-border"
             value={phone}
             onChange={(e) => {
               const onlyNums = e.target.value.replace(/\D/g, "");
@@ -99,7 +99,7 @@ export default function ProfilePage() {
         <div className="col-span-2 flex justify-end">
           <button
             type="submit"
-            className="cursor-pointer bg-brand-primary text-white px-8 py-2 rounded-md font-medium hover:bg-brand-primary transition disabled:bg-neutral-disabled"
+            className="cursor-pointer bg-brand-primary text-white px-8 py-2 rounded-md font-medium hover:bg-brand-primary transition disabled:bg-cta-disabled disabled:text-typography-disabled"
             disabled={
               updating ||
               (fullName === userDetails?.name &&
@@ -107,7 +107,7 @@ export default function ProfilePage() {
                 phone === (userDetails?.phoneNumber || ""))
             }
           >
-            {updating ? "Saving..." : "Save"}
+            {updating ? "Saving..." : "Update Password"}
           </button>
         </div>
       </form>

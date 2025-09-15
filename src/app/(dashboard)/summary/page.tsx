@@ -45,14 +45,14 @@ export default function SummaryPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col gap-[16px]">
       {/* Header */}
-      <div className="mb-[16px]">
+      <div>
         <h1 className="text-2xl font-bold text-typography-headline">Summary</h1>
       </div>
 
       {/* Filter and Export Section */}
-      <div className="flex items-center justify-between mb-[16px]">
+      <div className="flex items-center justify-between">
         {/* Filter Modal */}
         <GenericFilterModal<SummaryFilterState>
           currentState={activeFilters}
@@ -76,7 +76,7 @@ export default function SummaryPage() {
       />
 
       {/* Summary Cards Grid */}
-      <div className="overflow-x-auto pb-4 mb-[16px]">
+      <div className="overflow-x-auto pb-4">
         <div className="flex gap-[16px] md:grid md:grid-cols-2 xl:grid-cols-4 min-w-max md:min-w-0 md:items-stretch">
           {/* Electricity Usage Card */}
           <div className="flex-shrink-0 w-80 md:w-auto md:flex">
@@ -144,7 +144,7 @@ export default function SummaryPage() {
       </div>
 
       {/* Usage Chart */}
-      <div className="mb-[16px]">
+      <div>
         <UsageChart data={chartData} comparedData={comparedChartData} />
       </div>
 
@@ -153,9 +153,12 @@ export default function SummaryPage() {
         <RealTimeMonitoringChart
           data={realTimeData}
           currentUsage={172.45}
-          className="lg:flex-3/4"
+          className="lg:flex-1"
         />
-        <ElectricUsageHistoryTable data={electricUsageHistory} />
+        <ElectricUsageHistoryTable
+          data={electricUsageHistory}
+          className="lg:flex-1"
+        />
       </div>
     </div>
   );

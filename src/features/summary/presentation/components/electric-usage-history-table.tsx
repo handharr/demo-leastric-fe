@@ -8,11 +8,13 @@ import { ShowMoreElectricUsageModalButton } from "@/features/summary/presentatio
 interface ElectricUsageHistoryTableProps {
   data: ElectricUsageRecord[];
   showAll?: boolean;
+  className?: string;
 }
 
 export function ElectricUsageHistoryTable({
   data,
   showAll = false,
+  className,
 }: ElectricUsageHistoryTableProps) {
   const displayData = showAll ? data : data.slice(0, 7);
 
@@ -21,6 +23,7 @@ export function ElectricUsageHistoryTable({
       title="Electricity Usage History"
       description="Overview of electricity consumption trends."
       topRightContent={<ShowMoreElectricUsageModalButton data={data} />}
+      className={className || ""}
     >
       <div className="overflow-x-auto">
         <table className="w-full">

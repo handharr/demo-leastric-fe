@@ -8,8 +8,28 @@ import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { Logger } from "@/shared/utils/logger/logger";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
+import {
+  deviceFilterDefaultValue,
+  DeviceFilterState,
+} from "../components/device-filter-modal";
 
 const useDummy = false;
+
+export interface UseDevicesReturn {
+  devices: DeviceModel[];
+  loading: boolean;
+  error: string | null;
+  pagination: PaginationModel;
+  search: string;
+  debouncedSearch: string;
+  activeFilters: DeviceFilterState;
+  nextPage: () => void;
+  previousPage: () => void;
+  goToPage: (page: number) => void;
+  reloadDevices: () => void;
+  setSearch: (search: string) => void;
+  setActiveFilters: (filters: DeviceFilterState) => void;
+}
 
 // Custom debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -28,7 +48,10 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-export function useDevices() {
+export function useDevices(): UseDevicesReturn {
+  const [activeFilters, setActiveFilters] = useState<DeviceFilterState>(
+    deviceFilterDefaultValue()
+  );
   const [search, setSearch] = useState("");
   const [devices, setDevices] = useState<DeviceModel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,11 +74,13 @@ export function useDevices() {
       take,
       search,
       size,
+      keyword,
     }: {
       page?: number;
       take?: number;
       search?: string;
       size?: number;
+      keyword?: string;
     }) => {
       setLoading(true);
       setError(null);
@@ -75,6 +100,7 @@ export function useDevices() {
             take: optional(take).orDefault(10),
             name: optional(search).orDefault(""),
             size: optional(size).orDefault(10),
+            keyword,
           },
         });
 
@@ -146,15 +172,22 @@ export function useDevices() {
     }));
   }, [debouncedSearch]);
 
-  // Fetch devices when debounced search, page, or take changes
+  // Fetch devices when filter, debounced search, page, or take changes
   useEffect(() => {
     fetchDevices({
       page: pagination.page,
       take: pagination.take,
       search: debouncedSearch,
       size: pagination.take,
+      keyword: activeFilters.singleSelection.location,
     });
-  }, [debouncedSearch, pagination.page, pagination.take, fetchDevices]);
+  }, [
+    debouncedSearch,
+    pagination.page,
+    pagination.take,
+    fetchDevices,
+    activeFilters.singleSelection.location,
+  ]);
 
   return {
     devices,
@@ -163,10 +196,12 @@ export function useDevices() {
     pagination,
     search,
     debouncedSearch, // Expose debounced search if needed
+    activeFilters,
     nextPage,
     previousPage,
     goToPage,
     reloadDevices,
     setSearch,
+    setActiveFilters,
   };
 }

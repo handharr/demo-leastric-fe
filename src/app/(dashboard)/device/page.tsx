@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { DeviceTable } from "@/features/device/presentation/components/device-table";
 import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
@@ -16,31 +15,28 @@ import { useGetLocations } from "@/features/device/presentation/hooks/locations/
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 
 export default function DevicePage() {
-  const [activeFilters, setActiveFilters] = useState<DeviceFilterState>(
-    deviceFilterDefaultValue()
-  );
   const {
     devices,
     loading,
     error,
     pagination,
     search,
+    activeFilters,
     nextPage,
     previousPage,
     goToPage,
     reloadDevices,
     setSearch,
+    setActiveFilters,
   } = useDevices();
   const { data: locations } = useGetLocations();
 
   const handleFilterApply = (filters: DeviceFilterState) => {
     setActiveFilters(filters);
-    console.log("Applied filters:", filters);
   };
 
   const handleFilterReset = (resetValue: DeviceFilterState) => {
     setActiveFilters(resetValue);
-    console.log("Filters reset");
   };
 
   const options: FilterOption[] = locations
@@ -54,7 +50,7 @@ export default function DevicePage() {
   const deviceFilterMeta = getDeviceFiltersMeta({ options });
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col gap-[16px] bg-gray-50">
       {/* Header */}
       <div className="mb-[16px]">
         <h1 className="text-2xl font-bold text-typography-headline">
@@ -63,7 +59,7 @@ export default function DevicePage() {
       </div>
 
       {/* Filter and search Section */}
-      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-[16px]">
+      <div className="flex flex-col md:flex-row md:items-center gap-4">
         {/* Search Input */}
         <div className="flex-1 flex items-center bg-white rounded-lg border px-3 py-2 max-w-xs gap-[8px]">
           <Image

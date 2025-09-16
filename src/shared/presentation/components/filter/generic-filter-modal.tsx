@@ -184,10 +184,10 @@ export function GenericFilterModal<T extends FilterState>({
       {filterButton}
       {/* Filter container */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[800px] max-w-4xl max-h-[50vh] overflow-hidden flex flex-col">
+        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 md:min-w-[800px] max-w-4xl max-h-[50vh] overflow-hidden flex flex-col">
           <div className="flex flex-1 overflow-hidden">
             {/* Left sidebar */}
-            <div className="w-80 border-r border-gray-200 overflow-y-auto">
+            <div className="flex-1 w-80 border-r border-gray-200 overflow-y-auto">
               {leftContent}
             </div>
             {/* Right content */}

@@ -184,20 +184,35 @@ export function GenericFilterModal<T extends FilterState>({
       {filterButton}
       {/* Filter container */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 md:min-w-[800px] max-w-4xl max-h-[50vh] overflow-hidden flex flex-col">
-          <div className="flex flex-1 overflow-hidden">
-            {/* Left sidebar */}
-            <div className="flex-1 w-80 border-r border-gray-200 overflow-y-auto">
-              {leftContent}
+        <>
+          {/* Mobile overlay */}
+          <div className="fixed inset-0 z-40 md:hidden" onClick={handleClose} />
+
+          <div
+            className={clsx(
+              "bg-white border border-gray-200 rounded-lg shadow-lg z-50 flex flex-col",
+              // Mobile: fixed center positioning
+              "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[80vh]",
+              // Desktop: absolute positioning relative to container
+              "md:absolute md:top-full md:left-0 md:mt-2 md:min-w-[800px] md:max-w-4xl md:max-h-[50vh] md:w-auto md:h-auto md:transform-none md:translate-x-0 md:translate-y-0"
+            )}
+          >
+            <div className="flex flex-1 overflow-hidden">
+              {/* Left sidebar */}
+              <div className="flex-1 w-80 border-r border-gray-200 overflow-y-auto">
+                {leftContent}
+              </div>
+              {/* Right content */}
+              <div className="flex-1 min-h-[400px] overflow-y-auto">
+                {rightContent}
+              </div>
             </div>
-            {/* Right content */}
-            <div className="flex-1 min-h-[400px] overflow-y-auto">
-              {rightContent}
+            {/* Footer */}
+            <div className="border-t border-gray-200 flex-shrink-0">
+              {footer}
             </div>
           </div>
-          {/* Footer */}
-          <div className="border-t border-gray-200 flex-shrink-0">{footer}</div>
-        </div>
+        </>
       )}
     </div>
   );

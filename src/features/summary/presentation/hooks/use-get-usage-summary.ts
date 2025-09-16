@@ -1,0 +1,70 @@
+import { useState, useCallback } from "react";
+import {
+  BaseErrorModel,
+  isErrorModel,
+} from "@/shared/domain/entities/base-error-model";
+import { GetUsageSummaryModel } from "@/features/summary/domain/entities/summary-models";
+import { GetUsageSummaryQueryParams } from "@/features/summary/domain/params/query-params";
+import { GetUsageSummaryUseCase } from "@/features/summary/domain/use-cases/get-usage-summary-use-case";
+import { Logger } from "@/shared/utils/logger/logger";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
+
+interface UseGetUsageSummaryReturn {
+  data: GetUsageSummaryModel | null;
+  error: BaseErrorModel | null;
+  loading: boolean;
+  fetchUsageSummary: (queryParam: GetUsageSummaryQueryParams) => Promise<void>;
+  reset: () => void;
+}
+
+export const useGetUsageSummary = (): UseGetUsageSummaryReturn => {
+  const [data, setData] = useState<GetUsageSummaryModel | null>(null);
+  const [error, setError] = useState<BaseErrorModel | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const fetchUsageSummary = useCallback(
+    async (queryParam: GetUsageSummaryQueryParams) => {
+      try {
+        setLoading(true);
+        setError(null);
+        const getUsageSummaryUseCase = new GetUsageSummaryUseCase();
+        const result = await getUsageSummaryUseCase.execute(queryParam);
+
+        if (isErrorModel(result)) {
+          setError(result);
+          setData(null);
+        } else {
+          setData(result);
+          setError(null);
+        }
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error occurred";
+        Logger.error("useGetUsageSummary", "Exception occurred:", errorMessage);
+        setError({
+          message: "Failed to fetch usage summary",
+          details: errorMessage,
+          type: ErrorType.UNEXPECTED,
+        } as BaseErrorModel);
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const reset = useCallback(() => {
+    setData(null);
+    setError(null);
+    setLoading(false);
+  }, []);
+
+  return {
+    data,
+    error,
+    loading,
+    fetchUsageSummary,
+    reset,
+  };
+};

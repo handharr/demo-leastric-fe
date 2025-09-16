@@ -22,3 +22,14 @@ export interface ElectricityUsageResponse {
   avgRealPower?: number; // e.g., 3200.5
   totalKwh?: number; // e.g., 1234.567
 }
+
+export interface GetUsageSummaryResponse {
+  summary?: {
+    threePhase?: UsageSummaryResponse;
+    singlePhase?: UsageSummaryResponse;
+  };
+}
+
+export interface GetElectricityUsageResponse {
+  usages?: ElectricityUsageResponse[];
+}

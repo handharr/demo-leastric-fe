@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import { GetLocationsUseCase } from "@/features/device/domain/use-cases/locations/get-locations-use-case";
 import { Logger } from "@/shared/utils/logger/logger";
+import { ErrorType } from "@/shared/domain/enum/base-enum";
 
 interface UseGetLocationsReturn {
   data: string[] | null;
@@ -39,7 +40,7 @@ export const useGetLocations = (): UseGetLocationsReturn => {
       setError({
         message: "Failed to fetch locations",
         details: errorMessage,
-        type: "UNEXPECTED",
+        type: ErrorType.UNEXPECTED,
       } as BaseErrorModel);
       setData(null);
     } finally {

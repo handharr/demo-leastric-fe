@@ -24,3 +24,8 @@ export interface ElectricityUsageModel {
   avgRealPower: number; // e.g., 3200.5
   totalKwh: number; // e.g., 1234.567
 }
+
+export interface GetUsageSummaryModel {
+  threePhase: UsageSummaryModel;
+  singlePhase: UsageSummaryModel;
+}

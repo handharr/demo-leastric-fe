@@ -2,7 +2,7 @@ import {
   LocationResponse,
   SubLocationResponse,
   DetailLocationResponse,
-} from "@/features/device/infrastructure/model/locations-response";
+} from "@/features/device/infrastructure/models/locations-response";
 import { LocationModel } from "@/features/device/domain/entities/locations-models";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 

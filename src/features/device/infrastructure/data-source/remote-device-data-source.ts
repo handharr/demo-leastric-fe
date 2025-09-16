@@ -1,17 +1,17 @@
 import { AxiosError } from "axios";
-import { BaseResponse } from "@/shared/infrastructure/model/base-response";
+import { BaseResponse } from "@/shared/infrastructure/models/base-response";
 import {
   ApiClient,
   createAuthApiClient,
 } from "@/shared/infrastructure/api/api-client";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import {
   CreateDeviceResponse,
   DeleteDeviceResponse,
   GetDeviceResponse,
   GetDevicesResponse,
   UpdateDeviceResponse,
-} from "@/features/device/infrastructure/model/device-response";
+} from "@/features/device/infrastructure/models/device-response";
 import { CreateDeviceFormData } from "@/features/device/domain/params/data-params";
 import { DeviceDataSource } from "@/features/device/infrastructure/data-source/device-data-source";
 import { Logger } from "@/shared/utils/logger/logger";

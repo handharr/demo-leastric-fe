@@ -10,11 +10,8 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import {
-  EnergyUnit,
-  TimePeriod,
-  ChartDataPoint,
-} from "@/features/summary/presentation/types/ui";
+import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
+import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import { CustomDot } from "@/features/summary/presentation/components/custom-dot-props";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
@@ -23,7 +20,7 @@ import { Dropdown } from "@/shared/presentation/components/dropdown";
 import {
   getTimePeriodPastLabel,
   getTimePeriodCurrentLabel,
-} from "@/features/summary/presentation/helper/presentation-helper";
+} from "@/shared/utils/helpers/enum-helpers";
 
 const availableTimePeriods = [
   TimePeriod.Daily,

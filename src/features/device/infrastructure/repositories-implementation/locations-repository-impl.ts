@@ -4,7 +4,7 @@ import {
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
-import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { Logger } from "@/shared/utils/logger/logger";
 import { LocationsRepository } from "@/features/device/domain/repositories/locations-repository";

@@ -1,15 +1,15 @@
-import { LoginResponse } from "@/features/auth/infrastructure/model/login/login-response";
-import { RefreshTokenResponse } from "@/features/auth/infrastructure/model/login/refresh-token-response";
-import { ValidateTokenResponse } from "@/features/auth/infrastructure/model/login/validate-token-response";
-import { ResetPasswordResponse } from "@/features/auth/infrastructure/model/reset-password/reset-password-response";
+import { LoginResponse } from "@/features/auth/infrastructure/models/login/login-response";
+import { RefreshTokenResponse } from "@/features/auth/infrastructure/models/login/refresh-token-response";
+import { ValidateTokenResponse } from "@/features/auth/infrastructure/models/login/validate-token-response";
+import { ResetPasswordResponse } from "@/features/auth/infrastructure/models/reset-password/reset-password-response";
 import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-password-data";
-import { BaseResponse } from "@/shared/infrastructure/model/base-response";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseResponse } from "@/shared/infrastructure/models/base-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { UpdatePasswordDto } from "@/features/auth/infrastructure/params/auth-dto";
 import {
   LogoutResponse,
   UpdatePasswordResponse,
-} from "@/features/auth/infrastructure/model/auth-response";
+} from "@/features/auth/infrastructure/models/auth-response";
 
 export interface AuthDataSource {
   login({

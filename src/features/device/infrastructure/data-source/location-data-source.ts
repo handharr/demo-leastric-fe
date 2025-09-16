@@ -1,10 +1,10 @@
-import { BaseResponse } from "@/shared/infrastructure/model/base-response";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseResponse } from "@/shared/infrastructure/models/base-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import {
   GetLocationsWithStatsResponse,
   GetLocationsResponse,
   GetLocationsWithDetailResponse,
-} from "@/features/device/infrastructure/model/locations-response";
+} from "@/features/device/infrastructure/models/locations-response";
 
 export interface LocationDataSource {
   getLocations(): Promise<

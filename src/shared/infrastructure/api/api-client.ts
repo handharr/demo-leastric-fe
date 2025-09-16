@@ -5,13 +5,13 @@ import axios, {
   InternalAxiosRequestConfig,
   AxiosRequestConfig,
 } from "axios";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import {
   RetryHandler,
   RetryOptions,
 } from "@/shared/utils/helpers/retry-helper";
 import { Logger } from "@/shared/utils/logger/logger";
-import { BaseResponse } from "@/shared/infrastructure/model/base-response";
+import { BaseResponse } from "@/shared/infrastructure/models/base-response";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
 

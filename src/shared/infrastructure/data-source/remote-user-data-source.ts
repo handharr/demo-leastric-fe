@@ -1,12 +1,12 @@
-import { BaseResponse } from "@/shared/infrastructure/model/base-response";
+import { BaseResponse } from "@/shared/infrastructure/models/base-response";
 import {
   ApiClient,
   createAuthApiClient,
 } from "@/shared/infrastructure/api/api-client";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { UpdateUserDto } from "@/shared/infrastructure/params/dto";
 import { UserDataSource } from "@/shared/infrastructure/data-source/user-data-source";
-import { GetUserResponse } from "@/shared/infrastructure/model/user-response";
+import { GetUserResponse } from "@/shared/infrastructure/models/user-response";
 
 export class RemoteUserDataSource implements UserDataSource {
   private apiClient: ApiClient;

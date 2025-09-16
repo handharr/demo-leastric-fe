@@ -11,7 +11,7 @@ import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import {
   deviceFilterDefaultValue,
   DeviceFilterState,
-} from "../components/device-filter-modal";
+} from "@/features/device/presentation/components/device-filter-modal";
 
 const useDummy = false;
 

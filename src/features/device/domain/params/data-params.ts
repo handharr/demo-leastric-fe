@@ -1,4 +1,5 @@
-import { DeviceType } from "@/features/device/domain/entities/device-model";
+import { DeviceType } from "@/shared/domain/enum/enums";
+
 export interface CreateDeviceFormData {
   deviceName?: string;
   deviceType?: DeviceType;

@@ -5,7 +5,7 @@ import {
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
-import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
 import {
   DeviceModel,

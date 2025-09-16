@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 
 export function handleErrorResponse(
   error: AxiosError<BaseErrorResponse>,

@@ -11,7 +11,7 @@ import {
 } from "@/shared/domain/entities/base-error-model";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { UserModel } from "@/shared/domain/entities/user-model";
-import { isErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { UpdatePasswordModel } from "@/features/auth/domain/entities/auth-model";
 import { mapUpdatePasswordFormDataToDto } from "@/features/auth/domain/mapper/auth-params-mapper";

@@ -1,15 +1,15 @@
 import { AxiosError } from "axios";
-import { BaseResponse } from "@/shared/infrastructure/model/base-response";
+import { BaseResponse } from "@/shared/infrastructure/models/base-response";
 import {
   ApiClient,
   createAuthApiClient,
 } from "@/shared/infrastructure/api/api-client";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import {
   GetLocationsWithStatsResponse,
   GetLocationsResponse,
   GetLocationsWithDetailResponse,
-} from "@/features/device/infrastructure/model/locations-response";
+} from "@/features/device/infrastructure/models/locations-response";
 import { LocationDataSource } from "@/features/device/infrastructure/data-source/location-data-source";
 import { Logger } from "@/shared/utils/logger/logger";
 

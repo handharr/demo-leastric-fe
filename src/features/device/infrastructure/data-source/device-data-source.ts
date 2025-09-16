@@ -1,12 +1,12 @@
-import { BaseResponse } from "@/shared/infrastructure/model/base-response";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseResponse } from "@/shared/infrastructure/models/base-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import {
   CreateDeviceResponse,
   DeleteDeviceResponse,
   GetDeviceResponse,
   GetDevicesResponse,
   UpdateDeviceResponse,
-} from "@/features/device/infrastructure/model/device-response";
+} from "@/features/device/infrastructure/models/device-response";
 import {
   CreateDeviceDto,
   UpdateDeviceDto,

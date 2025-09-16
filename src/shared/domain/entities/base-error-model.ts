@@ -1,5 +1,5 @@
 import { ErrorType, validErrorTypes } from "@/shared/domain/enum/base-enum";
-import { BaseErrorResponse } from "@/shared/infrastructure/model/base-error-response";
+import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 export interface BaseErrorModel {
   type: ErrorType;

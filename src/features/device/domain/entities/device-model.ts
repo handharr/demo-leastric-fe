@@ -1,8 +1,5 @@
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
-export enum DeviceType {
-  SinglePhase = "single_phase",
-  ThreePhase = "three_phase",
-}
+import { DeviceType } from "@/shared/domain/enum/enums";
 export interface DeviceModel {
   id: number;
   deviceName: string;

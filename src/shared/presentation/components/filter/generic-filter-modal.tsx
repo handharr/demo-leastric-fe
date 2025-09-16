@@ -186,7 +186,7 @@ export function GenericFilterModal<T extends FilterState>({
       {isOpen && (
         <>
           {/* Mobile overlay */}
-          <div className="fixed inset-0 z-40 md:hidden" onClick={handleClose} />
+          <div className="fixed inset-0 z-40" onClick={handleClose} />
 
           <div
             className={clsx(
@@ -194,7 +194,7 @@ export function GenericFilterModal<T extends FilterState>({
               // Mobile: fixed center positioning
               "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[80vh]",
               // Desktop: absolute positioning relative to container
-              "md:absolute md:top-full md:left-0 md:mt-2 md:min-w-[800px] md:max-w-4xl md:max-h-[50vh] md:w-auto md:h-auto md:transform-none md:translate-x-0 md:translate-y-0"
+              "lg:absolute lg:top-full lg:left-0 lg:mt-2 lg:min-w-[800px] lg:max-w-4xl lg:max-h-[50vh] lg:w-auto lg:h-auto lg:transform-none lg:translate-x-0 lg:translate-y-0"
             )}
           >
             <div className="flex flex-1 overflow-hidden">

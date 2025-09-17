@@ -11,5 +11,6 @@ export interface BaseResponse<T> {
     pageCount?: number;
     hasPreviousPage?: boolean;
     hasNextPage?: boolean;
+    size?: string;
   };
 }

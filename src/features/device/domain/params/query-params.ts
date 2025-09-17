@@ -5,4 +5,6 @@ export interface GetAllDevicesQueryParams {
   keyword?: string;
   name?: string;
   size: number;
+  location?: string;
+  subLocation?: string;
 }

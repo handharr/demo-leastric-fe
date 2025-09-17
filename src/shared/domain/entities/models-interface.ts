@@ -5,4 +5,5 @@ export interface PaginationModel {
   pageCount: number;
   hasPreviousPage: boolean;
   hasNextPage: boolean;
+  size: number;
 }

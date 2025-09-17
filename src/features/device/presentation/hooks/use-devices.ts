@@ -63,6 +63,7 @@ export function useDevices(): UseDevicesReturn {
     pageCount: 1,
     hasPreviousPage: false,
     hasNextPage: false,
+    size: 10,
   });
 
   // Debounce search with 500ms delay
@@ -71,16 +72,14 @@ export function useDevices(): UseDevicesReturn {
   const fetchDevices = useCallback(
     async ({
       page,
-      take,
       search,
       size,
-      keyword,
+      location,
     }: {
       page?: number;
-      take?: number;
       search?: string;
       size?: number;
-      keyword?: string;
+      location?: string;
     }) => {
       setLoading(true);
       setError(null);
@@ -93,14 +92,17 @@ export function useDevices(): UseDevicesReturn {
 
       try {
         const useCase = new GetAllDevicesUseCase();
+        let locationParam = location;
+        if (locationParam === "all") {
+          locationParam = undefined;
+        }
         const result = await useCase.execute({
           queryParam: {
             sortOrder: "ASC",
             page: optional(page).orDefault(1),
-            take: optional(take).orDefault(10),
             name: optional(search).orDefault(""),
             size: optional(size).orDefault(10),
-            keyword,
+            location: locationParam ?? undefined,
           },
         });
 
@@ -158,11 +160,10 @@ export function useDevices(): UseDevicesReturn {
   const reloadDevices = useCallback(() => {
     fetchDevices({
       page: pagination.page,
-      take: pagination.take,
       search: debouncedSearch,
-      size: pagination.take,
+      size: pagination.size,
     });
-  }, [fetchDevices, pagination.page, pagination.take, debouncedSearch]);
+  }, [fetchDevices, pagination.page, debouncedSearch, pagination.size]);
 
   // Reset to page 1 when search changes
   useEffect(() => {
@@ -176,17 +177,16 @@ export function useDevices(): UseDevicesReturn {
   useEffect(() => {
     fetchDevices({
       page: pagination.page,
-      take: pagination.take,
       search: debouncedSearch,
-      size: pagination.take,
-      keyword: activeFilters.singleSelection.location,
+      size: pagination.size,
+      location: activeFilters.singleSelection.location,
     });
   }, [
     debouncedSearch,
     pagination.page,
-    pagination.take,
     fetchDevices,
     activeFilters.singleSelection.location,
+    pagination.size,
   ]);
 
   return {

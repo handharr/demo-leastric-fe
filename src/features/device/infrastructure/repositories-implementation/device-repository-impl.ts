@@ -114,6 +114,7 @@ export class DeviceRepositoryImpl implements DeviceRepository {
           pageCount: optional(result.meta?.pageCount).orZero(),
           hasPreviousPage: optional(result.meta?.hasPreviousPage).orFalse(),
           hasNextPage: optional(result.meta?.hasNextPage).orFalse(),
+          size: Number(optional(result.meta?.size).orEmpty()),
         },
       };
     }

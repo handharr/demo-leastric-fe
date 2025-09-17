@@ -1,8 +1,3 @@
-// export interface PaginationModel {
-//   total: number;
-//   page: number;
-//   pageSize: number;
-// }
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 interface PaginationProps {
   model: PaginationModel;
@@ -17,11 +12,13 @@ export function Pagination({
   onPreviousPage,
   onNextPage,
 }: PaginationProps) {
-  const { itemCount, page, take } = model;
-  const totalPages = Math.ceil(itemCount / take);
+  const { itemCount, page, size } = model;
+  const totalPages = Math.ceil(itemCount / size);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const start = (page - 1) * take + 1;
-  const end = Math.min(page * take, itemCount);
+  const start = (page - 1) * size + 1;
+  const end = Math.min(page * size, itemCount);
+
+  console.log({ model, totalPages, pageNumbers, start, end });
 
   return (
     <div className="w-full bg-gray-50 border-t rounded-b-xl">

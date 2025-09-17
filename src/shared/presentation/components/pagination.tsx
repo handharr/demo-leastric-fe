@@ -18,8 +18,6 @@ export function Pagination({
   const start = (page - 1) * size + 1;
   const end = Math.min(page * size, itemCount);
 
-  console.log({ model, totalPages, pageNumbers, start, end });
-
   return (
     <div className="w-full bg-gray-50 border-t rounded-b-xl">
       <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 text-gray-600 text-sm gap-2">

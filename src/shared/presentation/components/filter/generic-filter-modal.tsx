@@ -66,6 +66,10 @@ export function GenericFilterModal<T extends FilterState>({
   }, [onReset, defaultValue]);
 
   const handleOpen = useCallback(() => {
+    if (!isOpen) {
+      setFilter(currentState ?? defaultValue);
+    }
+
     let isHasEmptyOptions = false;
     Object.values(filterMeta).forEach((meta) => {
       if (meta.options.length === 0) {
@@ -75,10 +79,6 @@ export function GenericFilterModal<T extends FilterState>({
 
     if (isHasEmptyOptions) {
       return;
-    }
-
-    if (!isOpen) {
-      setFilter(currentState ?? defaultValue);
     }
 
     setIsOpen((isOpen) => !isOpen);

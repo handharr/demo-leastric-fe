@@ -59,8 +59,8 @@ export function ReportTable() {
   return (
     <div className="w-full">
       {/* Table */}
-      <div className="bg-white rounded-lg border border-gray-200 mb-4">
-        <table className="w-full">
+      <div className="overflow-x-auto bg-white rounded-xl shadow border">
+        <table className="min-w-full">
           <thead className="bg-brand-subtle-2 border-b border-gray-200">
             <tr className="text-left text-sm font-medium text-typography-headline">
               <th className="px-4 py-3 text-left">

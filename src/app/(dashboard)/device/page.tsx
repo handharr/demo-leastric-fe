@@ -52,7 +52,7 @@ export default function DevicePage() {
   return (
     <div className="flex min-h-screen flex-col gap-[16px] bg-gray-50">
       {/* Header */}
-      <div className="mb-[16px]">
+      <div>
         <h1 className="text-2xl font-bold text-typography-headline">
           Device List
         </h1>
@@ -67,6 +67,7 @@ export default function DevicePage() {
             alt="Search"
             width={16}
             height={16}
+            className="w-[16px] h-[16px]"
           />
           <input
             className="w-full outline-none bg-transparent text-gray-700"

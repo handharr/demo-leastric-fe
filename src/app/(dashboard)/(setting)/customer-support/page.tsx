@@ -9,7 +9,7 @@ type SupportButtonProps = {
   className?: string;
 };
 
-export function SupportButton({
+function SupportButton({
   icon,
   emoji,
   alt,

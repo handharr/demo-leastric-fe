@@ -2,13 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {},
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/,
-      issuer: /\.[jt]sx?$/,
-      use: ["@svgr/webpack"],
-    });
-    return config;
+  images: {
+    unoptimized: false, // Keep optimization enabled
+    domains: [], // Add external domains if needed
+    formats: ["image/webp", "image/avif"],
   },
 };
 

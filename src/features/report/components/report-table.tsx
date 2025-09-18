@@ -71,13 +71,13 @@ export function ReportTable() {
                   <Image
                     src={
                       isAllSelected
-                        ? "/resources/icons/checkbox/checkbox-default-selected"
-                        : "/resources/icons/checkbox/checkbox-default"
+                        ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                        : "/resources/icons/checkbox/checkbox-default.svg"
                     }
                     alt={isAllSelected ? "Unselect all" : "Select all"}
                     width={20}
                     height={20}
-                    className="w-5 h-5"
+                    className="w-[20px] h-[20px]"
                   />
                 </button>
               </th>
@@ -98,8 +98,8 @@ export function ReportTable() {
                     <Image
                       src={
                         selectedIds.includes(row.id)
-                          ? "/resources/icons/checkbox/checkbox-default-selected"
-                          : "/resources/icons/checkbox/checkbox-default"
+                          ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                          : "/resources/icons/checkbox/checkbox-default.svg"
                       }
                       alt={
                         selectedIds.includes(row.id)
@@ -108,7 +108,7 @@ export function ReportTable() {
                       }
                       width={20}
                       height={20}
-                      className="w-5 h-5"
+                      className="w-[20px] h-[20px]"
                     />
                   </button>
                 </td>

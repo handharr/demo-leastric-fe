@@ -27,6 +27,7 @@ export function ReportTable() {
     pageCount: 5,
     hasPreviousPage: false,
     hasNextPage: true,
+    size: 10,
   };
 
   const handleRowSelect = (id: number) => {

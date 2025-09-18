@@ -56,7 +56,6 @@ export default function SecurityPage() {
       setConfirmPassword("");
       reset();
       showPopup("Password updated successfully!", PopupType.SUCCESS);
-      console.log("Password updated successfully!");
     }
   }, [isSuccess, reset, showPopup]);
 

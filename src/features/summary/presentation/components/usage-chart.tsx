@@ -22,25 +22,18 @@ import {
   getTimePeriodCurrentLabel,
 } from "@/shared/utils/helpers/enum-helpers";
 
-const availableTimePeriods = [
-  TimePeriod.Daily,
-  TimePeriod.Weekly,
-  TimePeriod.Monthly,
-];
-
-const availableUnits = [
-  EnergyUnit.Ampere,
-  EnergyUnit.KWH,
-  EnergyUnit.Volt,
-  EnergyUnit.Watt,
-];
-
 interface UsageChartProps {
   title?: string;
   description?: string;
   className?: string;
   data: ChartDataPoint[];
   comparedData: ChartDataPoint[];
+  selectedPeriod: TimePeriod;
+  selectedUnit: EnergyUnit;
+  periodOptions?: TimePeriod[];
+  unitOptions?: EnergyUnit[];
+  onChangePeriod: (period: TimePeriod) => void;
+  onChangeUnit: (unit: EnergyUnit) => void;
 }
 
 export function UsageChart({
@@ -49,11 +42,13 @@ export function UsageChart({
   className = "",
   data,
   comparedData,
+  selectedPeriod = TimePeriod.Daily,
+  selectedUnit = EnergyUnit.KWH,
+  periodOptions = [],
+  unitOptions = [],
+  onChangePeriod,
+  onChangeUnit,
 }: UsageChartProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
-    TimePeriod.Daily
-  );
-  const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(EnergyUnit.KWH);
   const [compareEnabled, setCompareEnabled] = useState(false);
 
   const isEmpty = !data || data.length === 0;
@@ -64,16 +59,16 @@ export function UsageChart({
       <div className="grid grid-cols-2 gap-3">
         {/* Period Selector */}
         <Dropdown
-          options={availableTimePeriods}
+          options={periodOptions}
           value={selectedPeriod}
-          onChange={setSelectedPeriod}
+          onChange={onChangePeriod}
         />
 
         {/* Unit Selector */}
         <Dropdown
-          options={availableUnits}
+          options={unitOptions}
           value={selectedUnit}
-          onChange={setSelectedUnit}
+          onChange={onChangeUnit}
         />
       </div>
 

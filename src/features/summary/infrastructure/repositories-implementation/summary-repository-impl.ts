@@ -45,47 +45,49 @@ export class SummaryRepositoryImpl implements SummaryRepository {
 
     Logger.info("SummaryRepositoryImpl", "getUsageSummary", result);
 
-    if (result.flash?.type === "success" && result.data?.summary) {
+    if (result.flash?.type === "success" && result.data?.summaries) {
       return {
         threePhase: {
           estUsage: optional(
-            result.data?.summary?.threePhase?.estUsage
+            result.data?.summaries?.threePhase?.estUsage
           ).orZero(),
-          estBill: optional(result.data?.summary?.threePhase?.estBill).orZero(),
+          estBill: optional(
+            result.data?.summaries?.threePhase?.estBill
+          ).orZero(),
           totalCO2Emission: optional(
-            result.data?.summary?.threePhase?.totalCO2Emission
+            result.data?.summaries?.threePhase?.totalCO2Emission
           ).orZero(),
           deviceStatus: {
             activeDevices: optional(
-              result.data?.summary?.threePhase?.deviceStatus?.activeDevices
+              result.data?.summaries?.threePhase?.deviceStatus?.activeDevices
             ).orZero(),
             inactiveDevices: optional(
-              result.data?.summary?.threePhase?.deviceStatus?.inactiveDevices
+              result.data?.summaries?.threePhase?.deviceStatus?.inactiveDevices
             ).orZero(),
             totalDevices: optional(
-              result.data?.summary?.threePhase?.deviceStatus?.totalDevices
+              result.data?.summaries?.threePhase?.deviceStatus?.totalDevices
             ).orZero(),
           },
         },
         singlePhase: {
           estUsage: optional(
-            result.data?.summary?.singlePhase?.estUsage
+            result.data?.summaries?.singlePhase?.estUsage
           ).orZero(),
           estBill: optional(
-            result.data?.summary?.singlePhase?.estBill
+            result.data?.summaries?.singlePhase?.estBill
           ).orZero(),
           totalCO2Emission: optional(
-            result.data?.summary?.singlePhase?.totalCO2Emission
+            result.data?.summaries?.singlePhase?.totalCO2Emission
           ).orZero(),
           deviceStatus: {
             activeDevices: optional(
-              result.data?.summary?.singlePhase?.deviceStatus?.activeDevices
+              result.data?.summaries?.singlePhase?.deviceStatus?.activeDevices
             ).orZero(),
             inactiveDevices: optional(
-              result.data?.summary?.singlePhase?.deviceStatus?.inactiveDevices
+              result.data?.summaries?.singlePhase?.deviceStatus?.inactiveDevices
             ).orZero(),
             totalDevices: optional(
-              result.data?.summary?.singlePhase?.deviceStatus?.totalDevices
+              result.data?.summaries?.singlePhase?.deviceStatus?.totalDevices
             ).orZero(),
           },
         },

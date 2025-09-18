@@ -154,3 +154,43 @@ export function optional(value: unknown): unknown {
   // For other types, return as-is
   return value;
 }
+
+export class OptionalWrapper<T> {
+  constructor(private value: T | null | undefined) {}
+
+  orZero(): number {
+    if (typeof this.value === "number") {
+      return this.value;
+    }
+    return 0;
+  }
+
+  orDefault(defaultValue: T): T {
+    return this.value ?? defaultValue;
+  }
+
+  orNull(): T | null {
+    return this.value ?? null;
+  }
+
+  isPresent(): boolean {
+    return this.value != null;
+  }
+
+  isEmpty(): boolean {
+    return this.value == null;
+  }
+
+  map<U>(fn: (value: T) => U): OptionalWrapper<U> {
+    if (this.value != null) {
+      return new OptionalWrapper(fn(this.value));
+    }
+    return new OptionalWrapper<U>(undefined);
+  }
+}
+
+export function optionalValue<T>(
+  value: T | null | undefined
+): OptionalWrapper<T> {
+  return new OptionalWrapper(value);
+}

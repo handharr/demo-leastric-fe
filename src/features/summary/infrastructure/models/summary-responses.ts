@@ -24,7 +24,7 @@ export interface ElectricityUsageResponse {
 }
 
 export interface GetUsageSummaryResponse {
-  summary?: {
+  summaries?: {
     threePhase?: UsageSummaryResponse;
     singlePhase?: UsageSummaryResponse;
   };

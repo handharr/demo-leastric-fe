@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   BaseErrorModel,
   isErrorModel,
@@ -13,7 +13,6 @@ interface UseGetUsageSummaryReturn {
   data: GetUsageSummaryModel | null;
   error: BaseErrorModel | null;
   loading: boolean;
-  fetchUsageSummary: (queryParam: GetUsageSummaryQueryParams) => Promise<void>;
   reset: () => void;
 }
 
@@ -23,12 +22,25 @@ export const useGetUsageSummary = (): UseGetUsageSummaryReturn => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchUsageSummary = useCallback(
-    async (queryParam: GetUsageSummaryQueryParams) => {
+    async (
+      month: number = new Date().getMonth(),
+      year: number = new Date().getFullYear()
+    ) => {
       try {
         setLoading(true);
         setError(null);
         const getUsageSummaryUseCase = new GetUsageSummaryUseCase();
+        const queryParam: GetUsageSummaryQueryParams = {
+          month,
+          year,
+        };
         const result = await getUsageSummaryUseCase.execute(queryParam);
+
+        Logger.info(
+          "useGetUsageSummary",
+          "Fetched usage summary successfully",
+          result
+        );
 
         if (isErrorModel(result)) {
           setError(result);
@@ -60,11 +72,14 @@ export const useGetUsageSummary = (): UseGetUsageSummaryReturn => {
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    fetchUsageSummary();
+  }, [fetchUsageSummary]);
+
   return {
     data,
     error,
     loading,
-    fetchUsageSummary,
     reset,
   };
 };

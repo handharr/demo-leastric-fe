@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SummaryCard } from "@/features/summary/presentation/components/summary-card";
 import { UsageChart } from "@/features/summary/presentation/components/usage-chart";
 import { RealTimeMonitoringChart } from "@/features/summary/presentation/components/real-time-monitoring-chart";
@@ -18,11 +18,41 @@ import {
   electricUsageHistoryDummies,
   realTimeDataDummies,
 } from "@/features/summary/presentation/data/dummies";
+import { useGetUsageSummary } from "@/features/summary/presentation/hooks/use-get-usage-summary";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
+
+const availableTimePeriods = [
+  TimePeriod.Daily,
+  TimePeriod.Weekly,
+  TimePeriod.Monthly,
+];
+
+const availableUnits = [
+  EnergyUnit.Ampere,
+  EnergyUnit.KWH,
+  EnergyUnit.Volt,
+  EnergyUnit.Watt,
+];
 
 export default function SummaryPage() {
   const [activeFilters, setActiveFilters] = useState<SummaryFilterState>(
     summaryFilterDefaultValue()
   );
+  const {
+    data: usageSummary,
+    error: errorSummary,
+    reset: resetSummary,
+  } = useGetUsageSummary();
+  const { showPopup } = usePopup();
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
+    TimePeriod.Daily
+  );
+  const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(EnergyUnit.KWH);
 
   // Sample data points for the chart
   const chartData = chartDataDummies;
@@ -43,6 +73,16 @@ export default function SummaryPage() {
     setActiveFilters(resetValue);
     console.log("Filters reset");
   };
+
+  useEffect(() => {
+    if (errorSummary) {
+      showPopup(
+        `Error fetching summary: ${errorSummary.message}`,
+        PopupType.ERROR
+      );
+      resetSummary();
+    }
+  }, [errorSummary, showPopup, resetSummary]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px]">
@@ -83,7 +123,9 @@ export default function SummaryPage() {
             <SummaryCard
               title="This Month's Est. Usage"
               description="Est. total electricity usage month to date"
-              value="172,45"
+              value={optionalValue(
+                usageSummary?.singlePhase?.estUsage
+              ).orZero()}
               unit="kWh"
               className="md:flex-1"
             />
@@ -94,7 +136,7 @@ export default function SummaryPage() {
             <SummaryCard
               title="This Month's Est. Bill"
               description="Est. total Bill month to date"
-              value="292.993"
+              value={optionalValue(usageSummary?.singlePhase?.estBill).orZero()}
               prefix="Rp"
               className="md:flex-1"
             />
@@ -105,7 +147,9 @@ export default function SummaryPage() {
             <SummaryCard
               title="Total CO₂ Emission"
               description="Est. total CO₂ Emission month to date"
-              value="24.523"
+              value={optionalValue(
+                usageSummary?.singlePhase?.totalCO2Emission
+              ).orZero()}
               unit="kg CO₂e/kWh"
               className="md:flex-1"
             />
@@ -125,7 +169,9 @@ export default function SummaryPage() {
                     Active
                   </span>
                   <span className="inline-flex items-center justify-center w-6 h-6 bg-background-brand-positive-subtle text-leastric-primary text-xs font-medium rounded-full">
-                    1
+                    {optionalValue(
+                      usageSummary?.singlePhase?.deviceStatus?.activeDevices
+                    ).orZero()}
                   </span>
                 </div>
                 <div className="h-8 w-px bg-default-border" />
@@ -134,7 +180,9 @@ export default function SummaryPage() {
                     Inactive
                   </span>
                   <span className="inline-flex items-center justify-center w-6 h-6 bg-background-critical-subtle text-typography-negative text-xs font-medium rounded-full">
-                    1
+                    {optionalValue(
+                      usageSummary?.singlePhase?.deviceStatus?.inactiveDevices
+                    ).orZero()}
                   </span>
                 </div>
               </div>
@@ -145,7 +193,16 @@ export default function SummaryPage() {
 
       {/* Usage Chart */}
       <div>
-        <UsageChart data={chartData} comparedData={comparedChartData} />
+        <UsageChart
+          data={chartData}
+          comparedData={comparedChartData}
+          selectedPeriod={selectedPeriod}
+          selectedUnit={selectedUnit}
+          periodOptions={availableTimePeriods}
+          unitOptions={availableUnits}
+          onChangePeriod={(period) => setSelectedPeriod(period)}
+          onChangeUnit={(unit) => setSelectedUnit(unit)}
+        />
       </div>
 
       {/* Real-Time Monitoring and Usage History */}

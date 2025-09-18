@@ -5,7 +5,7 @@ export enum DeviceType {
 
 export enum EnergyUnit {
   Ampere = "Ampere",
-  KWH = "Kwh",
+  KWH = "kWh",
   Volt = "Volt",
   Watt = "Watt",
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   BaseErrorModel,
   isErrorModel,
@@ -8,14 +8,18 @@ import { GetElectricityUsageQueryParams } from "@/features/summary/domain/params
 import { GetElectricityUsageUseCase } from "@/features/summary/domain/use-cases/get-electricity-usage-use-case";
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
 
 interface UseGetElectricityUsageReturn {
   data: ElectricityUsageModel[] | null;
   error: BaseErrorModel | null;
   loading: boolean;
-  fetchElectricityUsage: (
-    queryParam: GetElectricityUsageQueryParams
-  ) => Promise<void>;
+  fetchElectricityUsage: ({
+    period,
+    unit,
+    startDate,
+    endDate,
+  }: GetElectricityUsageQueryParams) => Promise<void>;
   reset: () => void;
 }
 
@@ -25,10 +29,21 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchElectricityUsage = useCallback(
-    async (queryParam: GetElectricityUsageQueryParams) => {
+    async ({
+      period = TimePeriod.Monthly,
+      unit = EnergyUnit.KWH,
+      startDate = undefined,
+      endDate = undefined,
+    }: GetElectricityUsageQueryParams = {}) => {
       try {
         setLoading(true);
         setError(null);
+        const queryParam: GetElectricityUsageQueryParams = {
+          period: (period as string).toLowerCase(),
+          unit,
+          startDate,
+          endDate,
+        };
         const getElectricityUsageUseCase = new GetElectricityUsageUseCase();
         const result = await getElectricityUsageUseCase.execute(queryParam);
 
@@ -59,6 +74,10 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
     },
     []
   );
+
+  useEffect(() => {
+    fetchElectricityUsage();
+  }, [fetchElectricityUsage]);
 
   const reset = useCallback(() => {
     setData(null);

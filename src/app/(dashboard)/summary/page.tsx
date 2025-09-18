@@ -25,6 +25,7 @@ import {
 } from "@/shared/presentation/hooks/top-popup-context";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
+import { useGetElectricityUsage } from "@/features/summary/presentation/hooks/use-get-electricity-usage";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -43,16 +44,21 @@ export default function SummaryPage() {
   const [activeFilters, setActiveFilters] = useState<SummaryFilterState>(
     summaryFilterDefaultValue()
   );
-  const {
-    data: usageSummary,
-    error: errorSummary,
-    reset: resetSummary,
-  } = useGetUsageSummary();
   const { showPopup } = usePopup();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
     TimePeriod.Daily
   );
   const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(EnergyUnit.KWH);
+  const {
+    data: usageSummary,
+    error: errorSummary,
+    reset: resetSummary,
+  } = useGetUsageSummary();
+  const {
+    data: electricityUsage,
+    error: errorElectricityUsage,
+    reset: resetElectricityUsage,
+  } = useGetElectricityUsage();
 
   // Sample data points for the chart
   const chartData = chartDataDummies;
@@ -82,7 +88,21 @@ export default function SummaryPage() {
       );
       resetSummary();
     }
-  }, [errorSummary, showPopup, resetSummary]);
+
+    if (errorElectricityUsage) {
+      showPopup(
+        `Error fetching electricity usage: ${errorElectricityUsage.message}`,
+        PopupType.ERROR
+      );
+      resetElectricityUsage();
+    }
+  }, [
+    errorSummary,
+    errorElectricityUsage,
+    showPopup,
+    resetSummary,
+    resetElectricityUsage,
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px]">

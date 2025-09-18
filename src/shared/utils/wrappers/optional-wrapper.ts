@@ -173,6 +173,36 @@ export class OptionalWrapper<T> {
     return this.value ?? null;
   }
 
+  // String methods
+  orEmpty(): string {
+    if (typeof this.value === "string") {
+      return this.value;
+    }
+    return "";
+  }
+
+  isNullOrEmpty(): boolean {
+    if (typeof this.value === "string") {
+      return this.value == null || this.value === "";
+    }
+    return this.value == null;
+  }
+
+  isNotNullOrEmpty(): boolean {
+    return !this.isNullOrEmpty();
+  }
+
+  ifStringPresent(action: (value: string) => void): OptionalWrapper<T> {
+    if (
+      typeof this.value === "string" &&
+      this.value != null &&
+      this.value !== ""
+    ) {
+      action(this.value);
+    }
+    return this;
+  }
+
   // Boolean methods
   orFalse(): boolean {
     if (typeof this.value === "boolean") {

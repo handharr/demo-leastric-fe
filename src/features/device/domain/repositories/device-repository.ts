@@ -1,6 +1,7 @@
 import {
   DeviceModel,
   GetDevicesModel,
+  GetDevicesStatusModel,
 } from "@/features/device/domain/entities/device-model";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
 import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
@@ -38,4 +39,6 @@ export interface DeviceRepository {
   }: {
     pathParam: GetDevicePathParams;
   }): Promise<string | BaseErrorModel>;
+
+  getDevicesStatus(): Promise<GetDevicesStatusModel | BaseErrorModel>;
 }

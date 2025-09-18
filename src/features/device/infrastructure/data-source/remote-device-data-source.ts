@@ -10,6 +10,7 @@ import {
   DeleteDeviceResponse,
   GetDeviceResponse,
   GetDevicesResponse,
+  GetDevicesStatusResponse,
   UpdateDeviceResponse,
 } from "@/features/device/infrastructure/models/device-response";
 import { CreateDeviceFormData } from "@/features/device/domain/params/data-params";
@@ -127,6 +128,27 @@ export class RemoteDeviceDataSource implements DeviceDataSource {
       return this.apiClient.handleError(
         error as AxiosError<BaseErrorResponse>,
         "Failed to retrieve devices. Please try again."
+      );
+    }
+  }
+
+  async getDevicesStatus(): Promise<
+    BaseResponse<GetDevicesStatusResponse> | BaseErrorResponse
+  > {
+    try {
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
+      return await this.apiClient.get<BaseResponse<GetDevicesStatusResponse>>(
+        `v1/status/devices`,
+        { headers }
+      );
+    } catch (error) {
+      return this.apiClient.handleError(
+        error as AxiosError<BaseErrorResponse>,
+        "Failed to retrieve devices status. Please try again."
       );
     }
   }

@@ -5,6 +5,7 @@ import {
   DeleteDeviceResponse,
   GetDeviceResponse,
   GetDevicesResponse,
+  GetDevicesStatusResponse,
   UpdateDeviceResponse,
 } from "@/features/device/infrastructure/models/device-response";
 import {
@@ -44,4 +45,8 @@ export interface DeviceDataSource {
   }: {
     params?: Record<string, unknown>;
   }): Promise<BaseResponse<GetDevicesResponse> | BaseErrorResponse>;
+
+  getDevicesStatus(): Promise<
+    BaseResponse<GetDevicesStatusResponse> | BaseErrorResponse
+  >;
 }

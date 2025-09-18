@@ -39,7 +39,7 @@ export function DateRangeModal({
         onClick={() => setOpen(!open)}
       >
         <Image
-          src="resources/icons/time/calendar.svg"
+          src="/resources/icons/time/calendar.svg"
           alt="Calendar"
           width={16}
           height={16}

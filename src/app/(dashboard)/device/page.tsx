@@ -63,7 +63,7 @@ export default function DevicePage() {
         {/* Search Input */}
         <div className="flex-1 flex items-center bg-white rounded-lg border px-3 py-2 max-w-xs gap-[8px]">
           <Image
-            src="resources/icons/system/search.svg"
+            src="/resources/icons/system/search.svg"
             alt="Search"
             width={16}
             height={16}
@@ -78,7 +78,7 @@ export default function DevicePage() {
           {search && (
             <button onClick={() => setSearch("")} className="cursor-pointer">
               <Image
-                src="resources/icons/menu/close.svg"
+                src="/resources/icons/menu/close.svg"
                 alt="Clear"
                 width={12}
                 height={12}

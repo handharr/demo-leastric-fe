@@ -163,7 +163,7 @@ export function EditDeviceModal({
         aria-label="Edit device"
       >
         <Image
-          src="resources/icons/document/edit.svg"
+          src="/resources/icons/document/edit.svg"
           alt="Edit"
           width={16}
           height={16}

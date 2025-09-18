@@ -17,22 +17,22 @@ import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
 const MENU_ITEMS: SidebarMenuItemProps[] = [
   {
     label: "Summary",
-    iconSource: "/resources/icons/analytic/dashboard",
+    iconSource: "/resources/icons/analytic/dashboard.svg",
     route: "/summary",
   },
   {
     label: "Report",
-    iconSource: "/resources/icons/analytic/chart-bar-vertical",
+    iconSource: "/resources/icons/analytic/chart-bar-vertical.svg",
     route: "/report",
   },
   {
     label: "Device",
-    iconSource: "/resources/icons/device/device",
+    iconSource: "/resources/icons/device/device.svg",
     route: "/device",
   },
   {
     label: "Setting",
-    iconSource: "/resources/icons/system/setting",
+    iconSource: "/resources/icons/system/setting.svg",
     route: "/profile",
   },
 ];

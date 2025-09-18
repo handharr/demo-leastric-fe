@@ -102,7 +102,7 @@ export function GenericFilterModal<T extends FilterState>({
         )}
       >
         <Image
-          src="resources/icons/system/filter.svg"
+          src="/resources/icons/system/filter.svg"
           alt="Filter"
           width={20}
           height={20}

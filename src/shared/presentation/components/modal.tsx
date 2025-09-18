@@ -30,7 +30,7 @@ export function Modal({
               aria-label="Close"
             >
               <Image
-                src="resources/icons/menu/close.svg"
+                src="/resources/icons/menu/close.svg"
                 alt="Close"
                 width={16}
                 height={16}

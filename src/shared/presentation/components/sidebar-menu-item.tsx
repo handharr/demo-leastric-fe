@@ -35,7 +35,7 @@ export default function SidebarMenuItem({
       {/* Icon */}
       {iconSource && (
         <Image
-          src={`${iconSource}.svg`}
+          src={`${iconSource}`}
           alt={label}
           width={16}
           height={16}

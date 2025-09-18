@@ -71,8 +71,8 @@ export function ReportTable() {
                   <Image
                     src={
                       isAllSelected
-                        ? "/resources/icons/checkbox/checkbox-default-selected.svg"
-                        : "/resources/icons/checkbox/checkbox-default.svg"
+                        ? "/resources/icons/checkbox/checkbox-default-selected"
+                        : "/resources/icons/checkbox/checkbox-default"
                     }
                     alt={isAllSelected ? "Unselect all" : "Select all"}
                     width={20}
@@ -98,8 +98,8 @@ export function ReportTable() {
                     <Image
                       src={
                         selectedIds.includes(row.id)
-                          ? "/resources/icons/checkbox/checkbox-default-selected.svg"
-                          : "/resources/icons/checkbox/checkbox-default.svg"
+                          ? "/resources/icons/checkbox/checkbox-default-selected"
+                          : "/resources/icons/checkbox/checkbox-default"
                       }
                       alt={
                         selectedIds.includes(row.id)

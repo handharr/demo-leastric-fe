@@ -99,8 +99,8 @@ export default function LoginPage() {
                   <Image
                     src={
                       showPassword
-                        ? "/resources/icons/security/eye-closed.svg"
-                        : "/resources/icons/security/eye-open.svg"
+                        ? "/resources/icons/security/eye-closed"
+                        : "/resources/icons/security/eye-open"
                     }
                     alt={showPassword ? "Hide password" : "Show password"}
                     width={20}

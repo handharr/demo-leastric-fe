@@ -78,7 +78,7 @@ export default function DevicePage() {
           {search && (
             <button onClick={() => setSearch("")} className="cursor-pointer">
               <Image
-                src="/resources/icons/menu/close.svg"
+                src="/resources/icons/menu/close"
                 alt="Clear"
                 width={12}
                 height={12}

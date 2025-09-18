@@ -101,8 +101,8 @@ export default function SecurityPage() {
                 <Image
                   src={
                     showCurrent
-                      ? "/resources/icons/security/eye-closed.svg"
-                      : "/resources/icons/security/eye-open.svg"
+                      ? "/resources/icons/security/eye-closed"
+                      : "/resources/icons/security/eye-open"
                   }
                   alt={showCurrent ? "Hide password" : "Show password"}
                   width={20}
@@ -161,8 +161,8 @@ export default function SecurityPage() {
               <Image
                 src={
                   showNew
-                    ? "/resources/icons/security/eye-closed.svg"
-                    : "/resources/icons/security/eye-open.svg"
+                    ? "/resources/icons/security/eye-closed"
+                    : "/resources/icons/security/eye-open"
                 }
                 alt={showNew ? "Hide password" : "Show password"}
                 width={20}
@@ -197,8 +197,8 @@ export default function SecurityPage() {
               <Image
                 src={
                   showConfirm
-                    ? "/resources/icons/security/eye-closed.svg"
-                    : "/resources/icons/security/eye-open.svg"
+                    ? "/resources/icons/security/eye-closed"
+                    : "/resources/icons/security/eye-open"
                 }
                 alt={showConfirm ? "Hide password" : "Show password"}
                 width={20}

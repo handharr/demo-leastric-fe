@@ -101,13 +101,13 @@ export default function SecurityPage() {
                 <Image
                   src={
                     showCurrent
-                      ? "/resources/icons/security/eye-closed"
-                      : "/resources/icons/security/eye-open"
+                      ? "/resources/icons/security/eye-closed.svg"
+                      : "/resources/icons/security/eye-open.svg"
                   }
                   alt={showCurrent ? "Hide password" : "Show password"}
                   width={20}
                   height={20}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 w-[20px] h-[20px]"
                 />
               </button>
             </div>
@@ -161,13 +161,13 @@ export default function SecurityPage() {
               <Image
                 src={
                   showNew
-                    ? "/resources/icons/security/eye-closed"
-                    : "/resources/icons/security/eye-open"
+                    ? "/resources/icons/security/eye-closed.svg"
+                    : "/resources/icons/security/eye-open.svg"
                 }
                 alt={showNew ? "Hide password" : "Show password"}
                 width={20}
                 height={20}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 w-[20px] h-[20px]"
               />
             </button>
           </div>
@@ -197,13 +197,13 @@ export default function SecurityPage() {
               <Image
                 src={
                   showConfirm
-                    ? "/resources/icons/security/eye-closed"
-                    : "/resources/icons/security/eye-open"
+                    ? "/resources/icons/security/eye-closed.svg"
+                    : "/resources/icons/security/eye-open.svg"
                 }
                 alt={showConfirm ? "Hide password" : "Show password"}
                 width={20}
                 height={20}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 w-[20px] h-[20px]"
               />
             </button>
           </div>

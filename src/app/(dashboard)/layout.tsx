@@ -52,7 +52,7 @@ const Logo = ({
     alt="Leastric Logo"
     width={sidebarOpen ? 135 : 20}
     height={30}
-    className={className}
+    className={`${className} w-[${sidebarOpen ? 135 : 20}px] h-[30px]`}
     priority
   />
 );
@@ -179,7 +179,7 @@ export default function DashboardLayout({
 
   const mobileLogo = useMemo(
     () => `
-    lg:hidden cursor-pointer transition-all duration-300 ease-in-out delay-75
+    lg:hidden cursor-pointer transition-all duration-300 ease-in-out delay-75 w-[20px] h-[20px]
     ${
       !sidebarOpen
         ? "opacity-100 translate-x-0 scale-100"
@@ -203,7 +203,7 @@ export default function DashboardLayout({
                   alt="Leastric Logo"
                   width={20}
                   height={30}
-                  className="lg:hidden"
+                  className="lg:hidden w-[20px] h-[30px]"
                   priority
                 />
                 <Logo sidebarOpen={sidebarOpen} className="hidden lg:block" />
@@ -217,6 +217,7 @@ export default function DashboardLayout({
                     alt=""
                     width={20}
                     height={20}
+                    className="w-[20px] h-[20px]"
                   />
                 </button>
               </div>
@@ -271,6 +272,7 @@ export default function DashboardLayout({
                     alt=""
                     width={20}
                     height={20}
+                    className="w-[20px] h-[20px]"
                   />
                 </button>
                 <Image

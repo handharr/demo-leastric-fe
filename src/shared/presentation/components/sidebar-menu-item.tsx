@@ -35,13 +35,11 @@ export default function SidebarMenuItem({
       {/* Icon */}
       {iconSource && (
         <Image
-          src={`${iconSource}`}
+          src={iconSource}
           alt={label}
           width={16}
           height={16}
-          className={
-            isActive ? "text-leastric-primary" : "text-typography-headline"
-          }
+          className="w-[16px] h-[16px]"
         />
       )}
 

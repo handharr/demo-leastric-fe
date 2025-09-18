@@ -9,19 +9,19 @@ export enum EmptyDataState {
 
 const stateConfig = {
   [EmptyDataState.EMPTY]: {
-    image: "/resources/images/empty/empty-data",
+    image: "/resources/images/empty/empty-data.svg",
     alt: "No data",
     defaultMessage: "No data display",
     description: undefined,
   },
   [EmptyDataState.LOADING]: {
-    image: "/resources/images/loading/loading-paper",
+    image: "/resources/images/loading/loading-paper.svg",
     alt: "Loading",
     defaultMessage: "Processing data...",
     description: undefined,
   },
   [EmptyDataState.ERROR]: {
-    image: "/resources/images/empty/unloaded",
+    image: "/resources/images/empty/unloaded.svg",
     alt: "Error",
     defaultMessage: "Something went wrong",
     description: "Refresh the page to reload the data",

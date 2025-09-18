@@ -24,22 +24,22 @@ interface SettingMenuItem {
 const MENU_ITEMS: SettingMenuItem[] = [
   {
     label: "Profile",
-    icon: "/resources/icons/user/account",
+    icon: "/resources/icons/user/account.svg",
     route: "/profile",
   },
   {
     label: "Security",
-    icon: "/resources/icons/security/shield-check",
+    icon: "/resources/icons/security/shield-check.svg",
     route: "/security",
   },
   {
     label: "Customer Support",
-    icon: "/resources/icons/menu/question-circle",
+    icon: "/resources/icons/menu/question-circle.svg",
     route: "/customer-support",
   },
   {
     label: "Logout",
-    icon: "/resources/icons/arrow/logout",
+    icon: "/resources/icons/arrow/logout.svg",
     route: "",
   },
 ];

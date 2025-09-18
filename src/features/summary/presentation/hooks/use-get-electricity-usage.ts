@@ -47,6 +47,8 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
         const getElectricityUsageUseCase = new GetElectricityUsageUseCase();
         const result = await getElectricityUsageUseCase.execute(queryParam);
 
+        Logger.info("useGetElectricityUsage", "Fetched data:", result);
+
         if (isErrorModel(result)) {
           setError(result);
           setData(null);

@@ -31,5 +31,5 @@ export interface GetUsageSummaryResponse {
 }
 
 export interface GetElectricityUsageResponse {
-  usages?: ElectricityUsageResponse[];
+  usage?: ElectricityUsageResponse[];
 }

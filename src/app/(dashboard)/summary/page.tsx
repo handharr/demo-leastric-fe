@@ -13,8 +13,6 @@ import {
   summaryFilterMeta,
 } from "@/features/summary/presentation/components/summary-filter-modal";
 import {
-  anotherChartDataDummies,
-  chartDataDummies,
   electricUsageHistoryDummies,
   realTimeDataDummies,
 } from "@/features/summary/presentation/data/dummies";
@@ -59,10 +57,6 @@ export default function SummaryPage() {
     error: errorElectricityUsage,
     reset: resetElectricityUsage,
   } = useGetElectricityUsage();
-
-  // Sample data points for the chart
-  const chartData = chartDataDummies;
-  const comparedChartData = anotherChartDataDummies;
 
   // Sample real-time monitoring data
   const realTimeData = realTimeDataDummies;
@@ -214,12 +208,12 @@ export default function SummaryPage() {
       {/* Usage Chart */}
       <div>
         <UsageChart
-          data={chartData}
-          comparedData={comparedChartData}
           selectedPeriod={selectedPeriod}
           selectedUnit={selectedUnit}
           periodOptions={availableTimePeriods}
           unitOptions={availableUnits}
+          usageData={electricityUsage}
+          usageComparedData={electricityUsage}
           onChangePeriod={(period) => setSelectedPeriod(period)}
           onChangeUnit={(unit) => setSelectedUnit(unit)}
         />

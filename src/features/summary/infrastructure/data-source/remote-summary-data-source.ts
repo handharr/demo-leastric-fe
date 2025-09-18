@@ -47,7 +47,14 @@ export class RemoteSummaryDataSource implements SummaryDataSource {
     params: Record<string, unknown>;
   }): Promise<BaseResponse<GetElectricityUsageResponse> | BaseErrorResponse> {
     try {
-      return await this.apiClient.get(`v1/readings/electricity-usage`, params);
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
+      return await this.apiClient.get(`v1/readings/electricity-usage`, params, {
+        headers,
+      });
     } catch (error) {
       Logger.error("Error fetching electricity usage", error);
       return this.apiClient.handleError(

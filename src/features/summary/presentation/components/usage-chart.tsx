@@ -10,7 +10,6 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { ChartDataPoint } from "@/features/summary/presentation/types/ui";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import { CustomDot } from "@/features/summary/presentation/components/custom-dot-props";
@@ -21,17 +20,18 @@ import {
   getTimePeriodPastLabel,
   getTimePeriodCurrentLabel,
 } from "@/shared/utils/helpers/enum-helpers";
+import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 
 interface UsageChartProps {
   title?: string;
   description?: string;
   className?: string;
-  data: ChartDataPoint[];
-  comparedData: ChartDataPoint[];
   selectedPeriod: TimePeriod;
   selectedUnit: EnergyUnit;
   periodOptions?: TimePeriod[];
   unitOptions?: EnergyUnit[];
+  usageData: ElectricityUsageModel[] | null;
+  usageComparedData: ElectricityUsageModel[] | null;
   onChangePeriod: (period: TimePeriod) => void;
   onChangeUnit: (unit: EnergyUnit) => void;
 }
@@ -40,18 +40,18 @@ export function UsageChart({
   title = "Electricity Usage",
   description = "Your electricity consumption trends.",
   className = "",
-  data,
-  comparedData,
   selectedPeriod = TimePeriod.Daily,
   selectedUnit = EnergyUnit.KWH,
   periodOptions = [],
   unitOptions = [],
+  usageData = [],
+  usageComparedData = [],
   onChangePeriod,
   onChangeUnit,
 }: UsageChartProps) {
   const [compareEnabled, setCompareEnabled] = useState(false);
-
-  const isEmpty = !data || data.length === 0;
+  console.log("Usage Data chart:", usageData);
+  const isEmpty = !usageData || usageData.length === 0;
 
   const controlsSection = (
     <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
@@ -111,7 +111,7 @@ export function UsageChart({
             vertical={false}
           />
           <XAxis
-            dataKey="day"
+            dataKey="period"
             axisLine={false}
             tickLine={false}
             tick={{
@@ -146,8 +146,8 @@ export function UsageChart({
           />
           <Line
             type="linear"
-            dataKey="usage"
-            data={data}
+            dataKey="value"
+            data={usageData}
             stroke="#2a6335"
             strokeWidth={2}
             dot={<CustomDot />}
@@ -161,8 +161,8 @@ export function UsageChart({
           {compareEnabled && (
             <Line
               type="linear"
-              dataKey="usage"
-              data={comparedData}
+              dataKey="value"
+              data={usageComparedData}
               stroke="#BABABA"
               strokeWidth={2}
               dot={<CustomDot />}

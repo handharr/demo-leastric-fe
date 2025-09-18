@@ -173,6 +173,56 @@ export class OptionalWrapper<T> {
     return this.value ?? null;
   }
 
+  // Boolean methods
+  orFalse(): boolean {
+    if (typeof this.value === "boolean") {
+      return this.value;
+    }
+    return false;
+  }
+
+  orTrue(): boolean {
+    if (typeof this.value === "boolean") {
+      return this.value;
+    }
+    return true;
+  }
+
+  // Array methods
+  orEmptyArray(): T extends readonly unknown[] ? T : T[] {
+    if (Array.isArray(this.value)) {
+      return this.value as T extends readonly unknown[] ? T : T[];
+    }
+    return [] as T extends readonly unknown[] ? T : T[];
+  }
+
+  isNullOrEmptyArray(): boolean {
+    if (!Array.isArray(this.value)) {
+      return this.value == null;
+    }
+    return this.value == null || this.value.length === 0;
+  }
+
+  isNotNullOrEmptyArray(): boolean {
+    return !this.isNullOrEmptyArray();
+  }
+
+  arrayLength(): number {
+    if (Array.isArray(this.value)) {
+      return this.value.length;
+    }
+    return 0;
+  }
+
+  ifArrayPresent(
+    action: (value: T extends readonly (infer U)[] ? U[] : T) => void
+  ): OptionalWrapper<T> {
+    if (Array.isArray(this.value) && this.value.length > 0) {
+      action(this.value as T extends readonly (infer U)[] ? U[] : T);
+    }
+    return this;
+  }
+
   isPresent(): boolean {
     return this.value != null;
   }

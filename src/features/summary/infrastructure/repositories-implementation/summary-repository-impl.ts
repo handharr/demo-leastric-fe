@@ -3,7 +3,10 @@ import {
   createErrorModel,
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import {
+  optional,
+  optionalValue,
+} from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
@@ -118,7 +121,8 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     }
 
     Logger.info("SummaryRepositoryImpl", "getElectricityUsage", result);
-    const usages = optional(result.data?.usages).orEmpty();
+    const usages = optionalValue(result.data?.usage).orEmptyArray();
+    Logger.info("SummaryRepositoryImpl", "Parsed usages", usages);
     if (result.flash?.type === "success" && usages) {
       return usages.map((usage) => ({
         deviceId: optional(usage.deviceId).orEmpty(),

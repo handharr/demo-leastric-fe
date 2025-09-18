@@ -44,7 +44,7 @@ export default function SummaryPage() {
   );
   const { showPopup } = usePopup();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
-    TimePeriod.Daily
+    TimePeriod.Monthly
   );
   const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(EnergyUnit.KWH);
   const {
@@ -54,7 +54,9 @@ export default function SummaryPage() {
   } = useGetUsageSummary();
   const {
     data: electricityUsage,
+    loading: electricityLoading,
     error: errorElectricityUsage,
+    fetchElectricityUsage,
     reset: resetElectricityUsage,
   } = useGetElectricityUsage();
 
@@ -97,6 +99,10 @@ export default function SummaryPage() {
     resetSummary,
     resetElectricityUsage,
   ]);
+
+  useEffect(() => {
+    fetchElectricityUsage({ period: selectedPeriod, unit: selectedUnit });
+  }, [selectedPeriod, selectedUnit, fetchElectricityUsage]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px]">
@@ -214,6 +220,7 @@ export default function SummaryPage() {
           unitOptions={availableUnits}
           usageData={electricityUsage}
           usageComparedData={electricityUsage}
+          isLoading={electricityLoading}
           onChangePeriod={(period) => setSelectedPeriod(period)}
           onChangeUnit={(unit) => setSelectedUnit(unit)}
         />

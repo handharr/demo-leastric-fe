@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import {
   BaseErrorModel,
   isErrorModel,
@@ -76,10 +76,6 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
     },
     []
   );
-
-  useEffect(() => {
-    fetchElectricityUsage();
-  }, [fetchElectricityUsage]);
 
   const reset = useCallback(() => {
     setData(null);

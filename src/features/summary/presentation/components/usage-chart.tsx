@@ -21,6 +21,7 @@ import {
   getTimePeriodCurrentLabel,
 } from "@/shared/utils/helpers/enum-helpers";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
+import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 
 interface UsageChartProps {
   title?: string;
@@ -32,6 +33,7 @@ interface UsageChartProps {
   unitOptions?: EnergyUnit[];
   usageData: ElectricityUsageModel[] | null;
   usageComparedData: ElectricityUsageModel[] | null;
+  isLoading?: boolean;
   onChangePeriod: (period: TimePeriod) => void;
   onChangeUnit: (unit: EnergyUnit) => void;
 }
@@ -46,6 +48,7 @@ export function UsageChart({
   unitOptions = [],
   usageData = [],
   usageComparedData = [],
+  isLoading = false,
   onChangePeriod,
   onChangeUnit,
 }: UsageChartProps) {
@@ -202,9 +205,17 @@ export function UsageChart({
     </>
   );
 
+  const mainContent = isLoading ? (
+    <LoadingSpinner className="flex items-center justify-center h-64" />
+  ) : isEmpty ? (
+    <EmptyData />
+  ) : (
+    sections
+  );
+
   return (
     <TilePrimary title={title} description={description} className={className}>
-      {isEmpty ? <EmptyData /> : sections}
+      {mainContent}
     </TilePrimary>
   );
 }

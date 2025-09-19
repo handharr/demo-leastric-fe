@@ -187,14 +187,14 @@ export function GenericFilterModal<T extends FilterState>({
         <>
           {/* Mobile overlay */}
           <div className="fixed inset-0 z-40" onClick={handleClose} />
-
+          {/* Modal content */}
           <div
             className={clsx(
-              "bg-white border border-gray-200 rounded-lg shadow-lg z-50 flex flex-col",
+              "bg-white border border-gray-200 rounded-lg shadow-lg z-50 flex flex-col max-h-[50vh]",
               // Mobile: fixed center positioning
-              "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[80vh]",
+              "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw]",
               // Desktop: absolute positioning relative to container
-              "lg:absolute lg:top-full lg:left-0 lg:mt-2 lg:min-w-[800px] lg:max-w-4xl lg:max-h-[50vh] lg:w-auto lg:h-auto lg:transform-none lg:translate-x-0 lg:translate-y-0"
+              "lg:absolute lg:top-full lg:left-0 lg:mt-2 lg:min-w-[800px] lg:max-w-4xl lg:w-auto lg:h-auto lg:transform-none lg:translate-x-0 lg:translate-y-0"
             )}
           >
             <div className="flex flex-1 overflow-hidden">

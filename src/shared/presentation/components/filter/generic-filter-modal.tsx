@@ -144,32 +144,40 @@ export function GenericFilterModal<T extends FilterState>({
     </div>
   );
 
-  const rightContent = (
-    <>
-      {Object.entries(filterMeta).map(([filterKey, meta]) =>
-        activeSection === filterKey && meta.type === FilterType.Multi ? (
-          <MultiSelectSection<T>
-            key={filterKey}
-            filterKey={filterKey}
-            filters={filter}
-            meta={meta}
-            options={meta.options}
-            onUpdateFilters={(newFilters) => setFilter(newFilters)}
-          />
-        ) : activeSection === filterKey && meta.type === FilterType.Single ? (
-          <SingleSelectSection<T>
-            key={filterKey}
-            filterKey={filterKey}
-            filters={filter}
-            meta={meta}
-            options={meta.options}
-            onUpdateFilters={setFilter}
-          />
-        ) : null
-      )}
-      {!activeSection && <FilterNoActiveSection />}
-    </>
-  );
+  const rightContent = () => {
+    if (!activeSection) {
+      return (
+        <div className="flex-1 h-[400px] flex items-center justify-center">
+          <FilterNoActiveSection />
+        </div>
+      );
+    }
+    return (
+      <div className="flex-1 min-h-[400px] overflow-y-auto">
+        {Object.entries(filterMeta).map(([filterKey, meta]) =>
+          activeSection === filterKey && meta.type === FilterType.Multi ? (
+            <MultiSelectSection<T>
+              key={filterKey}
+              filterKey={filterKey}
+              filters={filter}
+              meta={meta}
+              options={meta.options}
+              onUpdateFilters={(newFilters) => setFilter(newFilters)}
+            />
+          ) : activeSection === filterKey && meta.type === FilterType.Single ? (
+            <SingleSelectSection<T>
+              key={filterKey}
+              filterKey={filterKey}
+              filters={filter}
+              meta={meta}
+              options={meta.options}
+              onUpdateFilters={setFilter}
+            />
+          ) : null
+        )}
+      </div>
+    );
+  };
 
   const footer = (
     <FilterModalFooter
@@ -203,9 +211,7 @@ export function GenericFilterModal<T extends FilterState>({
                 {leftContent}
               </div>
               {/* Right content */}
-              <div className="flex-1 min-h-[400px] overflow-y-auto">
-                {rightContent}
-              </div>
+              {rightContent()}
             </div>
             {/* Footer */}
             <div className="border-t border-gray-200 flex-shrink-0">

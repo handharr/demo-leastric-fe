@@ -102,7 +102,7 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<SidebarMenuItemProps | null>(
     null
   );

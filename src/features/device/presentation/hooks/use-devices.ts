@@ -1,19 +1,14 @@
-import { useState, useCallback, useEffect } from "react";
+import { DeviceModel } from "@/features/device/domain/entities/device-model";
 import { GetAllDevicesUseCase } from "@/features/device/domain/use-cases/get-all-device-use-case";
-import {
-  DeviceModel,
-  deviceModelDummies,
-} from "@/features/device/domain/entities/device-model";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
-import { isErrorModel } from "@/shared/domain/entities/base-error-model";
-import { Logger } from "@/shared/utils/logger/logger";
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import {
   deviceFilterDefaultValue,
   DeviceFilterState,
 } from "@/features/device/presentation/components/device-filter-modal";
-
-const useDummy = false;
+import { isErrorModel } from "@/shared/domain/entities/base-error-model";
+import { PaginationModel } from "@/shared/domain/entities/models-interface";
+import { Logger } from "@/shared/utils/logger/logger";
+import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { useCallback, useEffect, useState } from "react";
 
 export interface UseDevicesReturn {
   devices: DeviceModel[];
@@ -83,12 +78,6 @@ export function useDevices(): UseDevicesReturn {
     }) => {
       setLoading(true);
       setError(null);
-
-      if (useDummy) {
-        setDevices(deviceModelDummies);
-        setLoading(false);
-        return;
-      }
 
       try {
         const useCase = new GetAllDevicesUseCase();

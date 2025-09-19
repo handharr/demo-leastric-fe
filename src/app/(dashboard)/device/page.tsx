@@ -15,7 +15,7 @@ import { useGetLocations } from "@/features/device/presentation/hooks/locations/
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 import { useGetDevicesStatus } from "@/features/device/presentation/hooks/use-get-devices-status";
 import { useEffect } from "react";
-import { get } from "http";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 export default function DevicePage() {
   const {
@@ -33,8 +33,11 @@ export default function DevicePage() {
     setActiveFilters,
   } = useDevices();
   const { data: locations, isLoading: getLocationsLoading } = useGetLocations();
-  const { loading: getStatusLoading, refetch: fetchDevicesStatus } =
-    useGetDevicesStatus();
+  const {
+    devicesStatus,
+    loading: getStatusLoading,
+    refetch: fetchDevicesStatus,
+  } = useGetDevicesStatus();
 
   useEffect(() => {
     fetchDevicesStatus();
@@ -118,6 +121,7 @@ export default function DevicePage() {
       <div>
         <DeviceTable
           devices={devices}
+          devicesStatus={optionalValue(devicesStatus?.devices).orEmptyArray()}
           loading={loading || getStatusLoading || getLocationsLoading}
           error={error}
           onEditSuccess={() => reloadDevices()}

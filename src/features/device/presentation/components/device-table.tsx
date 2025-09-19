@@ -1,11 +1,15 @@
 import { StatusBadge } from "@/shared/presentation/components/status-badge";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { EditDeviceModal } from "@/features/device/presentation/components/edit-device-modal";
 import { getDeviceTypeLabel } from "@/features/device/utils/device-helper";
-import { DeviceModel } from "@/features/device/domain/entities/device-model";
+import {
+  DeviceModel,
+  DeviceStatusModel,
+} from "@/features/device/domain/entities/device-model";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
 interface DeviceTableProps {
   devices: DeviceModel[];
+  devicesStatus?: DeviceStatusModel[];
   loading: boolean;
   error: string | null;
   onEditSuccess?: () => void;
@@ -13,6 +17,7 @@ interface DeviceTableProps {
 
 export function DeviceTable({
   devices,
+  devicesStatus,
   loading,
   error,
   onEditSuccess,
@@ -26,6 +31,7 @@ export function DeviceTable({
   }
 
   const devicesArray = Array.isArray(devices) ? devices : [];
+  console.log("DebugTest devicesStatus:", devicesStatus);
 
   return (
     <div className="overflow-x-auto bg-white rounded-xl shadow border">
@@ -45,24 +51,37 @@ export function DeviceTable({
           {loading ? (
             <TableSkeletonLoading />
           ) : (
-            devicesArray.map((d, i) => (
-              <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                <td className="px-4 py-3">{d.deviceName}</td>
-                <td className="px-4 py-3">
-                  <StatusBadge
-                    status={optional(d.status).orDefault("Unknown")}
-                  />
-                </td>
-                <td className="px-4 py-3">{d.tariffGroup}</td>
-                <td className="px-4 py-3">
-                  {getDeviceTypeLabel(d.deviceType)}
-                </td>
-                <td className="px-4 py-3">{d.location}</td>
-                <td className="px-4 py-3">
-                  <EditDeviceModal device={d} onSuccessUpdate={onEditSuccess} />
-                </td>
-              </tr>
-            ))
+            devicesArray.map((d, i) => {
+              const status = devicesStatus?.find((s) => s.device.id === d.id);
+              const isOnline = optionalValue(status?.isOnline).orFalse();
+              console.log(
+                "DebugTest Device",
+                d.deviceName,
+                "Device id:",
+                d.id,
+                "isOnline:",
+                isOnline
+              );
+              return (
+                <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <td className="px-4 py-3">{d.deviceName}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={isOnline} />
+                  </td>
+                  <td className="px-4 py-3">{d.tariffGroup}</td>
+                  <td className="px-4 py-3">
+                    {getDeviceTypeLabel(d.deviceType)}
+                  </td>
+                  <td className="px-4 py-3">{d.location}</td>
+                  <td className="px-4 py-3">
+                    <EditDeviceModal
+                      device={d}
+                      onSuccessUpdate={onEditSuccess}
+                    />
+                  </td>
+                </tr>
+              );
+            })
           )}
         </tbody>
       </table>

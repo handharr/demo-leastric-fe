@@ -1,14 +1,9 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { GetDeviceUseCase } from "@/features/device/domain/use-cases/get-device-use-case";
-import {
-  DeviceModel,
-  deviceModelDummies,
-} from "@/features/device/domain/entities/device-model";
+import { DeviceModel } from "@/features/device/domain/entities/device-model";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { Logger } from "@/shared/utils/logger/logger";
-
-const useDummy = false; // Toggle this to switch between dummy and real data
 
 interface UseGetDeviceProps {
   getDevicePathParams: GetDevicePathParams;
@@ -31,14 +26,6 @@ export function useGetDevice({
   const fetchDevice = useCallback(async () => {
     setLoading(true);
     setError(null);
-
-    if (useDummy) {
-      setDevice(
-        deviceModelDummies.find((d) => d.id === pathParams.deviceId) || null
-      );
-      setLoading(false);
-      return;
-    }
 
     const getDeviceUseCase = new GetDeviceUseCase();
 

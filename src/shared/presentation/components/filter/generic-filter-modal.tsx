@@ -147,13 +147,13 @@ export function GenericFilterModal<T extends FilterState>({
   const rightContent = () => {
     if (!activeSection) {
       return (
-        <div className="flex-1 h-[400px] flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center">
           <FilterNoActiveSection />
         </div>
       );
     }
     return (
-      <div className="flex-1 min-h-[400px] overflow-y-auto">
+      <div className="flex-1 min-h-[400px] overflow-hidden overflow-y-auto">
         {Object.entries(filterMeta).map(([filterKey, meta]) =>
           activeSection === filterKey && meta.type === FilterType.Multi ? (
             <MultiSelectSection<T>
@@ -198,16 +198,16 @@ export function GenericFilterModal<T extends FilterState>({
           {/* Modal content */}
           <div
             className={clsx(
-              "bg-white border border-gray-200 rounded-lg shadow-lg z-50 flex flex-col max-h-[50vh]",
+              "bg-white border border-gray-200 rounded-lg shadow-lg z-50 flex flex-col min-h-[400px] max-h-[50vh]",
               // Mobile: fixed center positioning
               "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw]",
               // Desktop: absolute positioning relative to container
-              "lg:absolute lg:top-full lg:left-0 lg:mt-2 lg:min-w-[800px] lg:max-w-4xl lg:w-auto lg:h-auto lg:transform-none lg:translate-x-0 lg:translate-y-0"
+              "lg:absolute lg:top-full lg:left-0 lg:mt-2 lg:min-w-[800px] lg:max-w-4xl lg:w-auto lg:h-auto lg:max-h-[50vh] lg:transform-none lg:translate-x-0 lg:translate-y-0"
             )}
           >
             <div className="flex flex-1 overflow-hidden">
               {/* Left sidebar */}
-              <div className="flex-1 w-80 border-r border-gray-200 overflow-y-auto">
+              <div className="flex-1 w-80 border-r border-gray-200 overflow-hidden overflow-y-auto">
                 {leftContent}
               </div>
               {/* Right content */}

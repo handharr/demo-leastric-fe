@@ -9,7 +9,7 @@ import {
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
 interface DeviceTableProps {
   devices: DeviceModel[];
-  devicesStatus?: DeviceStatusModel[];
+  devicesStatus: DeviceStatusModel[];
   loading: boolean;
   error: string | null;
   onEditSuccess?: () => void;

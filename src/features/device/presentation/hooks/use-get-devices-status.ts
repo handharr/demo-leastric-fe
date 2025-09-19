@@ -1,18 +1,18 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { GetDevicesStatusUseCase } from "@/features/device/domain/use-cases/get-devices-status-use-case";
 import { GetDevicesStatusModel } from "@/features/device/domain/entities/device-model";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { Logger } from "@/shared/utils/logger/logger";
 
-interface UseGetDevicesStatusProps {
-  enabled?: boolean;
-  refetchInterval?: number;
+export interface UseGetDevicesStatusReturn {
+  devicesStatus: GetDevicesStatusModel | null;
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
+  reset: () => void;
 }
 
-export function useGetDevicesStatus({
-  enabled = true,
-  refetchInterval,
-}: UseGetDevicesStatusProps = {}) {
+export function useGetDevicesStatus(): UseGetDevicesStatusReturn {
   const [devicesStatus, setDevicesStatus] =
     useState<GetDevicesStatusModel | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,30 +55,20 @@ export function useGetDevicesStatus({
   }, []);
 
   const refetch = useCallback(() => {
-    if (enabled) {
-      fetchDevicesStatus();
-    }
-  }, [fetchDevicesStatus, enabled]);
-
-  useEffect(() => {
-    if (!enabled) return;
     fetchDevicesStatus();
-  }, [fetchDevicesStatus, enabled]);
+  }, [fetchDevicesStatus]);
 
-  useEffect(() => {
-    if (!enabled || !refetchInterval) return;
-
-    const interval = setInterval(() => {
-      fetchDevicesStatus();
-    }, refetchInterval);
-
-    return () => clearInterval(interval);
-  }, [fetchDevicesStatus, enabled, refetchInterval]);
+  const reset = () => {
+    setDevicesStatus(null);
+    setLoading(false);
+    setError(null);
+  };
 
   return {
     devicesStatus,
     loading,
     error,
     refetch,
+    reset,
   };
 }

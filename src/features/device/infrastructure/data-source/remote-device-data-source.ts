@@ -143,6 +143,7 @@ export class RemoteDeviceDataSource implements DeviceDataSource {
       };
       return await this.apiClient.get<BaseResponse<GetDevicesStatusResponse>>(
         `v1/status/devices`,
+        undefined,
         { headers }
       );
     } catch (error) {

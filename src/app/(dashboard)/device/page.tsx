@@ -13,6 +13,9 @@ import { useDevices } from "@/features/device/presentation/hooks/use-devices";
 import { Pagination } from "@/shared/presentation/components/pagination";
 import { useGetLocations } from "@/features/device/presentation/hooks/locations/use-get-locations";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
+import { useGetDevicesStatus } from "@/features/device/presentation/hooks/use-get-devices-status";
+import { useEffect } from "react";
+import { get } from "http";
 
 export default function DevicePage() {
   const {
@@ -29,7 +32,13 @@ export default function DevicePage() {
     setSearch,
     setActiveFilters,
   } = useDevices();
-  const { data: locations } = useGetLocations();
+  const { data: locations, isLoading: getLocationsLoading } = useGetLocations();
+  const { loading: getStatusLoading, refetch: fetchDevicesStatus } =
+    useGetDevicesStatus();
+
+  useEffect(() => {
+    fetchDevicesStatus();
+  }, [fetchDevicesStatus]);
 
   const handleFilterApply = (filters: DeviceFilterState) => {
     setActiveFilters(filters);
@@ -109,7 +118,7 @@ export default function DevicePage() {
       <div>
         <DeviceTable
           devices={devices}
-          loading={loading}
+          loading={loading || getStatusLoading || getLocationsLoading}
           error={error}
           onEditSuccess={() => reloadDevices()}
         />

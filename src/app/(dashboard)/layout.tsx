@@ -241,7 +241,7 @@ export default function DashboardLayout({
   return (
     <UserProvider>
       <PopupProvider>
-        <div className="flex h-screen w-screen overflow-hidden bg-neutral-50">
+        <div className="flex h-screen w-screen bg-neutral-50">
           {/* Sidebar */}
           <aside className={sidebarClasses}>
             {/* Logo Section */}
@@ -337,8 +337,8 @@ export default function DashboardLayout({
             </header>
 
             {/* Content Area */}
-            <section className="flex-1 p-4 lg:p-8 min-h-0">
-              <div className="min-h-full overflow-auto">{children}</div>
+            <section className="flex-1 p-4 lg:p-8 overflow-auto">
+              <div className="min-h-full">{children}</div>
             </section>
           </main>
         </div>

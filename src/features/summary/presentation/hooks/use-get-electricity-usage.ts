@@ -9,7 +9,6 @@ import { GetElectricityUsageUseCase } from "@/features/summary/domain/use-cases/
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
-import { getDateRangeByTimePeriod } from "@/shared/utils/helpers/date-helpers";
 
 interface UseGetElectricityUsageReturn {
   data: GetElectricityUsageModel | null;
@@ -38,23 +37,9 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
         setLoading(true);
         setError(null);
         let normalizedPeriod: string;
-        let timePeriod: TimePeriod;
-
-        // Ensure period is a valid TimePeriod enum value
-        try {
-          timePeriod = period as TimePeriod;
-        } catch {
-          Logger.warn(
-            "useGetElectricityUsage",
-            "Invalid period provided, defaulting to Monthly:",
-            period
-          );
-          timePeriod = TimePeriod.Monthly;
-        }
-
         // Normalize period to lowercase string
         try {
-          normalizedPeriod = (timePeriod as TimePeriod).toLowerCase();
+          normalizedPeriod = (period as TimePeriod).toLowerCase();
         } catch (castError) {
           Logger.warn(
             "useGetElectricityUsage",
@@ -64,12 +49,10 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
           );
           normalizedPeriod = TimePeriod.Monthly.toLowerCase();
         }
-        const dateRange = getDateRangeByTimePeriod(timePeriod);
+
         const queryParam: GetElectricityUsageQueryParams = {
           period: normalizedPeriod.toLocaleLowerCase(),
           unit,
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
         };
 
         Logger.info(

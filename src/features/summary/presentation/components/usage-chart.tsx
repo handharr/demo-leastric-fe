@@ -20,7 +20,7 @@ import {
   getTimePeriodPastLabel,
   getTimePeriodCurrentLabel,
 } from "@/shared/utils/helpers/enum-helpers";
-import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
+import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 
 interface UsageChartProps {
@@ -31,8 +31,8 @@ interface UsageChartProps {
   selectedUnit: EnergyUnit;
   periodOptions?: TimePeriod[];
   unitOptions?: EnergyUnit[];
-  usageData: ElectricityUsageModel[] | null;
-  usageComparedData: ElectricityUsageModel[] | null;
+  usageData: PeriodValueData[] | null;
+  usageComparedData: PeriodValueData[] | null;
   isLoading?: boolean;
   onChangePeriod: (period: TimePeriod) => void;
   onChangeUnit: (unit: EnergyUnit) => void;

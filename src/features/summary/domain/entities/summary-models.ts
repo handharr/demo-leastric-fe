@@ -47,3 +47,15 @@ export interface GetUsageSummaryModel {
   threePhase: UsageSummaryModel;
   singlePhase: UsageSummaryModel;
 }
+
+export interface PeriodValueData {
+  period: string;
+  value: number;
+}
+
+export interface DeviceUsageData {
+  deviceId: string;
+  deviceName: string;
+  deviceType: string;
+  data: PeriodValueData[];
+}

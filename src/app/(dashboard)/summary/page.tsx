@@ -29,6 +29,7 @@ import {
   toMaxNDecimals,
   toMaxTwoDecimals,
 } from "@/shared/utils/helpers/number-helpers";
+import { convertToAggregatedPeriodicData } from "@/features/summary/utils/summary-helper";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -230,8 +231,14 @@ export default function SummaryPage() {
           selectedUnit={selectedUnit}
           periodOptions={availableTimePeriods}
           unitOptions={availableUnits}
-          usageData={electricityUsage}
-          usageComparedData={electricityUsage}
+          usageData={convertToAggregatedPeriodicData(
+            electricityUsage,
+            "totalKwh"
+          )}
+          usageComparedData={convertToAggregatedPeriodicData(
+            electricityUsage,
+            "totalKwh"
+          )}
           isLoading={electricityLoading}
           onChangePeriod={(period) => setSelectedPeriod(period)}
           onChangeUnit={(unit) => setSelectedUnit(unit)}

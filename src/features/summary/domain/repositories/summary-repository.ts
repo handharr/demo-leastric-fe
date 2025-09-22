@@ -1,6 +1,6 @@
 import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import {
-  ElectricityUsageModel,
+  GetElectricityUsageModel,
   GetUsageSummaryModel,
 } from "@/features/summary/domain/entities/summary-models";
 import {
@@ -18,5 +18,5 @@ export interface SummaryRepository {
     queryParam,
   }: {
     queryParam: GetElectricityUsageQueryParams;
-  }): Promise<ElectricityUsageModel[] | BaseErrorModel>;
+  }): Promise<GetElectricityUsageModel | BaseErrorModel>;
 }

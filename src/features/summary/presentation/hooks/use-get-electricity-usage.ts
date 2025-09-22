@@ -3,15 +3,16 @@ import {
   BaseErrorModel,
   isErrorModel,
 } from "@/shared/domain/entities/base-error-model";
-import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
+import { GetElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { GetElectricityUsageQueryParams } from "@/features/summary/domain/params/query-params";
 import { GetElectricityUsageUseCase } from "@/features/summary/domain/use-cases/get-electricity-usage-use-case";
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
+import { getDateRangeByTimePeriod } from "@/shared/utils/helpers/date-helpers";
 
 interface UseGetElectricityUsageReturn {
-  data: ElectricityUsageModel[] | null;
+  data: GetElectricityUsageModel | null;
   error: BaseErrorModel | null;
   loading: boolean;
   fetchElectricityUsage: ({
@@ -24,7 +25,7 @@ interface UseGetElectricityUsageReturn {
 }
 
 export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
-  const [data, setData] = useState<ElectricityUsageModel[] | null>(null);
+  const [data, setData] = useState<GetElectricityUsageModel | null>(null);
   const [error, setError] = useState<BaseErrorModel | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -32,17 +33,43 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
     async ({
       period = TimePeriod.Monthly,
       unit = EnergyUnit.KWH,
-      startDate = undefined,
-      endDate = undefined,
     }: GetElectricityUsageQueryParams = {}) => {
       try {
         setLoading(true);
         setError(null);
+        let normalizedPeriod: string;
+        let timePeriod: TimePeriod;
+
+        // Ensure period is a valid TimePeriod enum value
+        try {
+          timePeriod = period as TimePeriod;
+        } catch {
+          Logger.warn(
+            "useGetElectricityUsage",
+            "Invalid period provided, defaulting to Monthly:",
+            period
+          );
+          timePeriod = TimePeriod.Monthly;
+        }
+
+        // Normalize period to lowercase string
+        try {
+          normalizedPeriod = (timePeriod as TimePeriod).toLowerCase();
+        } catch (castError) {
+          Logger.warn(
+            "useGetElectricityUsage",
+            "Period casting failed, using default:",
+            period,
+            castError
+          );
+          normalizedPeriod = TimePeriod.Monthly.toLowerCase();
+        }
+        const dateRange = getDateRangeByTimePeriod(timePeriod);
         const queryParam: GetElectricityUsageQueryParams = {
-          period: (period as string).toLowerCase(),
+          period: normalizedPeriod.toLocaleLowerCase(),
           unit,
-          startDate,
-          endDate,
+          startDate: dateRange.startDate,
+          endDate: dateRange.endDate,
         };
         const getElectricityUsageUseCase = new GetElectricityUsageUseCase();
         const result = await getElectricityUsageUseCase.execute(queryParam);

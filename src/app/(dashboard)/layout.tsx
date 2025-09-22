@@ -12,6 +12,7 @@ import {
 } from "@/shared/presentation/hooks/user-context";
 import { usePathname } from "next/navigation";
 import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
+import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 
 // Constants - moved outside component to prevent recreation
 const MENU_ITEMS: SidebarMenuItemProps[] = [
@@ -102,10 +103,18 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    // Check if window is available (client-side) and screen width
+    if (typeof window !== "undefined") {
+      return window.innerWidth >= 1024; // lg breakpoint is 1024px
+    }
+    return false; // Default to false during SSR
+  });
   const [activeMenu, setActiveMenu] = useState<SidebarMenuItemProps | null>(
     null
   );
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   const router = useRouter();
   const pathname = usePathname();
 
@@ -127,10 +136,38 @@ export default function DashboardLayout({
 
   useEffect(() => {
     // Check AuthHelper for authentication status
-    if (!AuthHelper.isAuthenticated()) {
-      router.push("/login");
-    }
+    const checkAuth = async () => {
+      try {
+        if (!AuthHelper.isAuthenticated()) {
+          router.push("/login");
+          return;
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        router.push("/login");
+        return;
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
   }, [router]);
+
+  // Set initial sidebar state based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setSidebarOpen(window.innerWidth >= 1024);
+    };
+
+    // Set initial value
+    handleResize();
+
+    // Add resize listener
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Memoized handlers to prevent unnecessary re-renders
   const toggleSidebar = useCallback(() => {
@@ -159,7 +196,7 @@ export default function DashboardLayout({
     flex flex-col 
     h-full 
     shrink-0 
-    z-50 
+    z-60 
     transition-transform duration-300 ease-in-out
   `,
     [sidebarOpen]
@@ -189,6 +226,18 @@ export default function DashboardLayout({
     [sidebarOpen]
   );
 
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="flex items-center justify-center h-screen w-screen bg-neutral-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-2 border-[#2a6335] border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <UserProvider>
       <PopupProvider>
@@ -209,7 +258,7 @@ export default function DashboardLayout({
                 <Logo sidebarOpen={sidebarOpen} className="hidden lg:block" />
                 <button
                   onClick={toggleSidebar}
-                  className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  className="p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer"
                   aria-label="Toggle sidebar"
                 >
                   <Image
@@ -247,7 +296,7 @@ export default function DashboardLayout({
           </aside>
 
           {/* Main Content Area */}
-          <main className="flex-1 flex flex-col h-full w-full lg:w-auto relative">
+          <main className="flex-1 flex flex-col min-h-screen w-full lg:w-auto relative">
             {/* Mobile Overlay */}
             {sidebarOpen && (
               <div
@@ -288,8 +337,8 @@ export default function DashboardLayout({
             </header>
 
             {/* Content Area */}
-            <section className="flex-1 overflow-auto p-4 lg:p-8 relative z-10">
-              {children}
+            <section className="flex-1 p-4 lg:p-8 min-h-0">
+              <div className="min-h-full overflow-auto">{children}</div>
             </section>
           </main>
         </div>

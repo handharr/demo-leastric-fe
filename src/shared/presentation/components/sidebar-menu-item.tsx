@@ -56,7 +56,9 @@ export default function SidebarMenuItem({
 
   if (isActive) {
     return (
-      <div className={`${baseClasses} bg-background-brand-subtle relative`}>
+      <div
+        className={`${baseClasses} bg-background-brand-subtle relative cursor-pointer`}
+      >
         {content}
       </div>
     );

@@ -11,7 +11,7 @@ import { isErrorResponse } from "@/shared/infrastructure/models/base-error-respo
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import {
-  ElectricityUsageModel,
+  GetElectricityUsageModel,
   GetUsageSummaryModel,
 } from "@/features/summary/domain/entities/summary-models";
 import {
@@ -109,7 +109,7 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     queryParam,
   }: {
     queryParam: GetElectricityUsageQueryParams;
-  }): Promise<ElectricityUsageModel[] | BaseErrorModel> {
+  }): Promise<GetElectricityUsageModel | BaseErrorModel> {
     Logger.info("SummaryRepositoryImpl", "getElectricityUsage", queryParam);
     const result = await this.dataSource.getElectricityUsage({
       params: { ...queryParam },
@@ -121,10 +121,15 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     }
 
     Logger.info("SummaryRepositoryImpl", "getElectricityUsage", result);
-    const usages = optionalValue(result.data?.usage).orEmptyArray();
-    Logger.info("SummaryRepositoryImpl", "Parsed usages", usages);
-    if (result.flash?.type === "success" && usages) {
-      return usages.map((usage) => ({
+    const singlePhaseUsages = optionalValue(
+      result.data?.usage?.singlePhase
+    ).orEmptyArray();
+    const threePhaseUsages = optionalValue(
+      result.data?.usage?.threePhase
+    ).orEmptyArray();
+    Logger.info("SummaryRepositoryImpl", "Parsed usages", singlePhaseUsages);
+    if (result.flash?.type === "success" && singlePhaseUsages) {
+      const mappedSinglePhaseUsages = singlePhaseUsages.map((usage) => ({
         deviceId: optional(usage.deviceId).orEmpty(),
         deviceName: optional(usage.deviceName).orEmpty(),
         deviceType: parseDeviceType(optional(usage.deviceType).orEmpty()),
@@ -137,6 +142,44 @@ export class SummaryRepositoryImpl implements SummaryRepository {
         avgRealPower: optional(usage.avgRealPower).orZero(),
         totalKwh: optional(usage.totalKwh).orZero(),
       }));
+      const mappedThreePhaseUsages = threePhaseUsages.map((usage) => ({
+        deviceId: optional(usage.deviceId).orEmpty(),
+        deviceName: optional(usage.deviceName).orEmpty(),
+        deviceType: parseDeviceType(optional(usage.deviceType).orEmpty()),
+        period: optional(usage.period).orEmpty(),
+        value: optional(usage.value).orZero(),
+        unit: parseEnergyUnit(optional(usage.unit).orEmpty()),
+        avgVoltage: optional(usage.avgVoltage).orZero(),
+        avgVoltageLine: optional(usage.avgVoltageLine).orZero(),
+        avgCurrent: optional(usage.avgCurrent).orZero(),
+        avgRealPower: optional(usage.avgRealPower).orZero(),
+        totalKwh: optional(usage.totalKwh).orZero(),
+      }));
+      return {
+        usage: {
+          singlePhase: mappedSinglePhaseUsages,
+          threePhase: mappedThreePhaseUsages,
+          total: {
+            totalKwh: optional(result.data?.usage?.total?.totalKwh).orZero(),
+            avgVoltage: optional(
+              result.data?.usage?.total?.avgVoltage
+            ).orZero(),
+            avgCurrent: optional(
+              result.data?.usage?.total?.avgCurrent
+            ).orZero(),
+            avgRealPower: optional(
+              result.data?.usage?.total?.avgRealPower
+            ).orZero(),
+            totalBill: optional(result.data?.usage?.total?.totalBill).orZero(),
+            totalCO2Emission: optional(
+              result.data?.usage?.total?.totalCO2Emission
+            ).orZero(),
+            deviceCount: optional(
+              result.data?.usage?.total?.deviceCount
+            ).orZero(),
+          },
+        },
+      };
     } else {
       return createErrorModel({
         type: ErrorType.UNEXPECTED,

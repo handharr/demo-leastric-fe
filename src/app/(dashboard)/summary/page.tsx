@@ -24,6 +24,11 @@ import {
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
 import { useGetElectricityUsage } from "@/features/summary/presentation/hooks/use-get-electricity-usage";
+import {
+  formatRupiahNumber,
+  toMaxNDecimals,
+  toMaxTwoDecimals,
+} from "@/shared/utils/helpers/number-helpers";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -143,9 +148,9 @@ export default function SummaryPage() {
             <SummaryCard
               title="This Month's Est. Usage"
               description="Est. total electricity usage month to date"
-              value={optionalValue(
-                electricityUsage?.usage?.total?.totalKwh
-              ).orZero()}
+              value={toMaxTwoDecimals(
+                optionalValue(electricityUsage?.usage?.total?.totalKwh).orZero()
+              )}
               unit="kWh"
               className="md:flex-1"
             />
@@ -156,9 +161,11 @@ export default function SummaryPage() {
             <SummaryCard
               title="This Month's Est. Bill"
               description="Est. total Bill month to date"
-              value={optionalValue(
-                electricityUsage?.usage?.total?.totalEstBilling
-              ).orZero()}
+              value={formatRupiahNumber(
+                optionalValue(
+                  electricityUsage?.usage?.total?.totalEstBilling
+                ).orZero()
+              )}
               prefix="Rp"
               className="md:flex-1"
             />
@@ -169,9 +176,12 @@ export default function SummaryPage() {
             <SummaryCard
               title="Total CO₂ Emission"
               description="Est. total CO₂ Emission month to date"
-              value={optionalValue(
-                electricityUsage?.usage?.total?.totalCO2Emission
-              ).orZero()}
+              value={toMaxNDecimals(
+                optionalValue(
+                  electricityUsage?.usage?.total?.totalCO2Emission
+                ).orZero(),
+                3
+              )}
               unit="kg CO₂e/kWh"
               className="md:flex-1"
             />

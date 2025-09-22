@@ -21,6 +21,8 @@ export interface ElectricityUsageResponse {
   avgCurrent?: number; // e.g., 15.8
   avgRealPower?: number; // e.g., 3200.5
   totalKwh?: number; // e.g., 1234.567
+  totalEstBilling?: number; // e.g., 1500000
+  totalCO2Emission?: number; // e.g., 250.75
 }
 
 export interface GetUsageSummaryResponse {
@@ -40,7 +42,7 @@ export interface GetElectricityUsageResponse {
       avgVoltageLine?: number;
       avgCurrent?: number;
       avgRealPower?: number;
-      totalBill?: number;
+      totalEstBilling?: number;
       totalCO2Emission?: number;
       deviceCount?: number;
     };

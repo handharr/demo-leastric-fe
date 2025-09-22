@@ -144,7 +144,7 @@ export default function SummaryPage() {
               title="This Month's Est. Usage"
               description="Est. total electricity usage month to date"
               value={optionalValue(
-                usageSummary?.singlePhase?.estUsage
+                electricityUsage?.usage?.total?.totalKwh
               ).orZero()}
               unit="kWh"
               className="md:flex-1"
@@ -156,7 +156,9 @@ export default function SummaryPage() {
             <SummaryCard
               title="This Month's Est. Bill"
               description="Est. total Bill month to date"
-              value={optionalValue(usageSummary?.singlePhase?.estBill).orZero()}
+              value={optionalValue(
+                electricityUsage?.usage?.total?.totalEstBilling
+              ).orZero()}
               prefix="Rp"
               className="md:flex-1"
             />
@@ -168,7 +170,7 @@ export default function SummaryPage() {
               title="Total CO₂ Emission"
               description="Est. total CO₂ Emission month to date"
               value={optionalValue(
-                usageSummary?.singlePhase?.totalCO2Emission
+                electricityUsage?.usage?.total?.totalCO2Emission
               ).orZero()}
               unit="kg CO₂e/kWh"
               className="md:flex-1"

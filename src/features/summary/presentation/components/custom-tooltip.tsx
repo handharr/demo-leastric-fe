@@ -1,3 +1,4 @@
+import { toMaxTwoDecimals } from "@/shared/utils/helpers/number-helpers";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 
 interface CustomTooltipProps {
@@ -9,6 +10,7 @@ interface CustomTooltipProps {
   label?: string | number;
   unit?: string;
   titles?: string[];
+  timeUnit?: string;
 }
 
 export function CustomTooltip({
@@ -17,11 +19,12 @@ export function CustomTooltip({
   label,
   unit = "KWh",
   titles = [],
+  timeUnit = "Day",
 }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 shadow-lg rounded-lg border border-default-border">
-        <p className="text-sm text-gray-600">{`Day ${label}`}</p>
+        <p className="text-sm text-gray-600">{`${timeUnit} ${label}`}</p>
         {payload.map((entry, index) => (
           <p
             key={index}
@@ -29,7 +32,9 @@ export function CustomTooltip({
               index == 0 ? "text-leastric-primary" : "text-typography-subhead"
             }`}
           >
-            {`${optional(titles[index]).orEmpty()}: ${entry.value} ${unit}`}
+            {`${optional(titles[index]).orEmpty()}: ${toMaxTwoDecimals(
+              entry.value
+            )} ${unit}`}
           </p>
         ))}
       </div>

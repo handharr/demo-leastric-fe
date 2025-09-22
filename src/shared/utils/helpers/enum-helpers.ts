@@ -75,3 +75,18 @@ export function getTimePeriodCurrentLabel(period: TimePeriod): string {
       return "";
   }
 }
+
+export function getTimePeriodUnit(period: TimePeriod): string {
+  switch (period) {
+    case TimePeriod.Daily:
+      return "Day";
+    case TimePeriod.Weekly:
+      return "Week";
+    case TimePeriod.Monthly:
+      return "Month";
+    case TimePeriod.Yearly:
+      return "Year";
+    default:
+      return "";
+  }
+}

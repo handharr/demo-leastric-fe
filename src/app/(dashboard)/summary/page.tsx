@@ -12,10 +12,7 @@ import {
   summaryFilterDefaultValue,
   summaryFilterMeta,
 } from "@/features/summary/presentation/components/summary-filter-modal";
-import {
-  electricUsageHistoryDummies,
-  realTimeDataDummies,
-} from "@/features/summary/presentation/data/dummies";
+import { realTimeDataDummies } from "@/features/summary/presentation/data/dummies";
 import { useGetUsageSummary } from "@/features/summary/presentation/hooks/use-get-usage-summary";
 import {
   usePopup,
@@ -35,6 +32,7 @@ const availableTimePeriods = [
   TimePeriod.Daily,
   TimePeriod.Weekly,
   TimePeriod.Monthly,
+  TimePeriod.Yearly,
 ];
 
 const availableUnits = [
@@ -68,9 +66,6 @@ export default function SummaryPage() {
 
   // Sample real-time monitoring data
   const realTimeData = realTimeDataDummies;
-
-  // Sample electricity usage history data
-  const electricUsageHistory = electricUsageHistoryDummies;
 
   const handleFilterApply = (filters: SummaryFilterState) => {
     setActiveFilters(filters);

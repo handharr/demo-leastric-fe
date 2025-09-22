@@ -19,6 +19,7 @@ import { Dropdown } from "@/shared/presentation/components/dropdown";
 import {
   getTimePeriodPastLabel,
   getTimePeriodCurrentLabel,
+  getTimePeriodUnit,
 } from "@/shared/utils/helpers/enum-helpers";
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
@@ -55,6 +56,17 @@ export function UsageChart({
   const [compareEnabled, setCompareEnabled] = useState(false);
   console.log("Usage Data chart:", usageData);
   const isEmpty = !usageData || usageData.length === 0;
+
+  // Merge current and comparison data
+  const mergedData =
+    usageData?.map((currentItem, index) => {
+      const comparedItem = usageComparedData?.[index];
+      return {
+        period: currentItem.period,
+        value: currentItem.totalKwh,
+        comparedValue: comparedItem?.totalKwh || null,
+      };
+    }) || [];
 
   const controlsSection = (
     <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
@@ -100,6 +112,7 @@ export function UsageChart({
     <div className="h-64 mb-[16px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
+          data={mergedData}
           margin={{
             top: 5,
             right: 30,
@@ -122,9 +135,7 @@ export function UsageChart({
               fill: "#6b7280",
             }}
             tickFormatter={(value) => value.toString()}
-            domain={[1, 30]}
-            type="number"
-            scale="linear"
+            type="category"
           />
           <YAxis
             axisLine={false}
@@ -133,7 +144,6 @@ export function UsageChart({
               fontSize: 12,
               fill: "#6b7280",
             }}
-            domain={[0, 150]}
             tickCount={4}
           />
           <Tooltip
@@ -143,14 +153,18 @@ export function UsageChart({
                 getTimePeriodPastLabel(selectedPeriod),
               ];
               return (
-                <CustomTooltip {...props} unit={selectedUnit} titles={titles} />
+                <CustomTooltip
+                  {...props}
+                  unit={selectedUnit}
+                  titles={titles}
+                  timeUnit={getTimePeriodUnit(selectedPeriod)}
+                />
               );
             }}
           />
           <Line
             type="linear"
             dataKey="value"
-            data={usageData}
             stroke="#2a6335"
             strokeWidth={2}
             dot={<CustomDot />}
@@ -164,8 +178,7 @@ export function UsageChart({
           {compareEnabled && (
             <Line
               type="linear"
-              dataKey="totalKwh"
-              data={usageComparedData}
+              dataKey="comparedValue"
               stroke="#BABABA"
               strokeWidth={2}
               dot={<CustomDot />}

@@ -120,15 +120,28 @@ export class SummaryRepositoryImpl implements SummaryRepository {
       return mapErrorResponseToModel({ response: result });
     }
 
-    Logger.info("SummaryRepositoryImpl", "getElectricityUsage", result);
+    Logger.info("SummaryRepositoryImpl", "getElectricityUsage result", result);
     const singlePhaseUsages = optionalValue(
       result.data?.usage?.singlePhase
     ).orEmptyArray();
     const threePhaseUsages = optionalValue(
       result.data?.usage?.threePhase
     ).orEmptyArray();
-    Logger.info("SummaryRepositoryImpl", "Parsed usages", singlePhaseUsages);
-    if (result.flash?.type === "success" && singlePhaseUsages) {
+    Logger.info(
+      "SummaryRepositoryImpl",
+      "Parsed threePhases usages",
+      threePhaseUsages
+    );
+    Logger.info(
+      "SummaryRepositoryImpl",
+      "Parsed singlePhase usages",
+      singlePhaseUsages
+    );
+    if (result.flash?.type === "success") {
+      Logger.info(
+        "SummaryRepositoryImpl",
+        "Success getElectricityUsage - mapping usages"
+      );
       const mappedSinglePhaseUsages = singlePhaseUsages.map((usage) => ({
         deviceId: optional(usage.deviceId).orEmpty(),
         deviceName: optional(usage.deviceName).orEmpty(),
@@ -155,6 +168,16 @@ export class SummaryRepositoryImpl implements SummaryRepository {
         avgRealPower: optional(usage.avgRealPower).orZero(),
         totalKwh: optional(usage.totalKwh).orZero(),
       }));
+      Logger.info(
+        "SummaryRepositoryImpl",
+        "Mapped threePhases usages",
+        mappedThreePhaseUsages
+      );
+      Logger.info(
+        "SummaryRepositoryImpl",
+        "Mapped singlePhase usages",
+        mappedSinglePhaseUsages
+      );
       return {
         usage: {
           singlePhase: mappedSinglePhaseUsages,
@@ -181,6 +204,11 @@ export class SummaryRepositoryImpl implements SummaryRepository {
         },
       };
     } else {
+      Logger.error(
+        "SummaryRepositoryImpl",
+        "getElectricityUsage - unexpected flash type",
+        result
+      );
       return createErrorModel({
         type: ErrorType.UNEXPECTED,
         message:

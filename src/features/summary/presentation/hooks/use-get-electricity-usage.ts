@@ -71,6 +71,13 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
           startDate: dateRange.startDate,
           endDate: dateRange.endDate,
         };
+
+        Logger.info(
+          "useGetElectricityUsage",
+          "Fetching electricity usage with params:",
+          { period, unit }
+        );
+
         const getElectricityUsageUseCase = new GetElectricityUsageUseCase();
         const result = await getElectricityUsageUseCase.execute(queryParam);
 

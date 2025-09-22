@@ -231,14 +231,8 @@ export default function SummaryPage() {
           selectedUnit={selectedUnit}
           periodOptions={availableTimePeriods}
           unitOptions={availableUnits}
-          usageData={convertToAggregatedPeriodicData(
-            electricityUsage,
-            "totalKwh"
-          )}
-          usageComparedData={convertToAggregatedPeriodicData(
-            electricityUsage,
-            "totalKwh"
-          )}
+          usageData={convertToAggregatedPeriodicData(electricityUsage)}
+          usageComparedData={convertToAggregatedPeriodicData(electricityUsage)}
           isLoading={electricityLoading}
           onChangePeriod={(period) => setSelectedPeriod(period)}
           onChangeUnit={(unit) => setSelectedUnit(unit)}
@@ -253,7 +247,7 @@ export default function SummaryPage() {
           className="lg:flex-1"
         />
         <ElectricUsageHistoryTable
-          data={electricUsageHistory}
+          data={convertToAggregatedPeriodicData(electricityUsage)}
           className="lg:flex-1"
         />
       </div>

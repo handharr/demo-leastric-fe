@@ -50,7 +50,13 @@ export interface GetUsageSummaryModel {
 
 export interface PeriodValueData {
   period: string;
-  value: number;
+  avgVoltage: number;
+  avgVoltageLine: number;
+  avgCurrent: number;
+  avgRealPower: number;
+  totalKwh: number;
+  totalEstBilling: number;
+  totalCO2Emission: number;
 }
 
 export interface DeviceUsageData {

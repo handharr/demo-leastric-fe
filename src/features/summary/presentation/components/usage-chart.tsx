@@ -164,7 +164,7 @@ export function UsageChart({
           {compareEnabled && (
             <Line
               type="linear"
-              dataKey="value"
+              dataKey="totalKwh"
               data={usageComparedData}
               stroke="#BABABA"
               strokeWidth={2}

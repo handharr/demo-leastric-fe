@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ElectricUsageRecord } from "@/features/summary/presentation/types/ui";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DateRangeModal } from "@/shared/presentation/components/date-range-modal";
 import { format } from "date-fns";
+import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 function paginate<T>(array: T[], pageSize: number, page: number) {
   const start = (page - 1) * pageSize;
@@ -12,7 +13,7 @@ function paginate<T>(array: T[], pageSize: number, page: number) {
 export function ShowMoreElectricUsageModalButton({
   data,
 }: {
-  data: ElectricUsageRecord[];
+  data: PeriodValueData[];
 }) {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
@@ -68,22 +69,25 @@ export function ShowMoreElectricUsageModalButton({
                 </tr>
               </thead>
               <tbody>
-                {pagedData.map((record) => (
+                {pagedData.map((record, index) => (
                   <tr
-                    key={record.no}
+                    key={record.period}
                     className="border-b border-gray-50 last:border-b-0"
                   >
                     <td className="py-3 px-2 text-sm text-typography-headline">
-                      {record.no}.
+                      {index + 1}.
                     </td>
                     <td className="py-3 px-2 text-sm text-typography-headline">
-                      {record.date}
+                      {record.period}
                     </td>
                     <td className="py-3 px-2 text-sm text-typography-headline text-right">
-                      {record.usage}
+                      {optionalValue(record.totalKwh).orZero().toFixed(3)} kWh
                     </td>
                     <td className="py-3 px-2 text-sm text-typography-headline">
-                      {record.co2.toFixed(3)} kg
+                      {optionalValue(record.totalCO2Emission)
+                        .orZero()
+                        .toFixed(3)}{" "}
+                      kg
                     </td>
                   </tr>
                 ))}

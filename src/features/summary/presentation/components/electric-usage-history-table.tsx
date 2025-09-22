@@ -1,12 +1,13 @@
 "use client";
 import "react-day-picker/dist/style.css";
 
-import { ElectricUsageRecord } from "@/features/summary/presentation/types/ui";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { ShowMoreElectricUsageModalButton } from "@/features/summary/presentation/components/show-more-electric-usage-modal";
+import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 interface ElectricUsageHistoryTableProps {
-  data: ElectricUsageRecord[];
+  data: PeriodValueData[];
   showAll?: boolean;
   className?: string;
 }
@@ -44,22 +45,23 @@ export function ElectricUsageHistoryTable({
             </tr>
           </thead>
           <tbody>
-            {displayData.map((record) => (
+            {displayData.map((record, index) => (
               <tr
-                key={record.no}
+                key={record.period}
                 className="border-b border-gray-50 last:border-b-0"
               >
                 <td className="py-3 px-2 text-sm text-typography-headline">
-                  {record.no}.
+                  {index + 1}.
                 </td>
                 <td className="py-3 px-2 text-sm text-typography-headline">
-                  {record.date}
+                  {record.period}
                 </td>
                 <td className="py-3 px-2 text-sm text-typography-headline text-right">
-                  {record.usage}
+                  {optionalValue(record.totalKwh).orZero().toFixed(3)} kWh
                 </td>
                 <td className="py-3 px-2 text-sm text-typography-headline">
-                  {record.co2.toFixed(3)} kg
+                  {optionalValue(record.totalCO2Emission).orZero().toFixed(3)}{" "}
+                  kg
                 </td>
               </tr>
             ))}

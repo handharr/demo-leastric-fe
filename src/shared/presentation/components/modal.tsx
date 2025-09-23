@@ -1,10 +1,13 @@
 import Image from "next/image";
+import { useSidebarWidth } from "@/features/summary/presentation/hooks/use-sidebar-width";
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
   title?: string;
   description?: string;
+  onClickOutside?: () => void;
 }
 
 export function Modal({
@@ -13,19 +16,33 @@ export function Modal({
   children,
   title,
   description,
+  onClickOutside,
 }: ModalProps) {
+  const sidebarWidth = useSidebarWidth();
+
   if (!open) return null;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-white rounded-xl shadow-lg w-auto flex flex-col">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
+      onClick={() => {
+        if (onClickOutside) {
+          onClickOutside();
+        }
+      }}
+      style={{ left: `${sidebarWidth}px` }}
+    >
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-md max-h-full overflow-auto flex flex-col">
         {title && (
-          <div className="flex justify-between p-4 items-center">
-            <div>
-              <h2 className="text-lg font-semibold">{title}</h2>
-              <p className="text-sm text-gray-500">{description}</p>
+          <div className="flex justify-between p-4 items-center border-b border-gray-100">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-semibold truncate">{title}</h2>
+              {description && (
+                <p className="text-sm text-gray-500 truncate">{description}</p>
+              )}
             </div>
             <button
-              className="text-gray-400 hover:text-gray-700 cursor-pointer"
+              className="text-gray-400 hover:text-gray-700 cursor-pointer ml-4 flex-shrink-0"
               onClick={onClose}
               aria-label="Close"
             >
@@ -38,7 +55,7 @@ export function Modal({
             </button>
           </div>
         )}
-        <div className="px-6 pb-6">{children}</div>
+        <div className="px-6 pb-6 pt-4 overflow-auto">{children}</div>
       </div>
     </div>
   );

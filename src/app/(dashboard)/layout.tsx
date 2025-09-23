@@ -337,7 +337,7 @@ export default function DashboardLayout({
             </header>
 
             {/* Content Area */}
-            <section className="flex-1 p-4 lg:p-8 overflow-auto">
+            <section className="flex-1 p-4 lg:p-8 overflow-auto relative">
               <div className="min-h-full">{children}</div>
             </section>
           </main>

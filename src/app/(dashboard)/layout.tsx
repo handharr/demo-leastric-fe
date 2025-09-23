@@ -58,34 +58,6 @@ const Logo = ({
   />
 );
 
-const UserProfile = () => {
-  const { user: userData } = useUser();
-
-  // Generate initials from name
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word.charAt(0))
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  const displayName = userData?.name || "Unknown User";
-  const initials = userData?.name ? getInitials(userData.name) : "UN";
-
-  return (
-    <div className="flex items-center gap-3">
-      <div className="w-8 h-8 bg-[#2a6335] rounded-full flex items-center justify-center">
-        <span className="text-white text-sm font-medium">{initials}</span>
-      </div>
-      <span className="text-[#333333] text-sm font-medium hidden sm:block">
-        {displayName}
-      </span>
-    </div>
-  );
-};
-
 const Breadcrumb = ({
   activeMenu,
 }: {
@@ -225,6 +197,41 @@ export default function DashboardLayout({
   `,
     [sidebarOpen]
   );
+
+  const UserProfile = () => {
+    const { user: userData } = useUser();
+
+    // Generate initials from name
+    const getInitials = (name: string) => {
+      return name
+        .split(" ")
+        .map((word) => word.charAt(0))
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    };
+
+    const displayName = userData?.name || "Unknown User";
+    const initials = userData?.name ? getInitials(userData.name) : "UN";
+
+    return (
+      <div
+        className="flex items-center gap-3 cursor-pointer"
+        onClick={() => {
+          router.push("/profile");
+        }}
+      >
+        <div className="w-8 h-8 bg-brand-subtle rounded-full flex items-center justify-center">
+          <span className="text-brand-primary text-sm font-medium">
+            {initials}
+          </span>
+        </div>
+        <span className="text-[#333333] text-sm font-medium hidden sm:block">
+          {displayName}
+        </span>
+      </div>
+    );
+  };
 
   // Show loading while checking authentication
   if (isCheckingAuth) {

@@ -57,14 +57,16 @@ export default function LoginPage() {
                 className={cn(
                   "w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2",
                   errors.email
-                    ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                    : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                    ? "border-red-300 focus:ring-neutral-negative focus:border-neutral-negative"
+                    : "border-gray-300 focus:ring-brand-primary focus:border-brand-primary"
                 )}
                 placeholder={errors.email ? "" : "Enter your email"}
                 required
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-1 text-sm text-typography-negative">
+                  {errors.email}
+                </p>
               )}
             </div>
 
@@ -86,8 +88,8 @@ export default function LoginPage() {
                   className={cn(
                     "w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 pr-10",
                     errors.password
-                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
-                      : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                      ? "border-neutral-negative focus:ring-neutral-negative focus:border-neutral-negative"
+                      : "border-gray-300 focus:ring-brand-primary focus:border-brand-primary"
                   )}
                   required
                 />
@@ -99,8 +101,8 @@ export default function LoginPage() {
                   <Image
                     src={
                       showPassword
-                        ? "/resources/icons/security/eye-closed"
-                        : "/resources/icons/security/eye-open"
+                        ? "/resources/icons/security/eye-closed.svg"
+                        : "/resources/icons/security/eye-open.svg"
                     }
                     alt={showPassword ? "Hide password" : "Show password"}
                     width={20}
@@ -110,7 +112,9 @@ export default function LoginPage() {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-sm text-typography-negative">
+                  {errors.password}
+                </p>
               )}
             </div>
 
@@ -119,7 +123,7 @@ export default function LoginPage() {
               type="submit"
               disabled={isLoading}
               className={cn(
-                "w-full py-2 px-4 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2",
+                "w-full py-2 px-4 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2",
                 isLoading
                   ? "bg-gray-400 text-gray-600 cursor-not-allowed"
                   : "bg-leastric-primary text-white hover:bg-green-700"

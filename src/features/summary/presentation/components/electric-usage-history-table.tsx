@@ -5,6 +5,7 @@ import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { ShowMoreElectricUsageModalButton } from "@/features/summary/presentation/components/show-more-electric-usage-modal";
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 
 interface ElectricUsageHistoryTableProps {
   data: PeriodValueData[];
@@ -57,10 +58,17 @@ export function ElectricUsageHistoryTable({
                   {record.period}
                 </td>
                 <td className="py-3 px-2 text-sm text-typography-headline text-right">
-                  {optionalValue(record.totalKwh).orZero().toFixed(3)} kWh
+                  {formatNumberIndonesian(
+                    optionalValue(record.totalKwh).orZero(),
+                    3
+                  )}{" "}
+                  kWh
                 </td>
                 <td className="py-3 px-2 text-sm text-typography-headline">
-                  {optionalValue(record.totalCO2Emission).orZero().toFixed(3)}{" "}
+                  {formatNumberIndonesian(
+                    optionalValue(record.totalCO2Emission).orZero(),
+                    3
+                  )}{" "}
                   kg
                 </td>
               </tr>

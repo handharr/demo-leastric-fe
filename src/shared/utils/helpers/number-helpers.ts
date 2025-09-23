@@ -145,3 +145,70 @@ export function formatRupiahWithSymbol(
 export function formatRupiahNumber(value: number): string {
   return new Intl.NumberFormat("id-ID").format(Math.round(value));
 }
+
+/**
+ * Formats a number with thousand separators
+ * @param value - The number to format
+ * @param locale - Locale for formatting (default: 'en-US')
+ */
+export function formatNumberWithSeparator(
+  value: number,
+  locale: string = "en-US"
+): string {
+  return new Intl.NumberFormat(locale).format(value);
+}
+
+/**
+ * Formats a number with thousand separators and custom decimal places
+ * @param value - The number to format
+ * @param maxDecimals - Maximum number of decimal places (default: 2)
+ * @param locale - Locale for formatting (default: 'en-US')
+ */
+export function formatNumberWithSeparatorAndDecimals(
+  value: number,
+  maxDecimals: number = 2,
+  locale: string = "en-US"
+): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: maxDecimals,
+  }).format(value);
+}
+
+/**
+ * Formats a number with Indonesian-style separators (dot for thousands, comma for decimals)
+ * @param value - The number to format
+ * @param maxDecimals - Maximum number of decimal places (default: 2)
+ */
+export function formatNumberIndonesian(
+  value: number,
+  maxDecimals: number = 2
+): string {
+  return new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: maxDecimals,
+  }).format(value);
+}
+
+/**
+ * Formats a number with custom separator characters
+ * @param value - The number to format
+ * @param thousandSeparator - Character for thousand separator (default: ',')
+ * @param decimalSeparator - Character for decimal separator (default: '.')
+ * @param maxDecimals - Maximum number of decimal places (default: 2)
+ */
+export function formatNumberWithCustomSeparator(
+  value: number,
+  thousandSeparator: string = ",",
+  decimalSeparator: string = ".",
+  maxDecimals: number = 2
+): string {
+  const rounded = parseFloat(value.toFixed(maxDecimals));
+  const parts = rounded.toString().split(".");
+
+  // Add thousand separators to integer part
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+
+  // Join with custom decimal separator if there are decimals
+  return parts.length > 1 ? parts.join(decimalSeparator) : parts[0];
+}

@@ -1,4 +1,4 @@
-import { toMaxTwoDecimals } from "@/shared/utils/helpers/number-helpers";
+import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 
 interface CustomTooltipProps {
@@ -32,7 +32,7 @@ export function CustomTooltip({
               index == 0 ? "text-leastric-primary" : "text-typography-subhead"
             }`}
           >
-            {`${optional(titles[index]).orEmpty()}: ${toMaxTwoDecimals(
+            {`${optional(titles[index]).orEmpty()}: ${formatNumberIndonesian(
               entry.value
             )} ${unit}`}
           </p>

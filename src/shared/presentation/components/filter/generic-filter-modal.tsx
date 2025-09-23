@@ -44,7 +44,7 @@ export function GenericFilterModal<T extends FilterState>({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const hasActiveFiltersValue = hasActiveFilters({
-    filters: filter,
+    filters: currentState ?? defaultValue,
     meta: filterMeta,
   });
 

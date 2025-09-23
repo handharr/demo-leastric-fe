@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 
 type SupportButtonProps = {
@@ -38,6 +40,33 @@ function SupportButton({
 }
 
 export default function CustomerSupportPage() {
+  // Handler functions for external redirects
+  const handleCallSupport = () => {
+    window.location.href = "tel:+628111745929";
+  };
+
+  const handleWhatsAppChat = () => {
+    const message = "Hai Leastric, Saya butuh bantuan mengenai dashboard";
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/+628111745929?text=${encodedMessage}`, "_blank");
+  };
+
+  const handleEmailSupport = () => {
+    window.location.href = "mailto:info@leastric.com";
+  };
+
+  const handleFAQ = () => {
+    window.open("https://leastric.com/faq/", "_blank");
+  };
+
+  const handleTermsConditions = () => {
+    window.open("https://leastric.com/terms", "_blank");
+  };
+
+  const handlePrivacyPolicy = () => {
+    window.open("https://leastric.com/privacy-and-policy/", "_blank");
+  };
+
   return (
     <div className="bg-white gap-[16px]">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
@@ -75,6 +104,7 @@ export default function CustomerSupportPage() {
           icon="/resources/icons/communication/telephone.svg"
           alt="Call"
           className="px-[16px] py-[10px]"
+          onClick={handleCallSupport}
         >
           Call Leastric Support
         </SupportButton>
@@ -82,6 +112,7 @@ export default function CustomerSupportPage() {
           icon="/resources/icons/general/whatsapp.svg"
           alt="Chat"
           className="px-[16px] py-[10px]"
+          onClick={handleWhatsAppChat}
         >
           Chat with WhatsApp
         </SupportButton>
@@ -89,6 +120,7 @@ export default function CustomerSupportPage() {
           icon="/resources/icons/communication/email.svg"
           alt="Email"
           className="px-[16px] py-[10px]"
+          onClick={handleEmailSupport}
         >
           Send an Email
         </SupportButton>
@@ -102,12 +134,15 @@ export default function CustomerSupportPage() {
             icon="/resources/icons/menu/question-circle.svg"
             alt="FAQ"
             className="px-5 py-3"
+            onClick={handleFAQ}
           >
             FAQ
           </SupportButton>
           <SupportButton
             icon="/resources/icons/document/list-2.svg"
             className="px-5 py-3"
+            alt="Terms"
+            onClick={handleTermsConditions}
           >
             Terms &amp; Conditions
           </SupportButton>
@@ -115,6 +150,7 @@ export default function CustomerSupportPage() {
             icon="/resources/icons/security/shield-info.svg"
             alt="Terms"
             className="px-5 py-3"
+            onClick={handlePrivacyPolicy}
           >
             Privacy Policy
           </SupportButton>

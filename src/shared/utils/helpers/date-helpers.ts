@@ -1,5 +1,17 @@
 import { TimePeriod } from "@/shared/domain/enum/enums";
 import { DateRange } from "@/shared/domain/entities/models";
+
+export function formatDateToStringUTCWithoutMs(date: Date): string {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  const seconds = String(date.getUTCSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
+}
+
 export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -28,8 +40,8 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
       );
 
       return {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: startDate,
+        endDate: endDate,
       };
     }
 
@@ -55,8 +67,8 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
       );
 
       return {
-        startDate: startOfWeek.toISOString(),
-        endDate: endOfWeek.toISOString(),
+        startDate: startOfWeek,
+        endDate: endOfWeek,
       };
     }
 
@@ -73,8 +85,8 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
       ); // Last day of current month
 
       return {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: startDate,
+        endDate: endDate,
       };
     }
 
@@ -83,8 +95,8 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
       const endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999); // December 31st
 
       return {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: startDate,
+        endDate: endDate,
       };
     }
 

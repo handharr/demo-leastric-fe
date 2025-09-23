@@ -9,6 +9,10 @@ import { GetElectricityUsageUseCase } from "@/features/summary/domain/use-cases/
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
+import {
+  formatDateToStringUTCWithoutMs,
+  getDateRangeByTimePeriod,
+} from "@/shared/utils/helpers/date-helpers";
 
 interface UseGetElectricityUsageReturn {
   data: GetElectricityUsageModel | null;
@@ -37,6 +41,22 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
         setLoading(true);
         setError(null);
         let normalizedPeriod: string;
+        let startDate: string | undefined = undefined;
+        let endDate: string | undefined = undefined;
+
+        try {
+          const dateRange = getDateRangeByTimePeriod(period as TimePeriod);
+          startDate = formatDateToStringUTCWithoutMs(dateRange.startDate);
+          endDate = formatDateToStringUTCWithoutMs(dateRange.endDate);
+        } catch (dateError) {
+          Logger.warn(
+            "useGetElectricityUsage",
+            "Date range calculation failed, proceeding without date range:",
+            period,
+            dateError
+          );
+        }
+
         // Normalize period to lowercase string
         try {
           normalizedPeriod = (period as TimePeriod).toLowerCase();
@@ -53,6 +73,8 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
         const queryParam: GetElectricityUsageQueryParams = {
           period: normalizedPeriod.toLocaleLowerCase(),
           unit,
+          startDate: startDate,
+          endDate: endDate,
         };
 
         Logger.info(

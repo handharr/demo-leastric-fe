@@ -6,17 +6,20 @@ import { ShowMoreElectricUsageModalButton } from "@/features/summary/presentatio
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
+import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
 
 interface ElectricUsageHistoryTableProps {
   data: PeriodValueData[];
   showAll?: boolean;
   className?: string;
+  loading?: boolean;
 }
 
 export function ElectricUsageHistoryTable({
   data,
   showAll = false,
   className,
+  loading = false,
 }: ElectricUsageHistoryTableProps) {
   const displayData = showAll ? data : data.slice(0, 7);
 
@@ -46,33 +49,37 @@ export function ElectricUsageHistoryTable({
             </tr>
           </thead>
           <tbody>
-            {displayData.map((record, index) => (
-              <tr
-                key={record.period}
-                className="border-b border-gray-50 last:border-b-0"
-              >
-                <td className="py-3 px-2 text-sm text-typography-headline">
-                  {index + 1}.
-                </td>
-                <td className="py-3 px-2 text-sm text-typography-headline">
-                  {record.period}
-                </td>
-                <td className="py-3 px-2 text-sm text-typography-headline text-right">
-                  {formatNumberIndonesian(
-                    optionalValue(record.totalKwh).orZero(),
-                    3
-                  )}{" "}
-                  kWh
-                </td>
-                <td className="py-3 px-2 text-sm text-typography-headline">
-                  {formatNumberIndonesian(
-                    optionalValue(record.totalCO2Emission).orZero(),
-                    3
-                  )}{" "}
-                  kg
-                </td>
-              </tr>
-            ))}
+            {loading ? (
+              <TableSkeletonLoading />
+            ) : (
+              displayData.map((record, index) => (
+                <tr
+                  key={record.period}
+                  className="border-b border-gray-50 last:border-b-0"
+                >
+                  <td className="py-3 px-2 text-sm text-typography-headline">
+                    {index + 1}.
+                  </td>
+                  <td className="py-3 px-2 text-sm text-typography-headline">
+                    {record.period}
+                  </td>
+                  <td className="py-3 px-2 text-sm text-typography-headline text-right">
+                    {formatNumberIndonesian(
+                      optionalValue(record.totalKwh).orZero(),
+                      3
+                    )}{" "}
+                    kWh
+                  </td>
+                  <td className="py-3 px-2 text-sm text-typography-headline">
+                    {formatNumberIndonesian(
+                      optionalValue(record.totalCO2Emission).orZero(),
+                      3
+                    )}{" "}
+                    kg
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

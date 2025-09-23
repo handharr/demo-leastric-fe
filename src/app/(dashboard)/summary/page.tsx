@@ -31,7 +31,6 @@ const availableTimePeriods = [
   TimePeriod.Daily,
   TimePeriod.Weekly,
   TimePeriod.Monthly,
-  TimePeriod.Yearly,
 ];
 
 const availableUnits = [
@@ -144,9 +143,8 @@ export default function SummaryPage() {
               title="This Month's Est. Usage"
               description="Est. total electricity usage month to date"
               value={formatNumberIndonesian(
-                optionalValue(
-                  electricityUsage?.usage?.total?.totalKwh
-                ).orZero(),
+                optionalValue(usageSummary?.singlePhase?.estUsage).orZero() +
+                  optionalValue(usageSummary?.threePhase?.estUsage).orZero(),
                 2
               )}
               unit="kWh"
@@ -160,9 +158,8 @@ export default function SummaryPage() {
               title="This Month's Est. Bill"
               description="Est. total Bill month to date"
               value={formatRupiahNumber(
-                optionalValue(
-                  electricityUsage?.usage?.total?.totalEstBilling
-                ).orZero()
+                optionalValue(usageSummary?.singlePhase?.estBill).orZero() +
+                  optionalValue(usageSummary?.threePhase?.estBill).orZero()
               )}
               prefix="Rp"
               className="md:flex-1"
@@ -176,8 +173,11 @@ export default function SummaryPage() {
               description="Est. total CO₂ Emission month to date"
               value={formatNumberIndonesian(
                 optionalValue(
-                  electricityUsage?.usage?.total?.totalCO2Emission
-                ).orZero(),
+                  usageSummary?.singlePhase?.totalCO2Emission
+                ).orZero() +
+                  optionalValue(
+                    usageSummary?.threePhase?.totalCO2Emission
+                  ).orZero(),
                 3
               )}
               unit="kg CO₂e/kWh"
@@ -246,6 +246,7 @@ export default function SummaryPage() {
         <ElectricUsageHistoryTable
           data={convertToAggregatedPeriodicData(electricityUsage)}
           className="lg:flex-1"
+          loading={electricityLoading}
         />
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   DeviceStatusModel,
 } from "@/features/device/domain/entities/device-model";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
+
 interface DeviceTableProps {
   devices: DeviceModel[];
   devicesStatus: DeviceStatusModel[];

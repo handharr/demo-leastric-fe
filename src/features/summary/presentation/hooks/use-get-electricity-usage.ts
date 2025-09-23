@@ -36,18 +36,24 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
     async ({
       period = TimePeriod.Monthly,
       unit = EnergyUnit.KWH,
+      startDate = undefined,
+      endDate = undefined,
     }: GetElectricityUsageQueryParams = {}) => {
       try {
         setLoading(true);
         setError(null);
         let normalizedPeriod: string;
-        let startDate: string | undefined = undefined;
-        let endDate: string | undefined = undefined;
+        let _startDate: string | undefined = undefined;
+        let _endDate: string | undefined = undefined;
 
         try {
-          const dateRange = getDateRangeByTimePeriod(period as TimePeriod);
-          startDate = formatDateToStringUTCWithoutMs(dateRange.startDate);
-          endDate = formatDateToStringUTCWithoutMs(dateRange.endDate);
+          if (!startDate || !endDate) {
+            const { startDate: start, endDate: end } = getDateRangeByTimePeriod(
+              period as TimePeriod
+            );
+            _startDate = formatDateToStringUTCWithoutMs(start);
+            _endDate = formatDateToStringUTCWithoutMs(end);
+          }
         } catch (dateError) {
           Logger.warn(
             "useGetElectricityUsage",
@@ -73,8 +79,8 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
         const queryParam: GetElectricityUsageQueryParams = {
           period: normalizedPeriod.toLocaleLowerCase(),
           unit,
-          startDate: startDate,
-          endDate: endDate,
+          startDate: startDate ?? _startDate,
+          endDate: endDate ?? _endDate,
         };
 
         Logger.info(

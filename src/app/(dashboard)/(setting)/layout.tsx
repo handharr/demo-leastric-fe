@@ -156,7 +156,7 @@ export default function SettingLayout({
                 className={clsx(
                   "flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer text-left transition-colors",
                   idx === activeIndex
-                    ? "bg-[#E6F4EA] text-brand-primary font-semibold"
+                    ? "md:bg-[#E6F4EA] md:text-brand-primary md:font-semibold hover:bg-gray-100 text-typography-headline"
                     : "hover:bg-gray-100 text-typography-headline"
                 )}
                 onClick={() => handleMenuClick(item)}
@@ -168,7 +168,9 @@ export default function SettingLayout({
                   height={16}
                   className={clsx(
                     "transition-colors w-[16px] h-[16px]",
-                    idx === activeIndex ? "filter-none" : "grayscale"
+                    idx === activeIndex
+                      ? "md:filter-none grayscale"
+                      : "grayscale"
                   )}
                 />
                 <span>{item.label}</span>

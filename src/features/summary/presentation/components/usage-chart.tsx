@@ -23,6 +23,7 @@ import {
 } from "@/shared/utils/helpers/enum-helpers";
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
+import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 
 interface UsageChartProps {
   title?: string;
@@ -144,6 +145,7 @@ export function UsageChart({
               fontSize: 12,
               fill: "#6b7280",
             }}
+            tickFormatter={(value) => formatNumberIndonesian(Number(value), 0)}
             tickCount={4}
           />
           <Tooltip

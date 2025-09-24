@@ -16,77 +16,95 @@ import {
 
 interface UseGetElectricityUsageReturn {
   data: GetElectricityUsageModel | null;
+  comparedData: GetElectricityUsageModel | null;
   error: BaseErrorModel | null;
   loading: boolean;
-  fetchElectricityUsage: ({
-    period,
-    unit,
-    startDate,
-    endDate,
-  }: GetElectricityUsageQueryParams) => Promise<void>;
+  fetchElectricityUsage: (
+    params: GetElectricityUsageQueryParams
+  ) => Promise<void>;
+  fetchComparedElectricityUsage: (
+    params: GetElectricityUsageQueryParams
+  ) => Promise<void>;
   reset: () => void;
 }
 
 export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
   const [data, setData] = useState<GetElectricityUsageModel | null>(null);
+  const [comparedData, setComparedData] =
+    useState<GetElectricityUsageModel | null>(null);
   const [error, setError] = useState<BaseErrorModel | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const fetchElectricityUsage = useCallback(
-    async ({
+  // Helper function to prepare query parameters
+  const prepareQueryParams = (
+    params: GetElectricityUsageQueryParams
+  ): GetElectricityUsageQueryParams => {
+    const {
       period = TimePeriod.Monthly,
       unit = EnergyUnit.KWH,
-      startDate = undefined,
-      endDate = undefined,
-    }: GetElectricityUsageQueryParams = {}) => {
+      startDate,
+      endDate,
+    } = params;
+
+    let _startDate = startDate;
+    let _endDate = endDate;
+
+    // Calculate date range if not provided
+    if (!startDate || !endDate) {
+      try {
+        const { startDate: start, endDate: end } = getDateRangeByTimePeriod(
+          period as TimePeriod
+        );
+        _startDate = formatDateToStringUTCWithoutMs(start);
+        _endDate = formatDateToStringUTCWithoutMs(end);
+      } catch (dateError) {
+        Logger.warn(
+          "useGetElectricityUsage",
+          "Date range calculation failed, proceeding without date range:",
+          period,
+          dateError
+        );
+      }
+    }
+
+    // Normalize period to lowercase string
+    let normalizedPeriod: string;
+    try {
+      normalizedPeriod = (period as TimePeriod).toLowerCase();
+    } catch (castError) {
+      Logger.warn(
+        "useGetElectricityUsage",
+        "Period casting failed, using default:",
+        period,
+        castError
+      );
+      normalizedPeriod = TimePeriod.Monthly.toLowerCase();
+    }
+
+    return {
+      period: normalizedPeriod,
+      unit,
+      startDate: _startDate,
+      endDate: _endDate,
+    };
+  };
+
+  // Generic fetch function
+  const fetchElectricityUsageData = useCallback(
+    async (
+      params: GetElectricityUsageQueryParams,
+      setDataCallback: (data: GetElectricityUsageModel | null) => void
+    ) => {
       try {
         setLoading(true);
         setError(null);
-        let normalizedPeriod: string;
-        let _startDate: string | undefined = undefined;
-        let _endDate: string | undefined = undefined;
 
-        try {
-          if (!startDate || !endDate) {
-            const { startDate: start, endDate: end } = getDateRangeByTimePeriod(
-              period as TimePeriod
-            );
-            _startDate = formatDateToStringUTCWithoutMs(start);
-            _endDate = formatDateToStringUTCWithoutMs(end);
-          }
-        } catch (dateError) {
-          Logger.warn(
-            "useGetElectricityUsage",
-            "Date range calculation failed, proceeding without date range:",
-            period,
-            dateError
-          );
-        }
-
-        // Normalize period to lowercase string
-        try {
-          normalizedPeriod = (period as TimePeriod).toLowerCase();
-        } catch (castError) {
-          Logger.warn(
-            "useGetElectricityUsage",
-            "Period casting failed, using default:",
-            period,
-            castError
-          );
-          normalizedPeriod = TimePeriod.Monthly.toLowerCase();
-        }
-
-        const queryParam: GetElectricityUsageQueryParams = {
-          period: normalizedPeriod.toLocaleLowerCase(),
-          unit,
-          startDate: startDate ?? _startDate,
-          endDate: endDate ?? _endDate,
-        };
+        const queryParam = prepareQueryParams(params);
 
         Logger.info(
           "useGetElectricityUsage",
           "Fetching electricity usage with params:",
-          { period, unit }
+          { period: params.period, unit: params.unit }
         );
 
         const getElectricityUsageUseCase = new GetElectricityUsageUseCase();
@@ -96,9 +114,9 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
 
         if (isErrorModel(result)) {
           setError(result);
-          setData(null);
+          setDataCallback(null);
         } else {
-          setData(result);
+          setDataCallback(result);
           setError(null);
         }
       } catch (err) {
@@ -109,12 +127,14 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
           "Exception occurred:",
           errorMessage
         );
+
         setError({
           message: "Failed to fetch electricity usage",
           details: errorMessage,
           type: ErrorType.UNEXPECTED,
         } as BaseErrorModel);
-        setData(null);
+
+        setDataCallback(null);
       } finally {
         setLoading(false);
       }
@@ -122,17 +142,32 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
     []
   );
 
+  const fetchElectricityUsage = useCallback(
+    (params: GetElectricityUsageQueryParams = {}) =>
+      fetchElectricityUsageData(params, setData),
+    [fetchElectricityUsageData]
+  );
+
+  const fetchComparedElectricityUsage = useCallback(
+    (params: GetElectricityUsageQueryParams = {}) =>
+      fetchElectricityUsageData(params, setComparedData),
+    [fetchElectricityUsageData]
+  );
+
   const reset = useCallback(() => {
     setData(null);
+    setComparedData(null);
     setError(null);
     setLoading(false);
   }, []);
 
   return {
     data,
+    comparedData,
     error,
     loading,
     fetchElectricityUsage,
+    fetchComparedElectricityUsage,
     reset,
   };
 };

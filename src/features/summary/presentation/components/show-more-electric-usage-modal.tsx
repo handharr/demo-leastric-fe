@@ -39,7 +39,7 @@ export function ShowMoreElectricUsageModalButton({
         title="Electricity Usage History"
         description="This is for description"
       >
-        <div className="w-auto">
+        <div className="w-auto max-h-[50vh]">
           {/* Date range filter placeholder */}
           <div className="mb-4">
             <DateRangeModal

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useSidebarWidth } from "@/features/summary/presentation/hooks/use-sidebar-width";
+import { useState, useEffect } from "react";
 
 interface ModalProps {
   open: boolean;
@@ -19,6 +20,17 @@ export function Modal({
   onClickOutside,
 }: ModalProps) {
   const sidebarWidth = useSidebarWidth();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Tailwind's md breakpoint
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   if (!open) return null;
 
@@ -30,7 +42,7 @@ export function Modal({
           onClickOutside();
         }
       }}
-      style={{ left: `${sidebarWidth}px` }}
+      style={{ left: isMobile ? "0px" : `${sidebarWidth}px` }}
     >
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md max-h-full overflow-auto flex flex-col">
         {title && (

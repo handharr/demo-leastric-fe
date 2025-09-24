@@ -25,7 +25,7 @@ import {
   formatNumberIndonesian,
   formatRupiahNumber,
 } from "@/shared/utils/helpers/number-helpers";
-import { convertToAggregatedPeriodicData } from "@/features/summary/utils/summary-helper";
+import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -228,8 +228,12 @@ export default function SummaryPage() {
           selectedUnit={selectedUnit}
           periodOptions={availableTimePeriods}
           unitOptions={availableUnits}
-          usageData={convertToAggregatedPeriodicData(electricityUsage)}
-          usageComparedData={convertToAggregatedPeriodicData(electricityUsage)}
+          usageData={aggregateElectricityUsageByPeriod(
+            optionalValue(electricityUsage?.usage?.data).orEmptyArray()
+          )}
+          usageComparedData={aggregateElectricityUsageByPeriod(
+            optionalValue(electricityUsage?.usage?.data).orEmptyArray()
+          )}
           isLoading={electricityLoading}
           onChangePeriod={(period) => setSelectedPeriod(period)}
           onChangeUnit={(unit) => setSelectedUnit(unit)}
@@ -244,7 +248,9 @@ export default function SummaryPage() {
           className="lg:flex-1"
         />
         <ElectricUsageHistoryTable
-          data={convertToAggregatedPeriodicData(electricityUsage)}
+          data={aggregateElectricityUsageByPeriod(
+            optionalValue(electricityUsage?.usage?.data).orEmptyArray()
+          )}
           className="lg:flex-1"
           loading={electricityLoading}
         />

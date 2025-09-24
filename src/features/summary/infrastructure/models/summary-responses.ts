@@ -34,17 +34,6 @@ export interface GetUsageSummaryResponse {
 
 export interface GetElectricityUsageResponse {
   usage?: {
-    threePhase?: ElectricityUsageResponse[];
-    singlePhase?: ElectricityUsageResponse[];
-    total?: {
-      totalKwh?: number;
-      avgVoltage?: number;
-      avgVoltageLine?: number;
-      avgCurrent?: number;
-      avgRealPower?: number;
-      totalEstBilling?: number;
-      totalCO2Emission?: number;
-      deviceCount?: number;
-    };
+    data?: ElectricityUsageResponse[];
   };
 }

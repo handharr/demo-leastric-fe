@@ -29,17 +29,7 @@ export interface ElectricityUsageModel {
 
 export interface GetElectricityUsageModel {
   usage: {
-    threePhase: ElectricityUsageModel[];
-    singlePhase: ElectricityUsageModel[];
-    total: {
-      totalKwh: number;
-      avgVoltage: number;
-      totalEstBilling: number;
-      avgCurrent: number;
-      avgRealPower: number;
-      totalCO2Emission: number;
-      deviceCount: number;
-    };
+    data: ElectricityUsageModel[];
   };
 }
 

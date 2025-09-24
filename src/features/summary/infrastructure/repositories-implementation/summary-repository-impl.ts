@@ -121,29 +121,15 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     }
 
     Logger.info("SummaryRepositoryImpl", "getElectricityUsage result", result);
-    const singlePhaseUsages = optionalValue(
-      result.data?.usage?.singlePhase
-    ).orEmptyArray();
-    const threePhaseUsages = optionalValue(
-      result.data?.usage?.threePhase
-    ).orEmptyArray();
-    Logger.info(
-      "SummaryRepositoryImpl",
-      "Parsed threePhases usages",
-      threePhaseUsages
-    );
-    Logger.info(
-      "SummaryRepositoryImpl",
-      "Parsed singlePhase usages",
-      singlePhaseUsages
-    );
+    const usages = optionalValue(result.data?.usage?.data).orEmptyArray();
+    Logger.info("SummaryRepositoryImpl", "Parsed usages", usages);
     if (result.flash?.type === "success") {
       try {
         Logger.info(
           "SummaryRepositoryImpl",
           "Success getElectricityUsage - mapping usages"
         );
-        const mappedSinglePhaseUsages = singlePhaseUsages.map((usage) => ({
+        const mappedUsages = usages.map((usage) => ({
           deviceId: optionalValue(usage.deviceId).orEmpty(),
           deviceName: optionalValue(usage.deviceName).orEmpty(),
           deviceType: parseDeviceType(
@@ -160,60 +146,10 @@ export class SummaryRepositoryImpl implements SummaryRepository {
           totalEstBilling: optionalValue(usage.totalEstBilling).orZero(),
           totalCO2Emission: optionalValue(usage.totalCO2Emission).orZero(),
         }));
-        const mappedThreePhaseUsages = threePhaseUsages.map((usage) => ({
-          deviceId: optionalValue(usage.deviceId).orEmpty(),
-          deviceName: optionalValue(usage.deviceName).orEmpty(),
-          deviceType: parseDeviceType(
-            optionalValue(usage.deviceType).orEmpty()
-          ),
-          period: optionalValue(usage.period).orEmpty(),
-          value: optionalValue(usage.value).orZero(),
-          unit: parseEnergyUnit(optionalValue(usage.unit).orEmpty()),
-          avgVoltage: optionalValue(usage.avgVoltage).orZero(),
-          avgVoltageLine: optionalValue(usage.avgVoltageLine).orZero(),
-          avgCurrent: optionalValue(usage.avgCurrent).orZero(),
-          avgRealPower: optionalValue(usage.avgRealPower).orZero(),
-          totalKwh: optionalValue(usage.totalKwh).orZero(),
-          totalEstBilling: optionalValue(usage.totalEstBilling).orZero(),
-          totalCO2Emission: optionalValue(usage.totalCO2Emission).orZero(),
-        }));
-        Logger.info(
-          "SummaryRepositoryImpl",
-          "Mapped threePhases usages",
-          mappedThreePhaseUsages
-        );
-        Logger.info(
-          "SummaryRepositoryImpl",
-          "Mapped singlePhase usages",
-          mappedSinglePhaseUsages
-        );
+        Logger.info("SummaryRepositoryImpl", "Mapped usages", mappedUsages);
         return {
           usage: {
-            singlePhase: mappedSinglePhaseUsages,
-            threePhase: mappedThreePhaseUsages,
-            total: {
-              totalKwh: optionalValue(
-                result.data?.usage?.total?.totalKwh
-              ).orZero(),
-              avgVoltage: optionalValue(
-                result.data?.usage?.total?.avgVoltage
-              ).orZero(),
-              avgCurrent: optionalValue(
-                result.data?.usage?.total?.avgCurrent
-              ).orZero(),
-              avgRealPower: optionalValue(
-                result.data?.usage?.total?.avgRealPower
-              ).orZero(),
-              totalEstBilling: optionalValue(
-                result.data?.usage?.total?.totalEstBilling
-              ).orZero(),
-              totalCO2Emission: optionalValue(
-                result.data?.usage?.total?.totalCO2Emission
-              ).orZero(),
-              deviceCount: optionalValue(
-                result.data?.usage?.total?.deviceCount
-              ).orZero(),
-            },
+            data: mappedUsages,
           },
         };
       } catch (error) {

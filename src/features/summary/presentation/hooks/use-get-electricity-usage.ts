@@ -19,14 +19,24 @@ interface UseGetElectricityUsageReturn {
   comparedData: GetElectricityUsageModel | null;
   error: BaseErrorModel | null;
   loading: boolean;
-  fetchElectricityUsage: (
-    params: GetElectricityUsageQueryParams
-  ) => Promise<void>;
+  fetchElectricityUsage: (params: GetElectricityUsageQueryParams) => void;
   fetchComparedElectricityUsage: (
     params: GetElectricityUsageQueryParams
-  ) => Promise<void>;
+  ) => void;
   reset: () => void;
 }
+
+const subMonths = (date: Date, months: number): Date => {
+  const result = new Date(date);
+  result.setMonth(result.getMonth() - months);
+  return result;
+};
+
+const subYears = (date: Date, years: number): Date => {
+  const result = new Date(date);
+  result.setFullYear(result.getFullYear() - years);
+  return result;
+};
 
 export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
   const [data, setData] = useState<GetElectricityUsageModel | null>(null);
@@ -143,14 +153,48 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
   );
 
   const fetchElectricityUsage = useCallback(
-    (params: GetElectricityUsageQueryParams = {}) =>
-      fetchElectricityUsageData(params, setData),
+    (params: GetElectricityUsageQueryParams = {}) => {
+      setComparedData(null);
+      fetchElectricityUsageData(params, setData);
+    },
     [fetchElectricityUsageData]
   );
 
   const fetchComparedElectricityUsage = useCallback(
-    (params: GetElectricityUsageQueryParams = {}) =>
-      fetchElectricityUsageData(params, setComparedData),
+    (params: GetElectricityUsageQueryParams = {}) => {
+      fetchElectricityUsageData(params, setData);
+      // Create new params for compared data
+      const comparedPeriod: TimePeriod =
+        (params.period as TimePeriod) || TimePeriod.Monthly;
+
+      const { startDate: start, endDate: end } =
+        getDateRangeByTimePeriod(comparedPeriod);
+
+      // If period is daily or weekly, use last month for comparison
+      // Else use last year
+      // Substract one period
+      let _startDate: string;
+      let _endDate: string;
+      if (
+        comparedPeriod === TimePeriod.Daily ||
+        comparedPeriod === TimePeriod.Weekly
+      ) {
+        _startDate = formatDateToStringUTCWithoutMs(subMonths(start, 1));
+        _endDate = formatDateToStringUTCWithoutMs(subMonths(end, 1));
+      } else {
+        _startDate = formatDateToStringUTCWithoutMs(subYears(start, 1));
+        _endDate = formatDateToStringUTCWithoutMs(subYears(end, 1));
+      }
+
+      const comparedParams: GetElectricityUsageQueryParams = {
+        ...params,
+        period: comparedPeriod,
+        startDate: _startDate,
+        endDate: _endDate,
+      };
+
+      fetchElectricityUsageData(comparedParams, setComparedData);
+    },
     [fetchElectricityUsageData]
   );
 

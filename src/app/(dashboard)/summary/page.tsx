@@ -44,6 +44,7 @@ export default function SummaryPage() {
   const [activeFilters, setActiveFilters] = useState<SummaryFilterState>(
     summaryFilterDefaultValue()
   );
+  const [compareEnabled, setCompareEnabled] = useState(false);
   const { showPopup } = usePopup();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
     TimePeriod.Monthly
@@ -56,9 +57,11 @@ export default function SummaryPage() {
   } = useGetUsageSummary();
   const {
     data: electricityUsage,
+    comparedData: electricityComparedUsage,
     loading: electricityLoading,
     error: errorElectricityUsage,
     fetchElectricityUsage,
+    fetchComparedElectricityUsage,
     reset: resetElectricityUsage,
   } = useGetElectricityUsage();
 
@@ -102,6 +105,23 @@ export default function SummaryPage() {
   useEffect(() => {
     fetchElectricityUsage({ period: selectedPeriod, unit: selectedUnit });
   }, [selectedPeriod, selectedUnit, fetchElectricityUsage]);
+
+  useEffect(() => {
+    if (compareEnabled) {
+      fetchComparedElectricityUsage({
+        period: selectedPeriod,
+        unit: selectedUnit,
+      });
+    } else {
+      fetchElectricityUsage({ period: selectedPeriod, unit: selectedUnit });
+    }
+  }, [
+    compareEnabled,
+    selectedPeriod,
+    selectedUnit,
+    fetchComparedElectricityUsage,
+    fetchElectricityUsage,
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px]">
@@ -232,11 +252,15 @@ export default function SummaryPage() {
             optionalValue(electricityUsage?.usage?.data).orEmptyArray()
           )}
           usageComparedData={aggregateElectricityUsageByPeriod(
-            optionalValue(electricityUsage?.usage?.data).orEmptyArray()
+            optionalValue(electricityComparedUsage?.usage?.data).orEmptyArray()
           )}
           isLoading={electricityLoading}
+          compareEnabled={compareEnabled}
           onChangePeriod={(period) => setSelectedPeriod(period)}
           onChangeUnit={(unit) => setSelectedUnit(unit)}
+          onChangeCompare={() => {
+            setCompareEnabled(!compareEnabled);
+          }}
         />
       </div>
 

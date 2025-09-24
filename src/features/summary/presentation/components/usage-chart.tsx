@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -36,8 +35,10 @@ interface UsageChartProps {
   usageData: PeriodValueData[] | null;
   usageComparedData: PeriodValueData[] | null;
   isLoading?: boolean;
+  compareEnabled: boolean;
   onChangePeriod: (period: TimePeriod) => void;
   onChangeUnit: (unit: EnergyUnit) => void;
+  onChangeCompare?: () => void;
 }
 
 export function UsageChart({
@@ -51,10 +52,11 @@ export function UsageChart({
   usageData = [],
   usageComparedData = [],
   isLoading = false,
+  compareEnabled = false,
   onChangePeriod,
   onChangeUnit,
+  onChangeCompare,
 }: UsageChartProps) {
-  const [compareEnabled, setCompareEnabled] = useState(false);
   console.log("Usage Data chart:", usageData);
   const isEmpty = !usageData || usageData.length === 0;
 
@@ -94,7 +96,7 @@ export function UsageChart({
           Compare vs. last period
         </span>
         <button
-          onClick={() => setCompareEnabled(!compareEnabled)}
+          onClick={onChangeCompare}
           className={`relative inline-flex cursor-pointer h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
             compareEnabled ? "bg-leastric-primary" : "bg-neutral-disabled"
           }`}

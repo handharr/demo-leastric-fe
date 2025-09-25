@@ -31,7 +31,14 @@ export class RemoteSummaryDataSource implements SummaryDataSource {
   }): Promise<BaseResponse<GetUsageSummaryResponse> | BaseErrorResponse> {
     Logger.info("RemoteSummaryDataSource", "Fetching usage summary");
     try {
-      return await this.apiClient.get("v1/readings/monthly-summary", params);
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
+      return await this.apiClient.get("v1/readings/monthly-summary", params, {
+        headers,
+      });
     } catch (error) {
       Logger.error("Error fetching usage summary", error);
       return this.apiClient.handleError(

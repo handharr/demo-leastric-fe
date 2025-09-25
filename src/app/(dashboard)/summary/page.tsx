@@ -25,7 +25,11 @@ import {
   formatNumberIndonesian,
   formatRupiahNumber,
 } from "@/shared/utils/helpers/number-helpers";
-import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
+import {
+  aggregateElectricityUsageByPeriod,
+  getComparedLegendLabelForPeriod,
+  getLegendLabelForPeriod,
+} from "@/features/summary/utils/summary-helper";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -101,10 +105,6 @@ export default function SummaryPage() {
     resetSummary,
     resetElectricityUsage,
   ]);
-
-  useEffect(() => {
-    fetchElectricityUsage({ period: selectedPeriod, unit: selectedUnit });
-  }, [selectedPeriod, selectedUnit, fetchElectricityUsage]);
 
   useEffect(() => {
     if (compareEnabled) {
@@ -261,6 +261,8 @@ export default function SummaryPage() {
           onChangeCompare={() => {
             setCompareEnabled(!compareEnabled);
           }}
+          legendLabel={getLegendLabelForPeriod(selectedPeriod)}
+          legendComparedLabel={getComparedLegendLabelForPeriod(selectedPeriod)}
         />
       </div>
 

@@ -23,6 +23,7 @@ import {
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
+import { mergeCurrentAndLastPeriodData } from "@/features/summary/utils/summary-helper";
 
 interface UsageChartProps {
   title?: string;
@@ -36,6 +37,8 @@ interface UsageChartProps {
   usageComparedData: PeriodValueData[] | null;
   isLoading?: boolean;
   compareEnabled: boolean;
+  legendLabel?: string;
+  legendComparedLabel?: string;
   onChangePeriod: (period: TimePeriod) => void;
   onChangeUnit: (unit: EnergyUnit) => void;
   onChangeCompare?: () => void;
@@ -53,23 +56,20 @@ export function UsageChart({
   usageComparedData = [],
   isLoading = false,
   compareEnabled = false,
+  legendLabel,
+  legendComparedLabel,
   onChangePeriod,
   onChangeUnit,
   onChangeCompare,
 }: UsageChartProps) {
-  console.log("Usage Data chart:", usageData);
   const isEmpty = !usageData || usageData.length === 0;
 
   // Merge current and comparison data
-  const mergedData =
-    usageData?.map((currentItem, index) => {
-      const comparedItem = usageComparedData?.[index];
-      return {
-        period: currentItem.period,
-        value: currentItem.totalKwh,
-        comparedValue: comparedItem?.totalKwh || null,
-      };
-    }) || [];
+  const mergedData = mergeCurrentAndLastPeriodData({
+    currentData: usageData || [],
+    lastData: compareEnabled ? usageComparedData || null : null,
+    period: selectedPeriod,
+  });
 
   const controlsSection = (
     <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
@@ -203,12 +203,14 @@ export function UsageChart({
     <div className="flex flex-row items-center gap-[16px]">
       <div className="flex items-center gap-[8px]">
         <div className="w-[20px] h-[20px] bg-leastric-primary rounded-sm"></div>
-        <span className="text-sm text-typography-headline">This month</span>
+        <span className="text-sm text-typography-headline">{legendLabel}</span>
       </div>
       {compareEnabled && (
         <div className="flex items-center gap-[8px]">
           <div className="w-[20px] h-[20px] bg-neutral-shadow-base rounded-sm"></div>
-          <span className="text-sm text-typography-headline">Last month</span>
+          <span className="text-sm text-typography-headline">
+            {legendComparedLabel}
+          </span>
         </div>
       )}
     </div>

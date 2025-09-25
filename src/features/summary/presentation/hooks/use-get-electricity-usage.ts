@@ -154,7 +154,6 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
 
   const fetchElectricityUsage = useCallback(
     (params: GetElectricityUsageQueryParams = {}) => {
-      setComparedData(null);
       fetchElectricityUsageData(params, setData);
     },
     [fetchElectricityUsageData]

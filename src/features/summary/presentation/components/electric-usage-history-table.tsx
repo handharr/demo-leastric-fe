@@ -7,27 +7,40 @@ import { PeriodValueData } from "@/features/summary/domain/entities/summary-mode
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
+import { PaginationModel } from "@/shared/domain/entities/models-interface";
 
 interface ElectricUsageHistoryTableProps {
   data: PeriodValueData[];
-  showAll?: boolean;
   className?: string;
   loading?: boolean;
+  pagination: PaginationModel;
+  onModalNextPage: () => void;
+  onModalPreviousPage: () => void;
+  onModalPageChange: (page: number) => void;
 }
 
 export function ElectricUsageHistoryTable({
   data,
-  showAll = false,
   className,
   loading = false,
+  pagination,
+  onModalNextPage,
+  onModalPreviousPage,
+  onModalPageChange,
 }: ElectricUsageHistoryTableProps) {
-  const displayData = showAll ? data : data.slice(0, 7);
-
   return (
     <TilePrimary
       title="Electricity Usage History"
       description="Overview of electricity consumption trends."
-      topRightContent={<ShowMoreElectricUsageModalButton data={data} />}
+      topRightContent={
+        <ShowMoreElectricUsageModalButton
+          data={data}
+          pagination={pagination}
+          onNextPage={onModalNextPage}
+          onPreviousPage={onModalPreviousPage}
+          onPageChange={onModalPageChange}
+        />
+      }
       className={className || ""}
     >
       <div className="overflow-x-auto">
@@ -52,7 +65,7 @@ export function ElectricUsageHistoryTable({
             {loading ? (
               <TableSkeletonLoading />
             ) : (
-              displayData.map((record, index) => (
+              data.map((record, index) => (
                 <tr
                   key={record.period}
                   className="border-b border-gray-50 last:border-b-0"

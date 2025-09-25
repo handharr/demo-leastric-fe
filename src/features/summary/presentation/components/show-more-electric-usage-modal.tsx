@@ -4,25 +4,27 @@ import { DateRangeModal } from "@/shared/presentation/components/date-range-moda
 import { format } from "date-fns";
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { PaginationModel } from "@/shared/domain/entities/models-interface";
+import { Pagination } from "@/shared/presentation/components/pagination";
 
-function paginate<T>(array: T[], pageSize: number, page: number) {
-  const start = (page - 1) * pageSize;
-  return array.slice(start, start + pageSize);
+export interface ShowMoreElectricUsageModalButtonProps {
+  data: PeriodValueData[];
+  pagination: PaginationModel;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
+  onPageChange: (page: number) => void;
 }
 
 export function ShowMoreElectricUsageModalButton({
   data,
-}: {
-  data: PeriodValueData[];
-}) {
+  pagination,
+  onNextPage,
+  onPreviousPage,
+  onPageChange,
+}: ShowMoreElectricUsageModalButtonProps) {
   const [open, setOpen] = useState(false);
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
-  const totalPages = Math.ceil(data.length / pageSize);
   const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
-
-  const pagedData = paginate(data, pageSize, page);
 
   return (
     <>
@@ -39,7 +41,7 @@ export function ShowMoreElectricUsageModalButton({
         title="Electricity Usage History"
         description="This is for description"
       >
-        <div className="w-auto max-h-[50vh]">
+        <div className="w-auto max-h-[50vh] lg:max-h-[70vh] mb-[16px]">
           {/* Date range filter placeholder */}
           <div className="mb-4">
             <DateRangeModal
@@ -70,7 +72,7 @@ export function ShowMoreElectricUsageModalButton({
                 </tr>
               </thead>
               <tbody>
-                {pagedData.map((record, index) => (
+                {data.map((record, index) => (
                   <tr
                     key={record.period}
                     className="border-b border-gray-50 last:border-b-0"
@@ -96,59 +98,12 @@ export function ShowMoreElectricUsageModalButton({
             </table>
           </div>
           {/* Pagination */}
-          <div className="flex items-center justify-between mt-4 text-sm text-gray-500">
-            <span>
-              Show {pagedData.length > 0 ? (page - 1) * pageSize + 1 : 0}-
-              {(page - 1) * pageSize + pagedData.length} of {data.length} data
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                className="px-2 py-1 rounded hover:bg-gray-100 disabled:text-gray-300"
-                onClick={() => setPage(1)}
-                disabled={page === 1}
-                aria-label="First"
-              >
-                &laquo;
-              </button>
-              <button
-                className="px-2 py-1 rounded hover:bg-gray-100 disabled:text-gray-300"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                aria-label="Prev"
-              >
-                &lsaquo;
-              </button>
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i}
-                  className={`px-2 py-1 rounded ${
-                    page === i + 1
-                      ? "bg-gray-200 font-bold"
-                      : "hover:bg-gray-100"
-                  }`}
-                  onClick={() => setPage(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-              <button
-                className="px-2 py-1 rounded hover:bg-gray-100 disabled:text-gray-300"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                aria-label="Next"
-              >
-                &rsaquo;
-              </button>
-              <button
-                className="px-2 py-1 rounded hover:bg-gray-100 disabled:text-gray-300"
-                onClick={() => setPage(totalPages)}
-                disabled={page === totalPages}
-                aria-label="Last"
-              >
-                &raquo;
-              </button>
-            </div>
-          </div>
+          <Pagination
+            model={pagination}
+            onNextPage={onNextPage}
+            onPageChange={onPageChange}
+            onPreviousPage={onPreviousPage}
+          />
         </div>
       </Modal>
     </>

@@ -30,6 +30,7 @@ import {
   getComparedLegendLabelForPeriod,
   getLegendLabelForPeriod,
 } from "@/features/summary/utils/summary-helper";
+import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -68,6 +69,17 @@ export default function SummaryPage() {
     fetchComparedElectricityUsage,
     reset: resetElectricityUsage,
   } = useGetElectricityUsage();
+  const {
+    usageHistory: electricityUsageHistory,
+    loading: electricityUsageHistoryLoading,
+    error: electricityUsageHistoryError,
+    pagination: electricityUsageHistoryPagination,
+    nextPage: electricityUsageHistoryNextPage,
+    previousPage: electricityUsageHistoryPreviousPage,
+    goToPage: electricityUsageHistoryGoToPage,
+    fetchUsageHistory: fetchElectricityUsageHistory,
+    reset: resetElectricityUsageHistory,
+  } = useGetElectricityUsageHistory();
 
   // Sample real-time monitoring data
   const realTimeData = realTimeDataDummies;
@@ -98,12 +110,22 @@ export default function SummaryPage() {
       );
       resetElectricityUsage();
     }
+
+    if (electricityUsageHistoryError) {
+      showPopup(
+        `Error fetching electricity usage history: ${electricityUsageHistoryError}`,
+        PopupType.ERROR
+      );
+      resetElectricityUsageHistory();
+    }
   }, [
     errorSummary,
     errorElectricityUsage,
+    electricityUsageHistoryError,
     showPopup,
     resetSummary,
     resetElectricityUsage,
+    resetElectricityUsageHistory,
   ]);
 
   useEffect(() => {
@@ -122,6 +144,10 @@ export default function SummaryPage() {
     fetchComparedElectricityUsage,
     fetchElectricityUsage,
   ]);
+
+  useEffect(() => {
+    fetchElectricityUsageHistory({ page: 1 });
+  }, [fetchElectricityUsageHistory]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px]">
@@ -274,11 +300,13 @@ export default function SummaryPage() {
           className="lg:flex-1"
         />
         <ElectricUsageHistoryTable
-          data={aggregateElectricityUsageByPeriod(
-            optionalValue(electricityUsage?.usage?.data).orEmptyArray()
-          )}
+          data={aggregateElectricityUsageByPeriod(electricityUsageHistory)}
           className="lg:flex-1"
-          loading={electricityLoading}
+          loading={electricityUsageHistoryLoading}
+          pagination={electricityUsageHistoryPagination}
+          onModalNextPage={electricityUsageHistoryNextPage}
+          onModalPreviousPage={electricityUsageHistoryPreviousPage}
+          onModalPageChange={electricityUsageHistoryGoToPage}
         />
       </div>
     </div>

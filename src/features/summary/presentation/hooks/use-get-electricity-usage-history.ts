@@ -6,6 +6,11 @@ import { Logger } from "@/shared/utils/logger/logger";
 import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { useCallback, useState } from "react";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
+import { TimePeriod } from "@/shared/domain/enum/enums";
+import {
+  formatDateToStringUTCWithoutMs,
+  getDateRangeByTimePeriod,
+} from "@/shared/utils/helpers/date-helpers";
 
 export interface UseGetElectricityUsageHistoryReturn {
   usageHistory: ElectricityUsageModel[];
@@ -19,6 +24,7 @@ export interface UseGetElectricityUsageHistoryReturn {
   fetchUsageHistory: (
     params: Partial<GetElectricityUsageHistoryQueryParams>
   ) => void;
+  reset: () => void;
 }
 
 export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryReturn {
@@ -39,25 +45,32 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
     async (params: GetElectricityUsageHistoryQueryParams) => {
       setLoading(true);
       setError(null);
+      let startDate = params.startDate;
+      let endDate = params.endDate;
+      const period = params.period || TimePeriod.Daily;
+
+      if (!startDate || !endDate) {
+        const dateRange = getDateRangeByTimePeriod(TimePeriod.Daily);
+        startDate = formatDateToStringUTCWithoutMs(dateRange.startDate);
+        endDate = formatDateToStringUTCWithoutMs(dateRange.endDate);
+      }
+
+      const usedParams: GetElectricityUsageHistoryQueryParams = {
+        ...params,
+        startDate,
+        endDate,
+        period: period.toLocaleLowerCase(),
+        size: 10,
+      };
 
       try {
         const useCase = new GetElectricityUsageHistoryUseCase();
-        const result = await useCase.execute(params);
+        const result = await useCase.execute(usedParams);
 
         Logger.info("useGetElectricityUsageHistory", "execute", result);
 
         if (isErrorModel(result)) {
           setError(result.message);
-          setUsageHistory([]);
-          setPagination({
-            page: 1,
-            take: 10,
-            itemCount: 0,
-            pageCount: 1,
-            hasPreviousPage: false,
-            hasNextPage: false,
-            size: 10,
-          });
         } else {
           setUsageHistory(result.usage.data);
           setPagination(result.pagination);
@@ -68,7 +81,6 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
         );
         Logger.error("useGetElectricityUsageHistory", "error", errorMessage);
         setError(errorMessage);
-        setUsageHistory([]);
       } finally {
         setLoading(false);
       }
@@ -125,6 +137,21 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
     });
   }, [fetchUsageHistoryInternal, pagination.page]);
 
+  const reset = useCallback(() => {
+    setUsageHistory([]);
+    setLoading(false);
+    setError(null);
+    setPagination({
+      page: 1,
+      take: 10,
+      itemCount: 0,
+      pageCount: 1,
+      hasPreviousPage: false,
+      hasNextPage: false,
+      size: 10,
+    });
+  }, []);
+
   return {
     usageHistory,
     loading,
@@ -135,5 +162,6 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
     goToPage,
     reload,
     fetchUsageHistory,
+    reset,
   };
 }

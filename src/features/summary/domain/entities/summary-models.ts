@@ -1,3 +1,4 @@
+import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { DeviceType, EnergyUnit } from "@/shared/domain/enum/enums";
 
 export interface UsageSummaryModel {
@@ -31,6 +32,13 @@ export interface GetElectricityUsageModel {
   usage: {
     data: ElectricityUsageModel[];
   };
+}
+
+export interface GetElectricityUsageHistoryModel {
+  usage: {
+    data: ElectricityUsageModel[];
+  };
+  pagination: PaginationModel;
 }
 
 export interface GetUsageSummaryModel {

@@ -16,4 +16,9 @@ export interface SummaryDataSource {
   }: {
     params: Record<string, unknown>;
   }): Promise<BaseResponse<GetElectricityUsageResponse> | BaseErrorResponse>;
+  getElectricityUsageHistory({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<BaseResponse<GetElectricityUsageResponse> | BaseErrorResponse>;
 }

@@ -70,4 +70,31 @@ export class RemoteSummaryDataSource implements SummaryDataSource {
       );
     }
   }
+
+  async getElectricityUsageHistory({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<BaseResponse<GetElectricityUsageResponse> | BaseErrorResponse> {
+    try {
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
+      return await this.apiClient.get(
+        `v1/readings/electricity-usage-paginated`,
+        params,
+        {
+          headers,
+        }
+      );
+    } catch (error) {
+      Logger.error("Error fetching electricity usage history", error);
+      return this.apiClient.handleError(
+        error as AxiosError<BaseErrorResponse>,
+        "Failed to fetch electricity usage history. Please try again."
+      );
+    }
+  }
 }

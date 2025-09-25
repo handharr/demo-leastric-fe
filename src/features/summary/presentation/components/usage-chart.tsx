@@ -15,15 +15,15 @@ import { CustomDot } from "@/features/summary/presentation/components/custom-dot
 import { EmptyData } from "@/shared/presentation/components/empty-data";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
-import {
-  getTimePeriodPastLabel,
-  getTimePeriodCurrentLabel,
-  getTimePeriodUnit,
-} from "@/shared/utils/helpers/enum-helpers";
+import { getTimePeriodUnit } from "@/shared/utils/helpers/enum-helpers";
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
-import { mergeCurrentAndLastPeriodData } from "@/features/summary/utils/summary-helper";
+import {
+  getComparedLegendLabelForPeriod,
+  getLegendLabelForPeriod,
+  mergeCurrentAndLastPeriodData,
+} from "@/features/summary/utils/summary-helper";
 
 interface UsageChartProps {
   title?: string;
@@ -153,8 +153,8 @@ export function UsageChart({
           <Tooltip
             content={(props) => {
               const titles = [
-                getTimePeriodCurrentLabel(selectedPeriod),
-                getTimePeriodPastLabel(selectedPeriod),
+                getLegendLabelForPeriod(selectedPeriod),
+                getComparedLegendLabelForPeriod(selectedPeriod),
               ];
               return (
                 <CustomTooltip

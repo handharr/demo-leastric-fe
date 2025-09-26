@@ -1,0 +1,95 @@
+name: Deploy to Staging with Watchtower
+
+on:
+  push:
+    branches: [staging]
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCR_REGISTRY: ${{ secrets.GCR_REGISTRY }}
+  IMAGE_NAME: leastric-fe
+
+jobs:
+  # Job 1: Build, Test, and Deploy Application
+  build-and-deploy:
+    name: Build, Test, and deploy Application
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tag: ${{ steps.meta.outputs.tags }}
+      staging-tag: ${{ steps.meta.outputs.staging-tag }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linting
+        run: npm run lint
+
+      - name: Setup Google Cloud Authentication
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+          token_format: access_token
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Google Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.GCR_REGISTRY }}
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - name: Generate Image Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.GCR_REGISTRY }}/leastric-fe
+          tags: |
+            type=raw,value=staging-latest
+            type=raw,value=staging-{{sha}}
+            type=raw,value={{date 'YYYYMMDD-HHmmss'}}
+          labels: |
+            org.opencontainers.image.title={{env.IMAGE_NAME}}
+            org.opencontainers.image.description=Leastric Frontend Application
+            org.opencontainers.image.url={{env.GITHUB_SERVER_URL}}/{{env.GITHUB_REPOSITORY}}
+            org.opencontainers.image.source={{env.GITHUB_SERVER_URL}}/{{env.GITHUB_REPOSITORY}}
+            org.opencontainers.image.version={{branch}}-{{sha}}
+            org.opencontainers.image.created={{date 'YYYY-MM-DDTHH:mm:ssZ'}}
+            org.opencontainers.image.revision={{sha}}
+            git.commit={{sha}}
+            git.branch={{branch}}
+            build.timestamp={{date 'YYYY-MM-DDTHH:mm:ssZ'}}
+
+      - name: Build and Push Docker Image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          target: runner
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+          build-args: |
+            NEXT_TELEMETRY_DISABLED=1

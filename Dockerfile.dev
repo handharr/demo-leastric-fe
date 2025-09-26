@@ -1,0 +1,19 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Create .next directory with proper permissions
+RUN mkdir -p .next && chown -R node:node .next
+
+USER node
+
+EXPOSE 3001
+
+CMD ["npm", "run", "dev"]

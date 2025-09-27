@@ -32,6 +32,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# Accept build argument for port configuration
+ARG APP_PORT=3000
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
@@ -48,9 +51,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 3000
+# Use dynamic port from build arg
+EXPOSE ${APP_PORT}
 
-ENV PORT=3000
+ENV PORT=${APP_PORT}
 ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]

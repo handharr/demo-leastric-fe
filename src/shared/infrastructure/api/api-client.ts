@@ -55,7 +55,6 @@ export class ApiClient {
     const baseURL =
       config.baseURL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
-    Logger.info(`ApiClient constructor with baseURL ${baseURL}`);
     this.config = {
       baseURL,
       timeout: config.timeout || 10000,

@@ -203,6 +203,14 @@ export class OptionalWrapper<T> {
     return this;
   }
 
+  // Date methods
+  orToday(): Date {
+    if (this.value instanceof Date) {
+      return this.value;
+    }
+    return new Date();
+  }
+
   // Boolean methods
   orFalse(): boolean {
     if (typeof this.value === "boolean") {

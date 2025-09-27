@@ -5,33 +5,30 @@ import { PeriodValueData } from "@/features/summary/domain/entities/summary-mode
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { Pagination } from "@/shared/presentation/components/pagination";
-import {
-  formatDateToStringUTCWithoutMs,
-  getDateRangeByTimePeriod,
-} from "@/shared/utils/helpers/date-helpers";
+import { getDateRangeByTimePeriod } from "@/shared/utils/helpers/date-helpers";
 import { TimePeriod } from "@/shared/domain/enum/enums";
 import { DateRange } from "@/shared/domain/entities/models";
 
 export interface ShowMoreElectricUsageModalButtonProps {
   data: PeriodValueData[];
   pagination: PaginationModel;
+  dateRange?: DateRange;
   onNextPage: () => void;
   onPreviousPage: () => void;
   onPageChange: (page: number) => void;
-  dateRange?: DateRange;
+  onChangeDateRange?: (dateRange: DateRange) => void;
 }
 
 export function ShowMoreElectricUsageModalButton({
   data,
   pagination,
+  dateRange = getDateRangeByTimePeriod(TimePeriod.Daily),
   onNextPage,
   onPreviousPage,
   onPageChange,
-  dateRange = getDateRangeByTimePeriod(TimePeriod.Daily),
+  onChangeDateRange,
 }: ShowMoreElectricUsageModalButtonProps) {
   const [open, setOpen] = useState(false);
-  const [startDate, setStartDate] = useState(dateRange.startDate);
-  const [endDate, setEndDate] = useState(dateRange.endDate);
 
   return (
     <>
@@ -52,11 +49,9 @@ export function ShowMoreElectricUsageModalButton({
           {/* Date range filter placeholder */}
           <div className="mb-4">
             <DateRangeModal
-              startDate={formatDateToStringUTCWithoutMs(startDate)}
-              endDate={formatDateToStringUTCWithoutMs(endDate)}
-              onApply={(start, end) => {
-                setStartDate(start);
-                setEndDate(end);
+              dateRange={dateRange}
+              onApply={(range) => {
+                onChangeDateRange?.(range);
               }}
             />
           </div>

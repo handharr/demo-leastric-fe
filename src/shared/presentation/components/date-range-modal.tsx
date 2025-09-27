@@ -11,7 +11,7 @@ interface DateRangeModalProps {
   onClose?: () => void;
   startDate: string;
   endDate: string;
-  onApply: (start: string, end: string) => void;
+  onApply: (start: Date, end: Date) => void;
 }
 
 export function DateRangeModal({
@@ -35,7 +35,7 @@ export function DateRangeModal({
   return (
     <>
       <button
-        className="border rounded-md px-3 py-1 text-sm flex items-center gap-2"
+        className="border rounded-md px-3 py-1 text-sm flex items-center gap-2 cursor-pointer"
         onClick={() => setOpen(!open)}
       >
         <Image
@@ -44,9 +44,10 @@ export function DateRangeModal({
           width={16}
           height={16}
         />
-        {startDate} - {endDate}
+        {format(selectedRange?.from || new Date(), "yyyy-MM-dd")} -{" "}
+        {format(selectedRange?.to || new Date(), "yyyy-MM-dd")}
       </button>
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={open} onClose={handleClose} zValue={51}>
         <div className="p-4 w-auto">
           {/* Replace below with your calendar picker */}
           <div className="flex flex-row">
@@ -72,10 +73,7 @@ export function DateRangeModal({
               className="bg-leastric-primary text-white rounded-lg px-4 py-1 text-sm font-semibold"
               onClick={() => {
                 if (selectedRange && selectedRange.from && selectedRange.to) {
-                  onApply(
-                    format(selectedRange.from, "yyyy-MM-dd"),
-                    format(selectedRange.to, "yyyy-MM-dd")
-                  );
+                  onApply(selectedRange.from, selectedRange.to);
                   handleClose();
                 }
               }}

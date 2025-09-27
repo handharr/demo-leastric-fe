@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DateRangeModal } from "@/shared/presentation/components/date-range-modal";
-import { format } from "date-fns";
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { Pagination } from "@/shared/presentation/components/pagination";
+import {
+  formatDateToStringUTCWithoutMs,
+  getDateRangeByTimePeriod,
+} from "@/shared/utils/helpers/date-helpers";
+import { TimePeriod } from "@/shared/domain/enum/enums";
+import { DateRange } from "@/shared/domain/entities/models";
 
 export interface ShowMoreElectricUsageModalButtonProps {
   data: PeriodValueData[];
@@ -13,6 +18,7 @@ export interface ShowMoreElectricUsageModalButtonProps {
   onNextPage: () => void;
   onPreviousPage: () => void;
   onPageChange: (page: number) => void;
+  dateRange?: DateRange;
 }
 
 export function ShowMoreElectricUsageModalButton({
@@ -21,10 +27,11 @@ export function ShowMoreElectricUsageModalButton({
   onNextPage,
   onPreviousPage,
   onPageChange,
+  dateRange = getDateRangeByTimePeriod(TimePeriod.Daily),
 }: ShowMoreElectricUsageModalButtonProps) {
   const [open, setOpen] = useState(false);
-  const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [startDate, setStartDate] = useState(dateRange.startDate);
+  const [endDate, setEndDate] = useState(dateRange.endDate);
 
   return (
     <>
@@ -45,8 +52,8 @@ export function ShowMoreElectricUsageModalButton({
           {/* Date range filter placeholder */}
           <div className="mb-4">
             <DateRangeModal
-              startDate={startDate}
-              endDate={endDate}
+              startDate={formatDateToStringUTCWithoutMs(startDate)}
+              endDate={formatDateToStringUTCWithoutMs(endDate)}
               onApply={(start, end) => {
                 setStartDate(start);
                 setEndDate(end);

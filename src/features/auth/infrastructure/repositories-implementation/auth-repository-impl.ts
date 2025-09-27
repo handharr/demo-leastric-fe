@@ -41,6 +41,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       email: data.email,
       password: data.password,
     });
+    console.log("result", result);
 
     if (isErrorResponse(result)) {
       return mapErrorResponseToModel({ response: result });

@@ -18,6 +18,7 @@ import { mapUpdatePasswordFormDataToDto } from "@/features/auth/domain/mapper/au
 import { UpdatePasswordFormData } from "@/features/auth/domain/params/data/auth-form-data";
 import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
 import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(
@@ -41,7 +42,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       email: data.email,
       password: data.password,
     });
-    console.log("result", result);
+    Logger.info("result", result);
 
     if (isErrorResponse(result)) {
       return mapErrorResponseToModel({ response: result });

@@ -16,6 +16,7 @@ import {
   UpdatePasswordResponse,
 } from "@/features/auth/infrastructure/models/auth-response";
 import { UpdatePasswordDto } from "@/features/auth/infrastructure/params/auth-dto";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export class RemoteAuthDataSource implements AuthDataSource {
   private apiClient: ApiClient;
@@ -37,6 +38,7 @@ export class RemoteAuthDataSource implements AuthDataSource {
     password: string;
   }): Promise<BaseResponse<LoginResponse> | BaseErrorResponse> {
     try {
+      Logger.info(`Login request to url ${this.apiClient.instance.defaults.baseURL} with data ${email} and ${password}`);
       return await this.apiClient.post<BaseResponse<LoginResponse>>(
         "/v1/login",
         {

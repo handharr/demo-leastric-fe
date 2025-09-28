@@ -11,6 +11,9 @@ import Image from "next/image";
 
 interface PasswordFormTileProps {
   title?: string;
+  subtitle?: string;
+  activateAccess?: boolean;
+  setActivateAccess?: (activate: boolean) => void;
   currentPassword?: string;
   setCurrentPassword?: (password: string) => void;
   newPassword?: string;
@@ -25,6 +28,9 @@ interface PasswordFormTileProps {
 
 export default function PasswordFormTile({
   title,
+  subtitle,
+  activateAccess,
+  setActivateAccess,
   currentPassword = "",
   setCurrentPassword,
   newPassword = "",
@@ -55,74 +61,96 @@ export default function PasswordFormTile({
         </div>
       )}
 
-      <div className="flex flex-col gap-[8px] w-full">
-        {/* Current Password */}
-        <div className="flex flex-col gap-[16px]">
-          <div className="flex flex-col gap-[4px]">
-            <label className="block text-sm font-medium">
-              Current Password
-            </label>
-            <div className="relative">
-              <input
-                type={showCurrent ? "text" : "password"}
-                className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
-                  validationErros?.currentPassword ||
-                  errorModel?.statusCode === 401
-                    ? "border-red-300 focus:ring-red-200"
-                    : "focus:ring-brand-primary"
-                }`}
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword?.(e.target.value)}
-                placeholder="Enter current password"
-                disabled={isLoading}
-              />
-              <button
-                type="button"
-                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
-                onClick={() => setShowCurrent((v) => !v)}
-                tabIndex={-1}
-                aria-label={showCurrent ? "Hide password" : "Show password"}
-              >
-                <Image
-                  src={
-                    showCurrent
-                      ? "/resources/icons/security/eye-closed.svg"
-                      : "/resources/icons/security/eye-open.svg"
-                  }
-                  alt={showCurrent ? "Hide password" : "Show password"}
-                  width={20}
-                  height={20}
-                  className="text-gray-400 hover:text-gray-600 w-[20px] h-[20px]"
+      {/* Activate access */}
+      {activateAccess !== undefined && setActivateAccess !== undefined && (
+        <div className="flex items-center gap-[50px]">
+          <label className="font-medium">Activate user access</label>
+          <button
+            onClick={() => setActivateAccess(!activateAccess)}
+            className={`relative inline-flex cursor-pointer h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+              activateAccess ? "bg-leastric-primary" : "bg-neutral-disabled"
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                activateAccess ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+      )}
+
+      {subtitle && <label className="font-bold">{subtitle}</label>}
+
+      {/* Current Password Container */}
+      {currentPassword !== undefined && setCurrentPassword !== undefined && (
+        <div className="flex flex-col gap-[8px] w-full">
+          {/* Current Password */}
+          <div className="flex flex-col gap-[16px]">
+            <div className="flex flex-col gap-[4px]">
+              <label className="block font-medium">Current Password</label>
+              <div className="relative">
+                <input
+                  type={showCurrent ? "text" : "password"}
+                  className={`w-full border rounded-md px-4 py-2 pr-10 focus:outline-none focus:ring-2 ${
+                    validationErros?.currentPassword ||
+                    errorModel?.statusCode === 401
+                      ? "border-red-300 focus:ring-red-200"
+                      : "focus:ring-brand-primary"
+                  }`}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword?.(e.target.value)}
+                  placeholder="Enter current password"
+                  disabled={isLoading}
                 />
-              </button>
+                <button
+                  type="button"
+                  className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
+                  onClick={() => setShowCurrent((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={showCurrent ? "Hide password" : "Show password"}
+                >
+                  <Image
+                    src={
+                      showCurrent
+                        ? "/resources/icons/security/eye-closed.svg"
+                        : "/resources/icons/security/eye-open.svg"
+                    }
+                    alt={showCurrent ? "Hide password" : "Show password"}
+                    width={20}
+                    height={20}
+                    className="text-gray-400 hover:text-gray-600 w-[20px] h-[20px]"
+                  />
+                </button>
+              </div>
             </div>
           </div>
+          {validationErros?.currentPassword && (
+            <p className="text-red-500 text-sm mt-1">
+              {validationErros?.currentPassword}
+            </p>
+          )}
+          {/* Show current password error from API */}
+          {errorModel?.statusCode === 401 && (
+            <p className="text-red-500 text-sm mt-1">
+              Current password is incorrect
+            </p>
+          )}
+          {/* Forgot password */}
+          <div>
+            <a
+              href="#"
+              className="text-brand-primary text-sm font-medium hover:underline whitespace-nowrap"
+            >
+              Forgot Password?
+            </a>
+          </div>
         </div>
-        {validationErros?.currentPassword && (
-          <p className="text-red-500 text-sm mt-1">
-            {validationErros?.currentPassword}
-          </p>
-        )}
-        {/* Show current password error from API */}
-        {errorModel?.statusCode === 401 && (
-          <p className="text-red-500 text-sm mt-1">
-            Current password is incorrect
-          </p>
-        )}
-        {/* Forgot password */}
-        <div>
-          <a
-            href="#"
-            className="text-brand-primary text-sm font-medium hover:underline whitespace-nowrap"
-          >
-            Forgot Password?
-          </a>
-        </div>
-      </div>
+      )}
 
       {/* New Password */}
       <div className="flex flex-col gap-[4px]">
-        <label className="text-sm font-medium">New password</label>
+        <label className="font-medium">New password</label>
         <div className="relative">
           <input
             type={showNew ? "text" : "password"}
@@ -160,7 +188,7 @@ export default function PasswordFormTile({
 
       {/* Confirm New Password */}
       <div className="flex flex-col gap-[4px]">
-        <label className="text-sm font-medium">Confirm new password</label>
+        <label className="font-medium">Confirm new password</label>
         <div className="relative">
           <input
             type={showConfirm ? "text" : "password"}

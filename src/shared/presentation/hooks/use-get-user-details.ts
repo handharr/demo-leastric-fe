@@ -6,8 +6,17 @@ import {
 } from "@/shared/domain/entities/base-error-model";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { useUser } from "@/shared/presentation/hooks/user-context";
+import { UserModel } from "@/shared/domain/entities/user-model";
 
-export const useGetUserDetails = () => {
+interface GetUserDetailsResult {
+  userDetails: UserModel | null; // Replace 'any' with actual UserModel type if available
+  loading: boolean;
+  error: BaseErrorModel | null;
+  fetchUserDetails: () => Promise<void>;
+  reset: () => void;
+}
+
+export const useGetUserDetails = (): GetUserDetailsResult => {
   const { user: userDetails, updateUser } = useUser();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<BaseErrorModel | null>(null);
@@ -42,10 +51,16 @@ export const useGetUserDetails = () => {
     }
   }, [fetchUserDetails, userDetails]);
 
+  const reset = useCallback(() => {
+    setError(null);
+    setLoading(false);
+  }, []);
+
   return {
     userDetails,
     loading,
     error,
     fetchUserDetails,
+    reset,
   };
 };

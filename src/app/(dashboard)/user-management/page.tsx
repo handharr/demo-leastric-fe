@@ -91,10 +91,13 @@ export default function UserManagementPage() {
   return (
     <div className="flex min-h-screen flex-col gap-[16px] bg-gray-50">
       {/* Header */}
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-typography-headline">
           User Management
         </h1>
+        <button className="bg-brand-primary text-white px-4 py-2 rounded-md transition font-semibold cursor-pointer">
+          Create
+        </button>
       </div>
 
       {/* Search Input Container */}

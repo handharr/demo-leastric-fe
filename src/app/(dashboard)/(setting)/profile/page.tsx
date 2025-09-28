@@ -4,12 +4,22 @@ import { useEffect, useState } from "react";
 import { useGetUserDetails } from "@/shared/presentation/hooks/use-get-user-details";
 import { useUpdateUserDetails } from "@/shared/presentation/hooks/use-update-user-details";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
+import ProfileFormTile from "@/shared/presentation/components/form-tile/profile-form-tile";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
+import PrimaryContainer from "@/shared/presentation/components/container/primary-container";
 
 export default function ProfilePage() {
-  const [fullName, setFullName] = useState("Jono Sujono Mangunkusom");
-  const [email, setEmail] = useState("Jonosujono@gmail.com");
-  const [phone, setPhone] = useState("");
-  const { userDetails, loading, error, fetchUserDetails } = useGetUserDetails();
+  const { showPopup } = usePopup();
+  const {
+    userDetails,
+    loading,
+    error,
+    fetchUserDetails,
+    reset: resetUserDetails,
+  } = useGetUserDetails();
   const {
     updateUserDetails,
     loading: updating,
@@ -17,20 +27,29 @@ export default function ProfilePage() {
     success,
     resetState,
   } = useUpdateUserDetails();
+  const [fullName, setFullName] = useState(userDetails?.name || "");
+  const [email, setEmail] = useState(userDetails?.email || "");
+  const [phone, setPhone] = useState(userDetails?.phoneNumber || "");
 
   useEffect(() => {
-    if (userDetails) {
-      setFullName(userDetails.name);
-      setEmail(userDetails.email);
-      setPhone(userDetails.phoneNumber);
-    }
-
     if (success) {
       // Handle success case
       fetchUserDetails();
       resetState();
     }
-  }, [userDetails, success, fetchUserDetails, resetState]);
+  }, [success, fetchUserDetails, resetState]);
+
+  useEffect(() => {
+    if (updateError) {
+      showPopup(updateError.message, PopupType.ERROR);
+      resetState();
+    }
+
+    if (error) {
+      showPopup(error.message, PopupType.ERROR);
+      resetUserDetails();
+    }
+  }, [updateError, showPopup, resetState, error, resetUserDetails]);
 
   if (loading) {
     return <LoadingSpinner size="md" className="h-40" />;
@@ -44,10 +63,9 @@ export default function ProfilePage() {
     );
 
   return (
-    <div className="flex flex-col w-full gap-[16px]">
-      <h2 className="text-xl font-semibold">Profile</h2>
+    <PrimaryContainer>
       <form
-        className="grid grid-cols-1 md:grid-cols-2 gap-[16px]"
+        className="flex flex-col gap-[24px] w-full"
         onSubmit={(e) => {
           e.preventDefault();
           updateUserDetails({
@@ -57,46 +75,17 @@ export default function ProfilePage() {
           });
         }}
       >
-        <div className="col-span-2">
-          <label className="block text-sm font-medium mb-1">
-            Full Name <span className="text-typography-negative">*</span>
-          </label>
-          <input
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-form-border"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-            type="text"
-            placeholder="Enter your full name"
-          />
-        </div>
-        <div className="col-span-2 lg:col-span-1">
-          <label className="block text-sm font-medium mb-1">
-            Email <span className="text-typography-negative">*</span>
-          </label>
-          <input
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-form-border"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            type="email"
-            placeholder="Enter your email"
-          />
-        </div>
-        <div className="col-span-2 lg:col-span-1">
-          <label className="block text-sm font-medium mb-1">Phone Number</label>
-          <input
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-primary border-form-border"
-            value={phone}
-            onChange={(e) => {
-              const onlyNums = e.target.value.replace(/\D/g, "");
-              setPhone(onlyNums);
-            }}
-            type="tel"
-            placeholder="Enter your phone number"
-          />
-        </div>
-        <div className="col-span-2 flex justify-end">
+        <ProfileFormTile
+          title="Profile"
+          userDetails={userDetails || undefined}
+          fullName={fullName}
+          setFullName={setFullName}
+          email={email}
+          setEmail={setEmail}
+          phone={phone}
+          setPhone={setPhone}
+        />
+        <div className="flex justify-end">
           <button
             type="submit"
             className="cursor-pointer bg-brand-primary text-white px-8 py-2 rounded-md font-medium hover:bg-brand-primary transition disabled:bg-cta-disabled disabled:text-typography-disabled"
@@ -111,6 +100,6 @@ export default function ProfilePage() {
           </button>
         </div>
       </form>
-    </div>
+    </PrimaryContainer>
   );
 }

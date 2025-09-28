@@ -31,11 +31,6 @@ import {
   getLegendLabelForPeriod,
 } from "@/features/summary/utils/summary-helper";
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
-import {
-  formatDateToStringUTCWithoutMs,
-  getDateRangeByTimePeriod,
-} from "@/shared/utils/helpers/date-helpers";
-import { DateRange } from "@/shared/domain/entities/models";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -60,9 +55,6 @@ export default function SummaryPage() {
     TimePeriod.Monthly
   );
   const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(EnergyUnit.KWH);
-  const [dateRange, setDateRange] = useState<DateRange>(
-    getDateRangeByTimePeriod(TimePeriod.Daily)
-  );
   const {
     data: usageSummary,
     error: errorSummary,
@@ -81,10 +73,6 @@ export default function SummaryPage() {
     usageHistory: electricityUsageHistory,
     loading: electricityUsageHistoryLoading,
     error: electricityUsageHistoryError,
-    pagination: electricityUsageHistoryPagination,
-    nextPage: electricityUsageHistoryNextPage,
-    previousPage: electricityUsageHistoryPreviousPage,
-    goToPage: electricityUsageHistoryGoToPage,
     fetchUsageHistory: fetchElectricityUsageHistory,
     reset: resetElectricityUsageHistory,
   } = useGetElectricityUsageHistory();
@@ -309,20 +297,8 @@ export default function SummaryPage() {
         />
         <ElectricUsageHistoryTable
           data={aggregateElectricityUsageByPeriod(electricityUsageHistory)}
-          dateRange={dateRange}
           className="lg:flex-1"
           loading={electricityUsageHistoryLoading}
-          pagination={electricityUsageHistoryPagination}
-          onModalNextPage={electricityUsageHistoryNextPage}
-          onModalPreviousPage={electricityUsageHistoryPreviousPage}
-          onModalPageChange={electricityUsageHistoryGoToPage}
-          onChangeDateRange={(dateRange) => {
-            console.log("Selected date range:", dateRange);
-            // fetchElectricityUsageHistory({
-            //   startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
-            //   endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
-            // });
-          }}
         />
       </div>
     </div>

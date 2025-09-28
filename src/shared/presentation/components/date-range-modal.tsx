@@ -1,10 +1,9 @@
 import { Modal } from "@/shared/presentation/components/modal";
 import { useState } from "react";
 import Image from "next/image";
-import { DayPicker, DateRange as DateRangeType } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import { DateRange } from "@/shared/domain/entities/models";
-
 import "react-day-picker/dist/style.css";
 import "@/features/summary/presentation/styles/date-range-modal.css";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
@@ -25,11 +24,6 @@ export function DateRangeModal({
   const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(
     dateRange
   );
-
-  const parsedDateRange: DateRangeType = {
-    from: dateRange.startDate,
-    to: dateRange.endDate,
-  };
 
   const handleClose = () => {
     setOpen(false);
@@ -59,7 +53,7 @@ export function DateRangeModal({
         )}
       </button>
       <Modal open={open} onClose={handleClose} zValue={51}>
-        <div className="p-4 w-auto">
+        <div className="p-4 w-auto max-h-[50vh]">
           {/* Replace below with your calendar picker */}
           <div className="flex flex-row">
             <DayPicker
@@ -68,8 +62,12 @@ export function DateRangeModal({
               navLayout="around"
               numberOfMonths={2}
               timeZone="Asia/Jakarta"
-              selected={parsedDateRange}
+              selected={{
+                from: selectedRange?.startDate,
+                to: selectedRange?.endDate,
+              }}
               onSelect={(range) => {
+                console.log("debugTest range", range);
                 if (range && range.from && range.to) {
                   setSelectedRange({
                     startDate: range.from,
@@ -82,15 +80,15 @@ export function DateRangeModal({
             />
           </div>
           {/* Footer */}
-          <div className="flex flex-grow justify-end gap-3 border-t border-t-default-border pt-[16px] mt-[16px]">
+          <div className="flex flex-grow justify-end gap-3 border-t border-t-default-border py-[16px] my-[16px]">
             <button
-              className="border rounded-lg px-4 py-1 text-typography-headline font-semibold"
+              className="border rounded-lg px-4 py-1 text-typography-headline font-semibold cursor-pointer"
               onClick={handleClose}
             >
               Cancel
             </button>
             <button
-              className="bg-leastric-primary text-white rounded-lg px-4 py-1 text-sm font-semibold"
+              className="bg-leastric-primary text-white rounded-lg px-4 py-1 text-sm font-semibold cursor-pointer"
               onClick={() => {
                 if (
                   selectedRange &&

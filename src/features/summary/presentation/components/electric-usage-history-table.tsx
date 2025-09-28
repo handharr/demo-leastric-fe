@@ -7,32 +7,18 @@ import { PeriodValueData } from "@/features/summary/domain/entities/summary-mode
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
-import { DateRange } from "@/shared/domain/entities/models";
 
 interface ElectricUsageHistoryTableProps {
   data: PeriodValueData[];
   className?: string;
   loading?: boolean;
-  pagination: PaginationModel;
-  dateRange: DateRange;
-  onModalNextPage: () => void;
-  onModalPreviousPage: () => void;
-  onModalPageChange: (page: number) => void;
-  onChangeDateRange?: (dateRange: DateRange) => void;
 }
 
 export function ElectricUsageHistoryTable({
   data,
   className,
   loading = false,
-  pagination,
-  dateRange,
-  onModalNextPage,
-  onModalPreviousPage,
-  onModalPageChange,
-  onChangeDateRange,
 }: ElectricUsageHistoryTableProps) {
   const TableContent = ({ isLoading }: { isLoading: boolean }) => {
     return (
@@ -102,17 +88,7 @@ export function ElectricUsageHistoryTable({
     <TilePrimary
       title="Electricity Usage History"
       description="Overview of electricity consumption trends."
-      topRightContent={
-        <ShowMoreElectricUsageModalButton
-          data={data}
-          pagination={pagination}
-          dateRange={dateRange}
-          onNextPage={onModalNextPage}
-          onPreviousPage={onModalPreviousPage}
-          onPageChange={onModalPageChange}
-          onChangeDateRange={onChangeDateRange}
-        />
-      }
+      topRightContent={<ShowMoreElectricUsageModalButton />}
       className={className || ""}
     >
       <div className="overflow-x-auto">

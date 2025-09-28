@@ -21,13 +21,15 @@ export function Pagination({
   return (
     <div className="w-full bg-gray-50 border-t rounded-b-xl">
       <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 text-gray-600 text-sm gap-2">
-        <span>
+        {/* Pagination info */}
+        <span className="shrink-0">
           Show{" "}
           <b>
             {start}-{end}
           </b>{" "}
           of <b>{itemCount}</b> data
         </span>
+        {/* Page controls */}
         <div className="flex items-center gap-1 overflow-x-auto">
           <button
             className="cursor-pointer p-1 rounded hover:bg-gray-200"

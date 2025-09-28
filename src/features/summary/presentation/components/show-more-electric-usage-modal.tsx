@@ -1,34 +1,63 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DateRangeModal } from "@/shared/presentation/components/date-range-modal";
-import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { Pagination } from "@/shared/presentation/components/pagination";
-import { getDateRangeByTimePeriod } from "@/shared/utils/helpers/date-helpers";
+import {
+  formatDateToStringUTCWithoutMs,
+  getDateRangeByTimePeriod,
+} from "@/shared/utils/helpers/date-helpers";
 import { TimePeriod } from "@/shared/domain/enum/enums";
 import { DateRange } from "@/shared/domain/entities/models";
+import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
+import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
+import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 
-export interface ShowMoreElectricUsageModalButtonProps {
-  data: PeriodValueData[];
-  pagination: PaginationModel;
-  dateRange?: DateRange;
-  onNextPage: () => void;
-  onPreviousPage: () => void;
-  onPageChange: (page: number) => void;
-  onChangeDateRange?: (dateRange: DateRange) => void;
-}
-
-export function ShowMoreElectricUsageModalButton({
-  data,
-  pagination,
-  dateRange = getDateRangeByTimePeriod(TimePeriod.Daily),
-  onNextPage,
-  onPreviousPage,
-  onPageChange,
-  onChangeDateRange,
-}: ShowMoreElectricUsageModalButtonProps) {
+export function ShowMoreElectricUsageModalButton() {
   const [open, setOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange>(
+    getDateRangeByTimePeriod(TimePeriod.Daily)
+  );
+  const { showPopup } = usePopup();
+  const {
+    usageHistory: electricityUsageHistory,
+    loading,
+    error,
+    pagination,
+    nextPage,
+    previousPage,
+    goToPage,
+    fetchUsageHistory,
+    reset,
+  } = useGetElectricityUsageHistory();
+
+  const data = aggregateElectricityUsageByPeriod(electricityUsageHistory);
+
+  useEffect(() => {
+    if (error) {
+      showPopup(
+        error || "Failed to fetch electricity usage history",
+        PopupType.ERROR
+      );
+      reset();
+    }
+  }, [error, showPopup, reset]);
+
+  useEffect(() => {
+    if (open) {
+      fetchUsageHistory({
+        startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+        endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+      });
+    } else {
+      reset();
+    }
+  }, [open, dateRange, fetchUsageHistory, reset]);
 
   return (
     <>
@@ -44,17 +73,24 @@ export function ShowMoreElectricUsageModalButton({
         onClickOutside={() => setOpen(false)}
         title="Electricity Usage History"
         description="This is for description"
+        zValue={52}
       >
-        <div className="w-auto max-h-[50vh] lg:max-h-[70vh] mb-[16px]">
+        {/* Content container */}
+        <div className="w-auto max-h-[50vh] lg:max-h-[50vh] mb-[16px]">
           {/* Date range filter placeholder */}
           <div className="mb-4">
             <DateRangeModal
               dateRange={dateRange}
               onApply={(range) => {
-                onChangeDateRange?.(range);
+                setDateRange(range);
+                fetchUsageHistory({
+                  startDate: formatDateToStringUTCWithoutMs(range.startDate),
+                  endDate: formatDateToStringUTCWithoutMs(range.endDate),
+                });
               }}
             />
           </div>
+          {/* Table content */}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -74,37 +110,60 @@ export function ShowMoreElectricUsageModalButton({
                 </tr>
               </thead>
               <tbody>
-                {data.map((record, index) => (
-                  <tr
-                    key={record.period}
-                    className="border-b border-gray-50 last:border-b-0"
-                  >
-                    <td className="py-3 px-2 text-sm text-typography-headline">
-                      {index + 1}.
-                    </td>
-                    <td className="py-3 px-2 text-sm text-typography-headline">
-                      {record.period}
-                    </td>
-                    <td className="py-3 px-2 text-sm text-typography-headline text-right">
-                      {optionalValue(record.totalKwh).orZero().toFixed(3)} kWh
-                    </td>
-                    <td className="py-3 px-2 text-sm text-typography-headline">
-                      {optionalValue(record.totalCO2Emission)
-                        .orZero()
-                        .toFixed(3)}{" "}
-                      kg
-                    </td>
-                  </tr>
-                ))}
+                {loading ? (
+                  <TableSkeletonLoading />
+                ) : (
+                  data.map((record, index) => (
+                    <tr
+                      key={record.period}
+                      className="border-b border-gray-50 last:border-b-0"
+                    >
+                      <td className="py-3 px-2 text-sm text-typography-headline">
+                        {index + 1}.
+                      </td>
+                      <td className="py-3 px-2 text-sm text-typography-headline">
+                        {record.period}
+                      </td>
+                      <td className="py-3 px-2 text-sm text-typography-headline text-right">
+                        {formatNumberIndonesian(
+                          optionalValue(record.totalKwh).orZero()
+                        )}{" "}
+                        kWh
+                      </td>
+                      <td className="py-3 px-2 text-sm text-typography-headline text-right">
+                        {formatNumberIndonesian(
+                          optionalValue(record.totalCO2Emission).orZero()
+                        )}{" "}
+                        kg
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
           {/* Pagination */}
           <Pagination
             model={pagination}
-            onNextPage={onNextPage}
-            onPageChange={onPageChange}
-            onPreviousPage={onPreviousPage}
+            onNextPage={() =>
+              nextPage({
+                startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+                endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+              })
+            }
+            onPageChange={(page) =>
+              goToPage({
+                page,
+                startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+                endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+              })
+            }
+            onPreviousPage={() =>
+              previousPage({
+                startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+                endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+              })
+            }
           />
         </div>
       </Modal>

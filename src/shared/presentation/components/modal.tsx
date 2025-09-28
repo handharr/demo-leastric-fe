@@ -9,6 +9,7 @@ interface ModalProps {
   title?: string;
   description?: string;
   onClickOutside?: () => void;
+  zValue?: number;
 }
 
 export function Modal({
@@ -18,6 +19,7 @@ export function Modal({
   title,
   description,
   onClickOutside,
+  zValue = 50,
 }: ModalProps) {
   const sidebarWidth = useSidebarWidth();
   const [isMobile, setIsMobile] = useState(false);
@@ -36,7 +38,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
+      className={`fixed inset-0 z-${zValue} flex items-center justify-center bg-black/30 p-4`}
       onClick={() => {
         if (onClickOutside) {
           onClickOutside();

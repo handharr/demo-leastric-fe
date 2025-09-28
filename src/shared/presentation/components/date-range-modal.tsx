@@ -1,31 +1,35 @@
 import { Modal } from "@/shared/presentation/components/modal";
 import { useState } from "react";
 import Image from "next/image";
-import { DayPicker, DateRange } from "react-day-picker";
-import { format, parseISO } from "date-fns";
+import { DayPicker, DateRange as DateRangeType } from "react-day-picker";
+import { format } from "date-fns";
+import { DateRange } from "@/shared/domain/entities/models";
 
 import "react-day-picker/dist/style.css";
 import "@/features/summary/presentation/styles/date-range-modal.css";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 interface DateRangeModalProps {
   onClose?: () => void;
-  startDate: string;
-  endDate: string;
-  onApply: (start: string, end: string) => void;
+  dateRange: DateRange;
+  onApply: (range: DateRange) => void;
 }
 
 export function DateRangeModal({
   onClose,
-  startDate,
-  endDate,
+  dateRange,
   onApply,
 }: DateRangeModalProps) {
   // For demo, use local state for selection. In real use, replace with a calendar picker.
   const [open, setOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>({
-    from: parseISO(startDate),
-    to: parseISO(endDate),
-  });
+  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(
+    dateRange
+  );
+
+  const parsedDateRange: DateRangeType = {
+    from: dateRange.startDate,
+    to: dateRange.endDate,
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -35,7 +39,7 @@ export function DateRangeModal({
   return (
     <>
       <button
-        className="border rounded-md px-3 py-1 text-sm flex items-center gap-2"
+        className="border rounded-md px-3 py-1 text-sm flex items-center gap-2 cursor-pointer"
         onClick={() => setOpen(!open)}
       >
         <Image
@@ -44,9 +48,17 @@ export function DateRangeModal({
           width={16}
           height={16}
         />
-        {startDate} - {endDate}
+        {format(
+          optionalValue(dateRange.startDate).orDefault(new Date()),
+          "yyyy-MM-dd"
+        )}{" "}
+        -{" "}
+        {format(
+          optionalValue(dateRange.endDate).orDefault(new Date()),
+          "yyyy-MM-dd"
+        )}
       </button>
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={open} onClose={handleClose} zValue={51}>
         <div className="p-4 w-auto">
           {/* Replace below with your calendar picker */}
           <div className="flex flex-row">
@@ -56,8 +68,17 @@ export function DateRangeModal({
               navLayout="around"
               numberOfMonths={2}
               timeZone="Asia/Jakarta"
-              selected={selectedRange}
-              onSelect={setSelectedRange}
+              selected={parsedDateRange}
+              onSelect={(range) => {
+                if (range && range.from && range.to) {
+                  setSelectedRange({
+                    startDate: range.from,
+                    endDate: range.to,
+                  });
+                } else {
+                  setSelectedRange(undefined);
+                }
+              }}
             />
           </div>
           {/* Footer */}
@@ -71,16 +92,19 @@ export function DateRangeModal({
             <button
               className="bg-leastric-primary text-white rounded-lg px-4 py-1 text-sm font-semibold"
               onClick={() => {
-                if (selectedRange && selectedRange.from && selectedRange.to) {
-                  onApply(
-                    format(selectedRange.from, "yyyy-MM-dd"),
-                    format(selectedRange.to, "yyyy-MM-dd")
-                  );
+                if (
+                  selectedRange &&
+                  selectedRange.startDate &&
+                  selectedRange.endDate
+                ) {
+                  onApply(selectedRange);
                   handleClose();
                 }
               }}
               disabled={
-                !selectedRange || !selectedRange.from || !selectedRange.to
+                !selectedRange ||
+                !selectedRange.startDate ||
+                !selectedRange.endDate
               }
             >
               Apply

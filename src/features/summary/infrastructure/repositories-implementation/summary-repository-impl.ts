@@ -123,7 +123,7 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     }
 
     Logger.info("SummaryRepositoryImpl", "getElectricityUsage result", result);
-    const usages = optionalValue(result.data?.usage?.data).orEmptyArray();
+    const usages = optionalValue(result.data?.usage).orEmptyArray();
     Logger.info("SummaryRepositoryImpl", "Parsed usages", usages);
     if (result.flash?.type === "success") {
       try {
@@ -200,7 +200,7 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     }
 
     Logger.info("SummaryRepositoryImpl", "getElectricityUsage result", result);
-    const usages = optionalValue(result.data?.usage?.data).orEmptyArray();
+    const usages = optionalValue(result.data?.usage).orEmptyArray();
     Logger.info("SummaryRepositoryImpl", "Parsed usages", usages);
     if (result.flash?.type === "success") {
       try {

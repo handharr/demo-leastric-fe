@@ -1,30 +1,34 @@
 import { useState } from "react";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DateRangeModal } from "@/shared/presentation/components/date-range-modal";
-import { format } from "date-fns";
 import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { Pagination } from "@/shared/presentation/components/pagination";
+import { getDateRangeByTimePeriod } from "@/shared/utils/helpers/date-helpers";
+import { TimePeriod } from "@/shared/domain/enum/enums";
+import { DateRange } from "@/shared/domain/entities/models";
 
 export interface ShowMoreElectricUsageModalButtonProps {
   data: PeriodValueData[];
   pagination: PaginationModel;
+  dateRange?: DateRange;
   onNextPage: () => void;
   onPreviousPage: () => void;
   onPageChange: (page: number) => void;
+  onChangeDateRange?: (dateRange: DateRange) => void;
 }
 
 export function ShowMoreElectricUsageModalButton({
   data,
   pagination,
+  dateRange = getDateRangeByTimePeriod(TimePeriod.Daily),
   onNextPage,
   onPreviousPage,
   onPageChange,
+  onChangeDateRange,
 }: ShowMoreElectricUsageModalButtonProps) {
   const [open, setOpen] = useState(false);
-  const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [endDate, setEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   return (
     <>
@@ -45,11 +49,9 @@ export function ShowMoreElectricUsageModalButton({
           {/* Date range filter placeholder */}
           <div className="mb-4">
             <DateRangeModal
-              startDate={startDate}
-              endDate={endDate}
-              onApply={(start, end) => {
-                setStartDate(start);
-                setEndDate(end);
+              dateRange={dateRange}
+              onApply={(range) => {
+                onChangeDateRange?.(range);
               }}
             />
           </div>

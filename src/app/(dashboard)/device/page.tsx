@@ -16,12 +16,16 @@ import { FilterOption } from "@/shared/presentation/types/filter-ui";
 import { useGetDevicesStatus } from "@/features/device/presentation/hooks/use-get-devices-status";
 import { useEffect } from "react";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
 
 export default function DevicePage() {
   const {
     devices,
     loading,
-    error,
+    error: getDevicesError,
     pagination,
     search,
     activeFilters,
@@ -31,13 +35,22 @@ export default function DevicePage() {
     reloadDevices,
     setSearch,
     setActiveFilters,
+    reset: getDevicesReset,
   } = useDevices();
-  const { data: locations, isLoading: getLocationsLoading } = useGetLocations();
+  const {
+    data: locations,
+    isLoading: getLocationsLoading,
+    error: getLocationsError,
+    reset: getLocationsReset,
+  } = useGetLocations();
   const {
     devicesStatus,
     loading: getStatusLoading,
+    error: getStatusError,
     refetch: fetchDevicesStatus,
+    reset: resetDevicesStatus,
   } = useGetDevicesStatus();
+  const { showPopup } = usePopup();
 
   useEffect(() => {
     fetchDevicesStatus();
@@ -60,6 +73,37 @@ export default function DevicePage() {
 
   // Update filter meta with dynamic options
   const deviceFilterMeta = getDeviceFiltersMeta({ options });
+
+  useEffect(() => {
+    if (getDevicesError) {
+      showPopup(getDevicesError || "Failed to fetch devices", PopupType.ERROR);
+      getDevicesReset();
+    }
+
+    if (getLocationsError) {
+      showPopup(
+        getLocationsError.message || "Failed to fetch device locations",
+        PopupType.ERROR
+      );
+      getLocationsReset();
+    }
+
+    if (getStatusError) {
+      showPopup(
+        getStatusError || "Failed to fetch devices status",
+        PopupType.ERROR
+      );
+      resetDevicesStatus();
+    }
+  }, [
+    getDevicesError,
+    showPopup,
+    resetDevicesStatus,
+    getLocationsError,
+    getLocationsReset,
+    getDevicesReset,
+    getStatusError,
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px] bg-gray-50">
@@ -123,7 +167,6 @@ export default function DevicePage() {
           devices={devices}
           devicesStatus={optionalValue(devicesStatus?.devices).orEmptyArray()}
           loading={loading || getStatusLoading || getLocationsLoading}
-          error={error}
           onEditSuccess={() => reloadDevices()}
         />
         {/* Pagination */}

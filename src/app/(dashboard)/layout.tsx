@@ -27,6 +27,11 @@ const MENU_ITEMS: SidebarMenuItemProps[] = [
     route: "/report",
   },
   {
+    label: "Mqtt Log",
+    iconSource: "/resources/icons/document/list-2.svg",
+    route: "/mqtt-log",
+  },
+  {
     label: "Device",
     iconSource: "/resources/icons/device/device.svg",
     route: "/device",

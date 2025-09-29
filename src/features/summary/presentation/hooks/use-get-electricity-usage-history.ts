@@ -17,9 +17,29 @@ export interface UseGetElectricityUsageHistoryReturn {
   loading: boolean;
   error: string | null;
   pagination: PaginationModel;
-  nextPage: () => void;
-  previousPage: () => void;
-  goToPage: (page: number) => void;
+  nextPage: ({
+    startDate,
+    endDate,
+  }: {
+    startDate: string;
+    endDate: string;
+  }) => void;
+  previousPage: ({
+    startDate,
+    endDate,
+  }: {
+    startDate: string;
+    endDate: string;
+  }) => void;
+  goToPage: ({
+    page,
+    startDate,
+    endDate,
+  }: {
+    page: number;
+    startDate: string;
+    endDate: string;
+  }) => void;
   reload: () => void;
   fetchUsageHistory: (
     params: Partial<GetElectricityUsageHistoryQueryParams>
@@ -98,35 +118,49 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
     [fetchUsageHistoryInternal]
   );
 
-  const nextPage = useCallback(() => {
-    if (!pagination.hasNextPage) return;
-    const newPage = pagination.page + 1;
-    setPagination((prev) => ({
-      ...prev,
-      page: newPage,
-    }));
-    fetchUsageHistory({ page: newPage });
-  }, [pagination.hasNextPage, pagination.page, fetchUsageHistory]);
+  const nextPage = useCallback(
+    ({ startDate, endDate }: { startDate: string; endDate: string }) => {
+      if (!pagination.hasNextPage) return;
+      const newPage = pagination.page + 1;
+      setPagination((prev) => ({
+        ...prev,
+        page: newPage,
+      }));
+      fetchUsageHistory({ page: newPage, startDate, endDate });
+    },
+    [pagination.hasNextPage, pagination.page, fetchUsageHistory]
+  );
 
-  const previousPage = useCallback(() => {
-    if (!pagination.hasPreviousPage) return;
-    const newPage = Math.max(pagination.page - 1, 1);
-    setPagination((prev) => ({
-      ...prev,
-      page: newPage,
-    }));
-    fetchUsageHistory({ page: newPage });
-  }, [pagination.hasPreviousPage, pagination.page, fetchUsageHistory]);
+  const previousPage = useCallback(
+    ({ startDate, endDate }: { startDate: string; endDate: string }) => {
+      if (!pagination.hasPreviousPage) return;
+      const newPage = Math.max(pagination.page - 1, 1);
+      setPagination((prev) => ({
+        ...prev,
+        page: newPage,
+      }));
+      fetchUsageHistory({ page: newPage, startDate, endDate });
+    },
+    [pagination.hasPreviousPage, pagination.page, fetchUsageHistory]
+  );
 
   const goToPage = useCallback(
-    (page: number) => {
+    ({
+      page,
+      startDate,
+      endDate,
+    }: {
+      page: number;
+      startDate: string;
+      endDate: string;
+    }) => {
       if (page < 1 || page > pagination.pageCount) return;
       if (page === pagination.page) return;
       setPagination((prev) => ({
         ...prev,
         page: page,
       }));
-      fetchUsageHistory({ page });
+      fetchUsageHistory({ page, startDate, endDate });
     },
     [pagination.pageCount, pagination.page, fetchUsageHistory]
   );

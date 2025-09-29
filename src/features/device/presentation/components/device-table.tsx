@@ -7,12 +7,12 @@ import {
   DeviceStatusModel,
 } from "@/features/device/domain/entities/device-model";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
+import { EmptyData } from "@/shared/presentation/components/empty-data";
 
 interface DeviceTableProps {
   devices: DeviceModel[];
   devicesStatus: DeviceStatusModel[];
   loading: boolean;
-  error: string | null;
   onEditSuccess?: () => void;
 }
 
@@ -20,19 +20,13 @@ export function DeviceTable({
   devices,
   devicesStatus,
   loading,
-  error,
   onEditSuccess,
 }: DeviceTableProps) {
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-40 text-typography-negative">
-        {error}
-      </div>
-    );
-  }
-
   const devicesArray = Array.isArray(devices) ? devices : [];
-  console.log("DebugTest devicesStatus:", devicesStatus);
+
+  if (devicesArray.length === 0 && !loading) {
+    return <EmptyData />;
+  }
 
   return (
     <div className="overflow-x-auto bg-white rounded-xl shadow border">
@@ -55,14 +49,6 @@ export function DeviceTable({
             devicesArray.map((d, i) => {
               const status = devicesStatus?.find((s) => s.device.id === d.id);
               const isOnline = optionalValue(status?.isOnline).orFalse();
-              console.log(
-                "DebugTest Device",
-                d.deviceName,
-                "Device id:",
-                d.id,
-                "isOnline:",
-                isOnline
-              );
               return (
                 <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                   <td className="px-4 py-3">{d.deviceName}</td>

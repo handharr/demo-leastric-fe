@@ -24,6 +24,7 @@ export interface UseDevicesReturn {
   reloadDevices: () => void;
   setSearch: (search: string) => void;
   setActiveFilters: (filters: DeviceFilterState) => void;
+  reset: () => void;
 }
 
 // Custom debounce hook
@@ -178,6 +179,23 @@ export function useDevices(): UseDevicesReturn {
     pagination.size,
   ]);
 
+  const reset = useCallback(() => {
+    setDevices([]);
+    setLoading(true);
+    setError(null);
+    setPagination({
+      page: 1,
+      take: 10,
+      itemCount: 10,
+      pageCount: 1,
+      hasPreviousPage: false,
+      hasNextPage: false,
+      size: 10,
+    });
+    setSearch("");
+    setActiveFilters(deviceFilterDefaultValue());
+  }, []);
+
   return {
     devices,
     loading,
@@ -192,5 +210,6 @@ export function useDevices(): UseDevicesReturn {
     reloadDevices,
     setSearch,
     setActiveFilters,
+    reset,
   };
 }

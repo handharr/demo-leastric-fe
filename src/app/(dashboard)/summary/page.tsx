@@ -73,10 +73,6 @@ export default function SummaryPage() {
     usageHistory: electricityUsageHistory,
     loading: electricityUsageHistoryLoading,
     error: electricityUsageHistoryError,
-    pagination: electricityUsageHistoryPagination,
-    nextPage: electricityUsageHistoryNextPage,
-    previousPage: electricityUsageHistoryPreviousPage,
-    goToPage: electricityUsageHistoryGoToPage,
     fetchUsageHistory: fetchElectricityUsageHistory,
     reset: resetElectricityUsageHistory,
   } = useGetElectricityUsageHistory();
@@ -303,10 +299,6 @@ export default function SummaryPage() {
           data={aggregateElectricityUsageByPeriod(electricityUsageHistory)}
           className="lg:flex-1"
           loading={electricityUsageHistoryLoading}
-          pagination={electricityUsageHistoryPagination}
-          onModalNextPage={electricityUsageHistoryNextPage}
-          onModalPreviousPage={electricityUsageHistoryPreviousPage}
-          onModalPageChange={electricityUsageHistoryGoToPage}
         />
       </div>
     </div>

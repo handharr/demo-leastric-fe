@@ -9,6 +9,7 @@ interface ModalProps {
   title?: string;
   description?: string;
   onClickOutside?: () => void;
+  zValue?: number;
 }
 
 export function Modal({
@@ -18,6 +19,7 @@ export function Modal({
   title,
   description,
   onClickOutside,
+  zValue = 50,
 }: ModalProps) {
   const sidebarWidth = useSidebarWidth();
   const [isMobile, setIsMobile] = useState(false);
@@ -36,15 +38,21 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
-      onClick={() => {
-        if (onClickOutside) {
-          onClickOutside();
-        }
-      }}
+      className={`fixed inset-0 z-${zValue} flex items-center justify-center p-4`}
       style={{ left: isMobile ? "0px" : `${sidebarWidth}px` }}
     >
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md max-h-full overflow-auto flex flex-col">
+      {/* Overlay background - separate from content */}
+      <div
+        className="absolute inset-0 bg-black/30"
+        onClick={() => {
+          if (onClickOutside) {
+            onClickOutside();
+          }
+        }}
+      />
+
+      {/* Modal content - same hierarchy as overlay */}
+      <div className="relative bg-white rounded-xl shadow-lg w-full max-w-md max-h-full overflow-auto flex flex-col">
         {title && (
           <div className="flex justify-between p-4 items-center border-b border-gray-100">
             <div className="flex-1 min-w-0">
@@ -67,7 +75,9 @@ export function Modal({
             </button>
           </div>
         )}
-        <div className="px-6 pb-6 pt-4 overflow-auto">{children}</div>
+        <div className="px-[16px] py-[16px] my-[16px] overflow-auto">
+          {children}
+        </div>
       </div>
     </div>
   );

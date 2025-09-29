@@ -27,7 +27,7 @@ export function ReportTable({
   previousPage,
   nextPage,
 }: ReportTableProps) {
-  const isAllSelected = selectedIds.length === data.length;
+  const isAllSelected = selectedIds.length === data.length && data.length > 0;
 
   return (
     <div className="w-full">

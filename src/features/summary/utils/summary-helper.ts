@@ -1,12 +1,16 @@
 import {
   ElectricityUsageModel,
-  PeriodValueData,
+  PeriodValueModel,
 } from "@/features/summary/domain/entities/summary-models";
 import { TimePeriod } from "@/shared/domain/enum/enums";
+import {
+  formatDateToStringUTCWithoutMs,
+  getStartAndEndDateOfYear,
+} from "@/shared/utils/helpers/date-helpers";
 
 export function aggregateElectricityUsageByPeriod(
   usageData: ElectricityUsageModel[]
-): PeriodValueData[] {
+): PeriodValueModel[] {
   if (!usageData || usageData.length === 0) {
     return [];
   }
@@ -24,7 +28,7 @@ export function aggregateElectricityUsageByPeriod(
   });
 
   // Aggregate grouped data
-  const result: PeriodValueData[] = [];
+  const result: PeriodValueModel[] = [];
 
   groupedData.forEach((usages, periodKey) => {
     const totalKwh = usages.reduce(
@@ -152,8 +156,8 @@ export function mergeCurrentAndLastPeriodData({
   lastData,
   period,
 }: {
-  currentData: PeriodValueData[];
-  lastData: PeriodValueData[] | null;
+  currentData: PeriodValueModel[];
+  lastData: PeriodValueModel[] | null;
   period: TimePeriod;
 }): { period: string; value: number | null; comparedValue: number | null }[] {
   if (!currentData) return [];
@@ -166,4 +170,13 @@ export function mergeCurrentAndLastPeriodData({
     };
   });
   return mergedData;
+}
+
+export function getStartAndEndDateFormattedUTCWithoutMsFromYear(year: number) {
+  const dateRange = getStartAndEndDateOfYear(year);
+
+  return {
+    startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+    endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+  };
 }

@@ -46,7 +46,7 @@ export interface GetUsageSummaryModel {
   singlePhase: UsageSummaryModel;
 }
 
-export interface PeriodValueData {
+export interface PeriodValueModel {
   period: string;
   avgVoltage: number;
   avgVoltageLine: number;
@@ -61,5 +61,5 @@ export interface DeviceUsageData {
   deviceId: string;
   deviceName: string;
   deviceType: string;
-  data: PeriodValueData[];
+  data: PeriodValueModel[];
 }

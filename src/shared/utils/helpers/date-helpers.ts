@@ -12,6 +12,16 @@ export function formatDateToStringUTCWithoutMs(date: Date): string {
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 }
 
+export function getStartAndEndDateOfYear(year: number): DateRange {
+  const startDate = new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0)); // January 1st
+  const endDate = new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999)); // December 31st
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
 export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -81,4 +91,15 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
     default:
       throw new Error(`Unsupported time period: ${timePeriod}`);
   }
+}
+
+export function get10YearsRangeFromCurrentYear(): string[] {
+  const currentYear = new Date().getFullYear();
+  const years: string[] = [];
+
+  for (let i = 0; i < 10; i++) {
+    years.push((currentYear - i).toString());
+  }
+
+  return years;
 }

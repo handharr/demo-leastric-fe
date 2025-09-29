@@ -3,14 +3,14 @@ import "react-day-picker/dist/style.css";
 
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { ShowMoreElectricUsageModalButton } from "@/features/summary/presentation/components/show-more-electric-usage-modal";
-import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
+import { PeriodValueModel } from "@/features/summary/domain/entities/summary-models";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
 
 interface ElectricUsageHistoryTableProps {
-  data: PeriodValueData[];
+  data: PeriodValueModel[];
   className?: string;
   loading?: boolean;
 }

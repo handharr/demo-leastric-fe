@@ -1,6 +1,6 @@
 "use client";
 
-import { ReportTable } from "@/features/report/components/report-table";
+import { ReportTable } from "@/features/summary/presentation/components/report-table";
 import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/active-filters-container";
 import { GenericFilterModal } from "@/shared/presentation/components/filter/generic-filter-modal";
 import {
@@ -8,12 +8,71 @@ import {
   reportFilterMeta,
   ReportFilterState,
 } from "@/features/setting/presentation/components/report-filter-modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
+import {
+  aggregateElectricityUsageByPeriod,
+  getStartAndEndDateFormattedUTCWithoutMsFromYear,
+} from "@/features/summary/utils/summary-helper";
+import { DateRange } from "@/shared/domain/entities/models";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
+import {
+  formatDateToStringUTCWithoutMs,
+  getDateRangeByTimePeriod,
+} from "@/shared/utils/helpers/date-helpers";
+import { TimePeriod } from "@/shared/domain/enum/enums";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 export default function ReportPage() {
   const [activeFilters, setActiveFilters] = useState<ReportFilterState>(
     reportFilterDefaultValue()
   );
+  const {
+    usageHistory,
+    loading,
+    error,
+    pagination,
+    nextPage,
+    previousPage,
+    goToPage,
+    fetchUsageHistory,
+    reset,
+  } = useGetElectricityUsageHistory();
+  const { showPopup } = usePopup();
+
+  const getDateRange = (): DateRange => {
+    return getDateRangeByTimePeriod(TimePeriod.Yearly);
+  };
+
+  useEffect(() => {
+    if (error) {
+      showPopup(
+        error || "Failed to fetch electricity usage history",
+        PopupType.ERROR
+      );
+      reset();
+    }
+  }, [error, showPopup, reset]);
+
+  useEffect(() => {
+    console.log("[debugTest] activeFilters changed: ", activeFilters);
+    const selectedYear = optionalValue(
+      activeFilters.singleSelection?.year
+    ).orDefault(new Date().getFullYear().toString());
+    const dateRangeFromYear = getStartAndEndDateFormattedUTCWithoutMsFromYear(
+      parseInt(selectedYear, 10)
+    );
+    console.log("[debugTest] dateRangeFromYear: ", dateRangeFromYear);
+    fetchUsageHistory({
+      page: 1,
+      startDate: dateRangeFromYear.startDate,
+      endDate: dateRangeFromYear.endDate,
+      period: TimePeriod.Monthly,
+    });
+  }, [fetchUsageHistory, activeFilters]);
 
   return (
     <div className="flex min-h-screen space-y-[16px] flex-col">
@@ -49,7 +108,33 @@ export default function ReportPage() {
       />
 
       {/* Report Table */}
-      <ReportTable />
+      <ReportTable
+        data={aggregateElectricityUsageByPeriod(usageHistory)}
+        pagination={pagination}
+        isLoading={loading}
+        gotoPage={(page) => {
+          const dateRange = getDateRange();
+          goToPage({
+            page,
+            startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+            endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+          });
+        }}
+        previousPage={() => {
+          const dateRange = getDateRange();
+          previousPage({
+            startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+            endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+          });
+        }}
+        nextPage={() => {
+          const dateRange = getDateRange();
+          nextPage({
+            startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+            endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+          });
+        }}
+      />
     </div>
   );
 }

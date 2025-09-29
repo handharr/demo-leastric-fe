@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # Frontend Application
+  frontend:
+    image: ${ECR_FE_IMAGE:-your-account-id.dkr.ecr.us-east-1.amazonaws.com/leastric-fe-production:production-latest}
+    container_name: leastric-fe-production
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    env_file:
+      - .env.production
+    restart: unless-stopped
+    depends_on:
+      - worker
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.lifecycle.pre-update=docker exec leastric-fe-production sh -c 'echo Frontend pre-update hook executed at $(date)'"
+      - "com.centurylinklabs.watchtower.lifecycle.post-update=docker exec leastric-fe-production sh -c 'echo Frontend post-update hook executed at $(date)'"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 450M
+          cpus: '1.0'
+        reservations:
+          memory: 200M
+          cpus: '0.25'
+    networks:
+      - leastric-network
+
+  # Background Worker
+  worker:
+    image: ${ECR_WORKER_IMAGE:-your-account-id.dkr.ecr.us-east-1.amazonaws.com/leastric-worker-production:production-latest}
+    container_name: leastric-worker-production
+    env_file:
+      - .env.production
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "com.centurylinklabs.watchtower.lifecycle.pre-update=docker exec leastric-worker-production sh -c 'echo Worker pre-update hook executed at $(date)'"
+      - "com.centurylinklabs.watchtower.lifecycle.post-update=docker exec leastric-worker-production sh -c 'echo Worker post-update hook executed at $(date)'"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 350M
+          cpus: '0.8'
+        reservations:
+          memory: 100M
+          cpus: '0.1'
+    networks:
+      - leastric-network
+
+  # Watchtower for automatic updates
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower-production
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json:ro
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_REVIVE_STOPPED=false
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_NOTIFICATIONS=slack
+      - WATCHTOWER_NOTIFICATION_SLACK_HOOK_URL=${SLACK_WEBHOOK_URL}
+      - WATCHTOWER_NOTIFICATION_SLACK_IDENTIFIER=watchtower-production
+      - WATCHTOWER_ROLLING_RESTART=true
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+          cpus: '0.2'
+        reservations:
+          memory: 32M
+          cpus: '0.05'
+    networks:
+      - leastric-network
+
+networks:
+  leastric-network:
+    driver: bridge
+    name: leastric-production
+
+volumes:
+  worker-data:
+    driver: local

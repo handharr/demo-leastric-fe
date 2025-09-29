@@ -7,8 +7,9 @@ services:
       dockerfile: Dockerfile
       args:
         - APP_PORT=${APP_PORT:-3000}
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
     ports:
-      - "${APP_PORT:-3000}:${APP_PORT:-3000}"
+      - "${APP_PORT:-3000}:3000"
     env_file:
       - .env
     restart: unless-stopped
@@ -16,6 +17,8 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
       - "com.centurylinklabs.watchtower.lifecycle.pre-update=docker exec leastric-fe-app-1 sh -c 'echo Pre-update hook executed'"
       - "com.centurylinklabs.watchtower.lifecycle.post-update=docker exec leastric-fe-app-1 sh -c 'echo Post-update hook executed'"
+    networks:
+      - frontend-leastric-network
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:${APP_PORT:-3000}/api/health"]
       interval: 30s
@@ -23,20 +26,48 @@ services:
       retries: 3
       start_period: 40s
 
-  # Development service with hot reload
-  dev:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    ports:
-      - "${APP_PORT:-3001}:${APP_PORT:-3001}"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/.next
-    env_file:
-      - .env
-    environment:
-      - NODE_ENV=development
-    profiles:
-      - dev
+  # watchtower:
+  #   image: containrrr/watchtower:latest
+  #   container_name: leastric-frontend-watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /root/.docker/config.json:/config.json:ro
+  #   environment:
+  #     # Core Watchtower configuration
+  #     WATCHTOWER_CLEANUP: "true"
+  #     WATCHTOWER_REMOVE_VOLUMES: "false" 
+  #     WATCHTOWER_INCLUDE_STOPPED: "false"
+  #     WATCHTOWER_INCLUDE_RESTARTING: "true"
+  #     WATCHTOWER_POLL_INTERVAL: "30"      # Check every 5 minutes
+  #     WATCHTOWER_TIMEOUT: "45s"           # Wait 45s for container to stop
+  #     WATCHTOWER_ROLLING_RESTART: "true"  # Update one container at a time
+  #     WATCHTOWER_NO_STARTUP_MESSAGE: "false"
+  #     WATCHTOWER_DEBUG: "true"
+  #     # Only monitor containers with the watchtower.enable=true label
+  #     WATCHTOWER_LABEL_ENABLE: "true"
+  #     # Lifecycle hooks for pre/post update actions
+  #     WATCHTOWER_LIFECYCLE_HOOKS: "true"
+  #   # Notification settings (optional)
+  #     # WATCHTOWER_NOTIFICATIONS: "${WATCHTOWER_NOTIFICATIONS:-}"
+  #     # WATCHTOWER_NOTIFICATION_SLACK_HOOK_URL: "${SLACK_WEBHOOK_URL:-}"
+  #     # WATCHTOWER_NOTIFICATION_SLACK_IDENTIFIER: "Leastric Staging Watchtower"
+  #     # WATCHTOWER_NOTIFICATION_SLACK_CHANNEL: "#deployments"
+  #   command: >
+  #     --cleanup
+  #     --remove-volumes=false
+  #     --include-stopped=false
+  #     --include-restarting=true
+  #     --rolling-restart=true
+  #     --stop-timeout=45s
+  #     --label-enable
+  #     --debug
+  #   restart: unless-stopped
+  #   labels:
+  #     - "com.centurylinklabs.watchtower.enable=false"  # Don't watch watchtower itself
+  #   networks:
+  #     - frontend-leastric-network
+
+networks:
+  frontend-leastric-network:
+    name: leastric-global-network
+    external: true

@@ -22,6 +22,19 @@ export function getStartAndEndDateOfYear(year: number): DateRange {
   };
 }
 
+export function getStartAndEndDateOfMonthFromDate(date: Date): DateRange {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth(); // 0-based (0 = January, 11 = December)
+
+  const startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
+  const endDate = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999)); // Last day of the month
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
 export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
   const now = new Date();
   const currentYear = now.getFullYear();

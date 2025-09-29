@@ -18,3 +18,8 @@ export interface GetElectricityUsageHistoryQueryParams {
   page?: number; // Page number for pagination
   size?: number; // Number of items per page
 }
+
+export interface GetExportToCsvQueryParams {
+  startDate?: string; // ISO 8601 format
+  endDate?: string; // ISO 8601 format
+}

@@ -8,6 +8,7 @@ import {
 import {
   GetUsageSummaryResponse,
   GetElectricityUsageResponse,
+  GetExportToCsvResponse,
 } from "@/features/summary/infrastructure/models/summary-responses";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
 import { AxiosError } from "axios";
@@ -94,6 +95,29 @@ export class RemoteSummaryDataSource implements SummaryDataSource {
       return this.apiClient.handleError(
         error as AxiosError<BaseErrorResponse>,
         "Failed to fetch electricity usage history. Please try again."
+      );
+    }
+  }
+
+  async getExportToCsv({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<BaseResponse<GetExportToCsvResponse> | BaseErrorResponse> {
+    try {
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
+      return await this.apiClient.get(`v1/readings/export-csv`, params, {
+        headers,
+      });
+    } catch (error) {
+      Logger.error("Error exporting to CSV", error);
+      return this.apiClient.handleError(
+        error as AxiosError<BaseErrorResponse>,
+        "Failed to export to CSV. Please try again."
       );
     }
   }

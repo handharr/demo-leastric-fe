@@ -63,3 +63,14 @@ export interface DeviceUsageData {
   deviceType: string;
   data: PeriodValueModel[];
 }
+
+export interface GetExportToCsvModel {
+  message: string;
+  fileUrl: string;
+  fileName: string;
+  recordCount: number;
+}
+
+export interface ExportToCsvDownloadModel {
+  count: number;
+}

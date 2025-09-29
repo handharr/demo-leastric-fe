@@ -35,3 +35,10 @@ export interface GetUsageSummaryResponse {
 export interface GetElectricityUsageResponse {
   usage?: ElectricityUsageResponse[];
 }
+
+export interface GetExportToCsvResponse {
+  message?: string;
+  fileUrl?: string;
+  fileName?: string;
+  recordCount?: number;
+}

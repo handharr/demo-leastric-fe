@@ -2,12 +2,14 @@ import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import {
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
+  GetExportToCsvModel,
   GetUsageSummaryModel,
 } from "@/features/summary/domain/entities/summary-models";
 import {
   GetUsageSummaryQueryParams,
   GetElectricityUsageQueryParams,
   GetElectricityUsageHistoryQueryParams,
+  GetExportToCsvQueryParams,
 } from "@/features/summary/domain/params/query-params";
 
 export interface SummaryRepository {
@@ -26,4 +28,9 @@ export interface SummaryRepository {
   }: {
     queryParam: GetElectricityUsageHistoryQueryParams;
   }): Promise<GetElectricityUsageHistoryModel | BaseErrorModel>;
+  getExportToCsv({
+    queryParam,
+  }: {
+    queryParam: GetExportToCsvQueryParams;
+  }): Promise<GetExportToCsvModel | BaseErrorModel>;
 }

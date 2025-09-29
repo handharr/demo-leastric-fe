@@ -53,6 +53,7 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
       let startDate = params.startDate;
       let endDate = params.endDate;
       const period = params.period || TimePeriod.Daily;
+      const size = optionalValue(params.size).orDefault(10);
 
       if (!startDate || !endDate) {
         const dateRange = getDateRangeByTimePeriod(TimePeriod.Daily);
@@ -65,7 +66,7 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
         startDate,
         endDate,
         period: period.toLocaleLowerCase(),
-        size: 10,
+        size,
       };
 
       try {

@@ -13,12 +13,14 @@ import { ErrorType } from "@/shared/domain/enum/base-enum";
 import {
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
+  GetExportToCsvModel,
   GetUsageSummaryModel,
 } from "@/features/summary/domain/entities/summary-models";
 import {
   GetUsageSummaryQueryParams,
   GetElectricityUsageQueryParams,
   GetElectricityUsageHistoryQueryParams,
+  GetExportToCsvQueryParams,
 } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
@@ -264,6 +266,44 @@ export class SummaryRepositoryImpl implements SummaryRepository {
         message:
           result.flash?.message ||
           "Failed to retrieve electricity usage. Please try again.",
+      });
+    }
+  }
+
+  async getExportToCsv({
+    queryParam,
+  }: {
+    queryParam: GetExportToCsvQueryParams;
+  }): Promise<GetExportToCsvModel | BaseErrorModel> {
+    Logger.info("SummaryRepositoryImpl", "getExportToCsv", queryParam);
+    const result = await this.dataSource.getExportToCsv({
+      params: { ...queryParam },
+    });
+
+    if (isErrorResponse(result)) {
+      Logger.error("SummaryRepositoryImpl", "getExportToCsv", result);
+      return mapErrorResponseToModel({ response: result });
+    }
+
+    Logger.info("SummaryRepositoryImpl", "getExportToCsv result", result);
+    if (result.flash?.type === "success") {
+      return {
+        message: optionalValue(result.data?.message).orEmpty(),
+        fileUrl: optionalValue(result.data?.fileUrl).orEmpty(),
+        fileName: optionalValue(result.data?.fileName).orEmpty(),
+        recordCount: optionalValue(result.data?.recordCount).orZero(),
+      };
+    } else {
+      Logger.error(
+        "SummaryRepositoryImpl",
+        "getExportToCsv - unexpected flash type",
+        result
+      );
+      return createErrorModel({
+        type: ErrorType.UNEXPECTED,
+        message:
+          result.flash?.message ||
+          "Failed to retrieve export to CSV. Please try again.",
       });
     }
   }

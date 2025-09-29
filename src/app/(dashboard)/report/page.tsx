@@ -25,6 +25,7 @@ export default function ReportPage() {
   const [activeFilters, setActiveFilters] = useState<ReportFilterState>(
     reportFilterDefaultValue()
   );
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const {
     usageHistory,
     loading,
@@ -84,7 +85,10 @@ export default function ReportPage() {
           defaultValue={reportFilterDefaultValue()}
         />
         {/* Export Button */}
-        <button className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer">
+        <button
+          disabled={selectedIds.length === 0}
+          className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+        >
           Download
         </button>
       </div>
@@ -101,6 +105,21 @@ export default function ReportPage() {
         data={aggregateElectricityUsageByPeriod(usageHistory)}
         pagination={pagination}
         isLoading={loading}
+        selectedIds={selectedIds}
+        handleRowSelect={(id) => {
+          setSelectedIds((prev) =>
+            prev.includes(id)
+              ? prev.filter((rowId) => rowId !== id)
+              : [...prev, id]
+          );
+        }}
+        handleSelectAll={() => {
+          setSelectedIds((prev) =>
+            prev.length === usageHistory.length
+              ? []
+              : usageHistory.map((row) => row.period)
+          );
+        }}
         gotoPage={(page) => {
           const selectedYear = optionalValue(
             activeFilters.singleSelection?.year

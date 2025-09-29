@@ -1,5 +1,4 @@
 import { Pagination } from "@/shared/presentation/components/pagination";
-import { useState } from "react";
 import Image from "next/image";
 import { PeriodValueModel } from "@/features/summary/domain/entities/summary-models";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
@@ -9,6 +8,9 @@ interface ReportTableProps {
   data: PeriodValueModel[];
   pagination: PaginationModel;
   isLoading?: boolean;
+  selectedIds: string[];
+  handleRowSelect?: (id: string) => void;
+  handleSelectAll?: () => void;
   gotoPage?: (page: number) => void;
   previousPage?: () => void;
   nextPage?: () => void;
@@ -18,24 +20,13 @@ export function ReportTable({
   data,
   pagination,
   isLoading = false,
+  selectedIds = [],
+  handleRowSelect,
+  handleSelectAll,
   gotoPage,
   previousPage,
   nextPage,
 }: ReportTableProps) {
-  const [selectedIds, setSelectedIds] = useState<string[]>(["2", "3", "4"]); // March, April, May selected by default
-
-  const handleRowSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = () => {
-    setSelectedIds((prev) =>
-      prev.length === data.length ? [] : data.map((row) => row.period)
-    );
-  };
-
   const isAllSelected = selectedIds.length === data.length;
 
   return (
@@ -76,7 +67,7 @@ export function ReportTable({
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <button
-                      onClick={() => handleRowSelect(row.period)}
+                      onClick={() => handleRowSelect?.(row.period)}
                       className="flex items-center justify-center cursor-pointer w-5 h-5 focus:outline-none rounded"
                     >
                       <Image

@@ -14,15 +14,10 @@ import {
   aggregateElectricityUsageByPeriod,
   getStartAndEndDateFormattedUTCWithoutMsFromYear,
 } from "@/features/summary/utils/summary-helper";
-import { DateRange } from "@/shared/domain/entities/models";
 import {
   usePopup,
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
-import {
-  formatDateToStringUTCWithoutMs,
-  getDateRangeByTimePeriod,
-} from "@/shared/utils/helpers/date-helpers";
 import { TimePeriod } from "@/shared/domain/enum/enums";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
@@ -43,10 +38,6 @@ export default function ReportPage() {
   } = useGetElectricityUsageHistory();
   const { showPopup } = usePopup();
 
-  const getDateRange = (): DateRange => {
-    return getDateRangeByTimePeriod(TimePeriod.Yearly);
-  };
-
   useEffect(() => {
     if (error) {
       showPopup(
@@ -58,14 +49,12 @@ export default function ReportPage() {
   }, [error, showPopup, reset]);
 
   useEffect(() => {
-    console.log("[debugTest] activeFilters changed: ", activeFilters);
     const selectedYear = optionalValue(
       activeFilters.singleSelection?.year
     ).orDefault(new Date().getFullYear().toString());
     const dateRangeFromYear = getStartAndEndDateFormattedUTCWithoutMsFromYear(
       parseInt(selectedYear, 10)
     );
-    console.log("[debugTest] dateRangeFromYear: ", dateRangeFromYear);
     fetchUsageHistory({
       page: 1,
       startDate: dateRangeFromYear.startDate,
@@ -113,25 +102,46 @@ export default function ReportPage() {
         pagination={pagination}
         isLoading={loading}
         gotoPage={(page) => {
-          const dateRange = getDateRange();
+          const selectedYear = optionalValue(
+            activeFilters.singleSelection?.year
+          ).orDefault(new Date().getFullYear().toString());
+          const dateRangeFromYear =
+            getStartAndEndDateFormattedUTCWithoutMsFromYear(
+              parseInt(selectedYear, 10)
+            );
           goToPage({
             page,
-            startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
-            endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+            startDate: dateRangeFromYear.startDate,
+            endDate: dateRangeFromYear.endDate,
+            period: TimePeriod.Monthly,
           });
         }}
         previousPage={() => {
-          const dateRange = getDateRange();
+          const selectedYear = optionalValue(
+            activeFilters.singleSelection?.year
+          ).orDefault(new Date().getFullYear().toString());
+          const dateRangeFromYear =
+            getStartAndEndDateFormattedUTCWithoutMsFromYear(
+              parseInt(selectedYear, 10)
+            );
           previousPage({
-            startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
-            endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+            startDate: dateRangeFromYear.startDate,
+            endDate: dateRangeFromYear.endDate,
+            period: TimePeriod.Monthly,
           });
         }}
         nextPage={() => {
-          const dateRange = getDateRange();
+          const selectedYear = optionalValue(
+            activeFilters.singleSelection?.year
+          ).orDefault(new Date().getFullYear().toString());
+          const dateRangeFromYear =
+            getStartAndEndDateFormattedUTCWithoutMsFromYear(
+              parseInt(selectedYear, 10)
+            );
           nextPage({
-            startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
-            endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+            startDate: dateRangeFromYear.startDate,
+            endDate: dateRangeFromYear.endDate,
+            period: TimePeriod.Monthly,
           });
         }}
       />

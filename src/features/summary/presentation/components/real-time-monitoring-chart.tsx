@@ -17,9 +17,9 @@ import {
   mapUsageDataToRealTimeDataPoints,
 } from "@/features/summary/utils/summary-helper";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
-import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 
 const availableIntervals = [
   getLabelFromRealTimeInterval(RealTimeInterval.Ten),
@@ -40,13 +40,13 @@ export function RealTimeMonitoringChart({
   data,
   className = "",
   selectedInterval,
-  isLoading,
+  isLoading = false,
   onIntervalChange: setSelectedInterval,
 }: RealTimeMonitoringChartProps) {
   const isEmpty = !data || data.length === 0;
   const lastData = data.findLast((d) => d.totalKwh !== undefined);
   const currentUsage = formatNumberIndonesian(
-    optionalValue(lastData?.totalKwh).orZero() / 1000,
+    optionalValue(lastData?.totalKwh).orZero(),
     2
   );
 
@@ -71,7 +71,7 @@ export function RealTimeMonitoringChart({
         <div className="text-2xl font-bold text-typography-headline">
           {currentUsage}
           <span className="text-sm font-normal text-typography-secondary ml-1">
-            Watt
+            Kwh
           </span>
         </div>
       </div>
@@ -94,11 +94,13 @@ export function RealTimeMonitoringChart({
             className="text-xs"
           />
           <YAxis
+            dataKey={"usage"}
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 12, fill: "#6B7280" }}
-            domain={[0, 150]}
-            ticks={[0, 50, 100, 150]}
+            tickFormatter={(value) => {
+              return formatNumberIndonesian(value, 0);
+            }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Line
@@ -113,12 +115,16 @@ export function RealTimeMonitoringChart({
     </div>
   );
 
-  const contents = isLoading ? (
-    <LoadingSpinner />
-  ) : (
+  const contents = (
     <>
       {controlsSection}
-      {chartSection}
+      {isLoading && isEmpty ? (
+        <LoadingSpinner />
+      ) : !isLoading && isEmpty ? (
+        <EmptyData />
+      ) : (
+        chartSection
+      )}
     </>
   );
 
@@ -128,7 +134,7 @@ export function RealTimeMonitoringChart({
       description="Track your electricity usage in real-time"
       className={className}
     >
-      {isEmpty ? <EmptyData /> : contents}
+      {contents}
     </TilePrimary>
   );
 }

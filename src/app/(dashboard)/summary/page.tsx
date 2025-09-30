@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SummaryCard } from "@/features/summary/presentation/components/summary-card";
 import { UsageChart } from "@/features/summary/presentation/components/usage-chart";
 import { RealTimeMonitoringChart } from "@/features/summary/presentation/components/real-time-monitoring-chart";
@@ -82,9 +82,11 @@ export default function SummaryPage() {
     error: electricityUsageRealTimeError,
     loading: electricityUsageRealTimeLoading,
     setSelectedInterval: setElectricitySelectedInterval,
-    fetchElectricityUsageRealTime,
+    fetchElectricityUsage: fetchElectricityUsageRealTime,
     reset: resetElectricityUsageRealTime,
   } = useGetElectricityUsageRealTime();
+
+  const fetchRealTimeRef = useRef(fetchElectricityUsageRealTime);
 
   const handleFilterApply = (filters: SummaryFilterState) => {
     setActiveFilters(filters);
@@ -95,6 +97,10 @@ export default function SummaryPage() {
     setActiveFilters(resetValue);
     console.log("Filters reset");
   };
+
+  useEffect(() => {
+    fetchRealTimeRef.current = fetchElectricityUsageRealTime;
+  }, [fetchElectricityUsageRealTime]);
 
   useEffect(() => {
     if (errorSummary) {
@@ -162,8 +168,17 @@ export default function SummaryPage() {
   }, [fetchElectricityUsageHistory]);
 
   useEffect(() => {
-    fetchElectricityUsageRealTime();
-  }, [fetchElectricityUsageRealTime, setElectricitySelectedInterval]);
+    if (!electricitySelectedInterval) return;
+
+    // Fetch once immediately
+    fetchRealTimeRef.current();
+
+    const intervalId = setInterval(() => {
+      fetchRealTimeRef.current();
+    }, electricitySelectedInterval * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [electricitySelectedInterval]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px]">
@@ -313,8 +328,8 @@ export default function SummaryPage() {
         <RealTimeMonitoringChart
           data={electricityUsageRealTime}
           className="lg:flex-1"
-          isLoading={electricityUsageRealTimeLoading}
           selectedInterval={electricitySelectedInterval}
+          isLoading={electricityUsageRealTimeLoading}
           onIntervalChange={setElectricitySelectedInterval}
         />
         <ElectricUsageHistoryTable

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   BaseErrorModel,
   isErrorModel,
@@ -21,7 +21,7 @@ interface UseGetElectricityUsageRealTimeReturn {
   error: BaseErrorModel | null;
   loading: boolean;
   setSelectedInterval: (interval: RealTimeInterval) => void;
-  fetchElectricityUsageRealTime: () => void;
+  fetchElectricityUsage: () => void;
   reset: () => void;
 }
 
@@ -36,7 +36,7 @@ export const useGetElectricityUsageRealTime =
       []
     );
     const [selectedInterval, setSelectedInterval] = useState<RealTimeInterval>(
-      RealTimeInterval.Ten
+      RealTimeInterval.Sixty
     );
     const [error, setError] = useState<BaseErrorModel | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -46,7 +46,7 @@ export const useGetElectricityUsageRealTime =
       const dateRange = getStartAndEndDateOfDayFromDate(new Date());
 
       return {
-        period: TimePeriod.Daily as string, // Clear period for real-time data
+        period: (TimePeriod.Daily as string).toLowerCase(), // Clear period for real-time data
         startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
         endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
       };
@@ -73,16 +73,14 @@ export const useGetElectricityUsageRealTime =
         );
         if (result.usage && result.usage.data.length > 0 && currentData) {
           setPeriodicData((prevData) => {
-            // Check count
             if (prevData.length < (selectedInterval as number)) {
               // If less than selectedInterval, append new data
-              prevData.push(currentData);
-              return prevData;
+              const newData = [...prevData, currentData];
+              return newData;
             } else {
               // If equal or more than selectedInterval, remove the oldest data and append new data
-              prevData.shift();
-              prevData.push(currentData);
-              return prevData;
+              const newData = [...prevData.slice(1), currentData];
+              return newData;
             }
           });
         }
@@ -101,22 +99,6 @@ export const useGetElectricityUsageRealTime =
       }
     }, [selectedInterval]);
 
-    // Start fetching data at intervals
-    const fetchElectricityUsageRealTime = useCallback(() => {
-      // Clear previous data
-      setPeriodicData([]);
-      // Fetch immediately
-      fetchElectricityUsage();
-
-      // Set interval to fetch data periodically
-      const intervalId = setInterval(() => {
-        fetchElectricityUsage();
-      }, (selectedInterval as number) * 1000); // Convert to milliseconds
-
-      // Clear interval on unmount or when interval changes
-      return () => clearInterval(intervalId);
-    }, [fetchElectricityUsage, selectedInterval]);
-
     const reset = () => {
       setPeriodicData([]);
       setSelectedInterval(RealTimeInterval.Ten);
@@ -124,13 +106,17 @@ export const useGetElectricityUsageRealTime =
       setLoading(false);
     };
 
+    useEffect(() => {
+      setPeriodicData([]);
+    }, [selectedInterval]);
+
     return {
       periodicData,
       selectedInterval,
       error,
       loading,
       setSelectedInterval: setSelectedInterval,
-      fetchElectricityUsageRealTime,
+      fetchElectricityUsage,
       reset,
     };
   };

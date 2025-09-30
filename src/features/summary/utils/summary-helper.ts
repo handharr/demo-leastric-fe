@@ -8,6 +8,7 @@ import {
   getStartAndEndDateOfYear,
 } from "@/shared/utils/helpers/date-helpers";
 import { RealTimeDataPoint } from "../presentation/types/ui";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 export function aggregateElectricityUsageByPeriod(
   usageData: ElectricityUsageModel[]
@@ -207,7 +208,7 @@ export function mapUsageDataToRealTimeDataPoints(
 
   /// For time, the latest is 0, and the oldest is (if interval is 10, then -9)
   return usageData.map((usage, index) => ({
-    time: `${(interval - index).toString().padStart(2, "0")}`,
-    usage: usage.totalKwh || 0,
+    time: `${(index - interval + 1).toString()}`,
+    usage: optionalValue(usage.totalKwh).orZero(),
   }));
 }

@@ -12,7 +12,6 @@ import {
   summaryFilterDefaultValue,
   summaryFilterMeta,
 } from "@/features/summary/presentation/components/summary-filter-modal";
-import { realTimeDataDummies } from "@/features/summary/presentation/data/dummies";
 import { useGetUsageSummary } from "@/features/summary/presentation/hooks/use-get-usage-summary";
 import {
   usePopup,
@@ -31,6 +30,7 @@ import {
   getLegendLabelForPeriod,
 } from "@/features/summary/utils/summary-helper";
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
+import { useGetElectricityUsageRealTime } from "@/features/summary/presentation/hooks/use-get-electricity-usage-real-time";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -76,9 +76,15 @@ export default function SummaryPage() {
     fetchUsageHistory: fetchElectricityUsageHistory,
     reset: resetElectricityUsageHistory,
   } = useGetElectricityUsageHistory();
-
-  // Sample real-time monitoring data
-  const realTimeData = realTimeDataDummies;
+  const {
+    periodicData: electricityUsageRealTime,
+    selectedInterval: electricitySelectedInterval,
+    error: electricityUsageRealTimeError,
+    loading: electricityUsageRealTimeLoading,
+    setSelectedInterval: setElectricitySelectedInterval,
+    fetchElectricityUsageRealTime,
+    reset: resetElectricityUsageRealTime,
+  } = useGetElectricityUsageRealTime();
 
   const handleFilterApply = (filters: SummaryFilterState) => {
     setActiveFilters(filters);
@@ -114,14 +120,24 @@ export default function SummaryPage() {
       );
       resetElectricityUsageHistory();
     }
+
+    if (electricityUsageRealTimeError) {
+      showPopup(
+        `Error fetching real-time electricity usage: ${electricityUsageRealTimeError.message}`,
+        PopupType.ERROR
+      );
+      resetElectricityUsageRealTime();
+    }
   }, [
     errorSummary,
     errorElectricityUsage,
     electricityUsageHistoryError,
+    electricityUsageRealTimeError,
     showPopup,
     resetSummary,
     resetElectricityUsage,
     resetElectricityUsageHistory,
+    resetElectricityUsageRealTime,
   ]);
 
   useEffect(() => {
@@ -144,6 +160,10 @@ export default function SummaryPage() {
   useEffect(() => {
     fetchElectricityUsageHistory({ page: 1 });
   }, [fetchElectricityUsageHistory]);
+
+  useEffect(() => {
+    fetchElectricityUsageRealTime();
+  }, [fetchElectricityUsageRealTime, setElectricitySelectedInterval]);
 
   return (
     <div className="flex min-h-screen flex-col gap-[16px]">
@@ -291,9 +311,11 @@ export default function SummaryPage() {
       {/* Real-Time Monitoring and Usage History */}
       <div className="grid grid-cols-1 lg:flex lg:flex-row gap-[16px]">
         <RealTimeMonitoringChart
-          data={realTimeData}
-          currentUsage={172.45}
+          data={electricityUsageRealTime}
           className="lg:flex-1"
+          isLoading={electricityUsageRealTimeLoading}
+          selectedInterval={electricitySelectedInterval}
+          onIntervalChange={setElectricitySelectedInterval}
         />
         <ElectricUsageHistoryTable
           data={aggregateElectricityUsageByPeriod(electricityUsageHistory)}

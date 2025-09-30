@@ -2,11 +2,12 @@ import {
   ElectricityUsageModel,
   PeriodValueModel,
 } from "@/features/summary/domain/entities/summary-models";
-import { TimePeriod } from "@/shared/domain/enum/enums";
+import { RealTimeInterval, TimePeriod } from "@/shared/domain/enum/enums";
 import {
   formatDateToStringUTCWithoutMs,
   getStartAndEndDateOfYear,
 } from "@/shared/utils/helpers/date-helpers";
+import { RealTimeDataPoint } from "../presentation/types/ui";
 
 export function aggregateElectricityUsageByPeriod(
   usageData: ElectricityUsageModel[]
@@ -179,4 +180,34 @@ export function getStartAndEndDateFormattedUTCWithoutMsFromYear(year: number) {
     startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
     endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
   };
+}
+
+export function getLabelFromRealTimeInterval(interval: number): string {
+  switch (interval) {
+    case 10:
+      return "10 seconds";
+    case 15:
+      return "15 seconds";
+    case 30:
+      return "30 seconds";
+    case 60:
+      return "60 seconds";
+    default:
+      return `${interval} seconds`;
+  }
+}
+
+export function mapUsageDataToRealTimeDataPoints(
+  usageData: ElectricityUsageModel[]
+): RealTimeDataPoint[] {
+  if (!usageData || usageData.length === 0) {
+    return [];
+  }
+  const interval = usageData.length as RealTimeInterval;
+
+  /// For time, the latest is 0, and the oldest is (if interval is 10, then -9)
+  return usageData.map((usage, index) => ({
+    time: `${(interval - index).toString().padStart(2, "0")}`,
+    usage: usage.totalKwh || 0,
+  }));
 }

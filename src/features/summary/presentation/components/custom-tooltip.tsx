@@ -19,12 +19,14 @@ export function CustomTooltip({
   label,
   unit = "KWh",
   titles = [],
-  timeUnit = "Day",
+  timeUnit,
 }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 shadow-lg rounded-lg border border-default-border">
-        <p className="text-sm text-gray-600">{`${timeUnit} ${label}`}</p>
+        {timeUnit && (
+          <p className="text-sm text-gray-600">{`${timeUnit} ${label}`}</p>
+        )}
         {payload.map((entry, index) => (
           <p
             key={index}

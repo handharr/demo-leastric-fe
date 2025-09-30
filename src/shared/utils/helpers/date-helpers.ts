@@ -150,3 +150,19 @@ export function getDateStringFromDate(
 
   return `${year}-${month}-${day}`;
 }
+
+// Substract date by seconds
+export function substractDateBySeconds(date: Date, seconds: number): Date {
+  const newDate = new Date(date);
+  newDate.setSeconds(newDate.getSeconds() - seconds);
+  return newDate;
+}
+
+// Get date string eg: 19:45:30
+export function getTimeStringFromDate(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${hours}:${minutes}:${seconds}`;
+}

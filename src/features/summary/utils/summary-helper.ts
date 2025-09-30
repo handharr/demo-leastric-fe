@@ -6,6 +6,8 @@ import { RealTimeInterval, TimePeriod } from "@/shared/domain/enum/enums";
 import {
   formatDateToStringUTCWithoutMs,
   getStartAndEndDateOfYear,
+  getTimeStringFromDate,
+  substractDateBySeconds,
 } from "@/shared/utils/helpers/date-helpers";
 import { RealTimeDataPoint } from "../presentation/types/ui";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
@@ -224,4 +226,12 @@ export function mapUsageDataToRealTimeDataPoints(
     time: (-1 * (interval * (usageData.length - 1 - index))).toString(), // in seconds
     usage: optionalValue(usage.totalKwh).orZero(),
   }));
+}
+
+export function getDateStringAfterSubstractingSeconds(
+  date: Date,
+  seconds: number
+): string {
+  const substractedDate = substractDateBySeconds(date, seconds);
+  return getTimeStringFromDate(substractedDate);
 }

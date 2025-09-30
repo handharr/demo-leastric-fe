@@ -13,6 +13,7 @@ import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
 import { RealTimeInterval } from "@/shared/domain/enum/enums";
 import {
+  getDateStringAfterSubstractingSeconds,
   getLabelFromRealTimeInterval,
   mapUsageDataToRealTimeDataPoints,
 } from "@/features/summary/utils/summary-helper";
@@ -105,7 +106,17 @@ export function RealTimeMonitoringChart({
               return formatNumberIndonesian(value, 0);
             }}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip
+            content={(props) => (
+              <CustomTooltip
+                titles={["Usage"]}
+                timeUnit={getDateStringAfterSubstractingSeconds(
+                  new Date(),
+                  props.payload[0].time as unknown as number
+                )}
+              />
+            )}
+          />
           <Line
             type="linear"
             dataKey="usage"

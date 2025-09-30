@@ -82,7 +82,10 @@ export function RealTimeMonitoringChart({
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={mapUsageDataToRealTimeDataPoints(data)}
+          data={mapUsageDataToRealTimeDataPoints(
+            data,
+            selectedInterval || RealTimeInterval.Sixty
+          )}
           margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#dedede" />

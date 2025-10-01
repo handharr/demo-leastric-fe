@@ -232,6 +232,14 @@ export function getDateStringAfterSubstractingSeconds(
   date: Date,
   seconds: number
 ): string {
+  // If seconds is 0, return time string from date
+  if (seconds === 0) {
+    return getTimeStringFromDate(date);
+  }
+  // check seconds if less than 0 then give absolute value
+  if (seconds < 0) {
+    seconds = Math.abs(seconds);
+  }
   const substractedDate = substractDateBySeconds(date, seconds);
   return getTimeStringFromDate(substractedDate);
 }

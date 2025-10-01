@@ -107,15 +107,29 @@ export function RealTimeMonitoringChart({
             }}
           />
           <Tooltip
-            content={(props) => (
-              <CustomTooltip
-                titles={["Usage"]}
-                timeUnit={getDateStringAfterSubstractingSeconds(
-                  new Date(),
-                  props.payload[0].time as unknown as number
-                )}
-              />
-            )}
+            content={(props) => {
+              if (
+                !props.active ||
+                !props.payload ||
+                props.payload.length === 0
+              ) {
+                return null;
+              }
+              const item = props.payload[0].payload.time;
+              console.log("[debugTest] item", item);
+              return (
+                <CustomTooltip
+                  titles={["Usage"]}
+                  active={props.active}
+                  payload={props.payload}
+                  label={getDateStringAfterSubstractingSeconds(
+                    new Date(),
+                    item
+                  )}
+                  timeUnit="Time:"
+                />
+              );
+            }}
           />
           <Line
             type="linear"

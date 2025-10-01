@@ -158,7 +158,9 @@ export function UsageChart({
               ];
               return (
                 <CustomTooltip
-                  {...props}
+                  active={props.active}
+                  payload={props.payload}
+                  label={props.label}
                   unit={selectedUnit}
                   titles={titles}
                   timeUnit={getTimePeriodUnit(selectedPeriod)}

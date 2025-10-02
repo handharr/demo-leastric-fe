@@ -52,7 +52,7 @@ export class AdminManagementRepositoryImpl
       .map((log) => ({
         dateTime: optionalValue(log.dateTime).orEmpty(),
         topic: optionalValue(log.topic).orEmpty(),
-        payload: optionalValue(log.payload).orEmpty(),
+        payload: JSON.stringify(optionalValue(log.payload).orDefault({})),
       }));
 
     return {

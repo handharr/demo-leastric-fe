@@ -2,7 +2,7 @@ import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { Logger } from "@/shared/utils/logger/logger";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { GetMqttLogsQueryParams } from "@/features/admin-management/domain/params/admin-management-query-params";
 import { MqttLogModel } from "@/features/admin-management/domain/entity/admin-management-model";
 import { GetMqttLogUseCase } from "@/features/admin-management/domain/use-cases/get-mqtt-log-use-case";
@@ -12,18 +12,38 @@ export interface UseGetMqttLogReturn {
   loading: boolean;
   error: string | null;
   pagination: PaginationModel;
+  search: string;
   nextPage: (params?: Partial<GetMqttLogsQueryParams>) => void;
   previousPage: (params?: Partial<GetMqttLogsQueryParams>) => void;
   goToPage: (params?: Partial<GetMqttLogsQueryParams>) => void;
+  setSearch: (search: string) => void;
   reload: () => void;
   fetchLogs: (params?: Partial<GetMqttLogsQueryParams>) => void;
   reset: () => void;
+}
+
+// Custom debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
 }
 
 export function useGetMqttLog(): UseGetMqttLogReturn {
   const [logs, setLogs] = useState<MqttLogModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
   const [pagination, setPagination] = useState<PaginationModel>({
     page: 1,
     itemCount: 0,
@@ -32,6 +52,7 @@ export function useGetMqttLog(): UseGetMqttLogReturn {
     hasNextPage: false,
     size: 10,
   });
+  const debouncedSearch = useDebounce(search, 500);
 
   const fetchLogsInternal = useCallback(
     async (params: GetMqttLogsQueryParams) => {
@@ -89,27 +110,32 @@ export function useGetMqttLog(): UseGetMqttLogReturn {
   const nextPage = useCallback(
     (params?: Partial<GetMqttLogsQueryParams>) => {
       if (pagination.hasNextPage) {
+        setPagination((prev) => ({ ...prev, page: prev.page + 1 }));
         fetchLogsInternal({
           page: pagination.page + 1,
-          size: pagination.size,
+          size: 10,
           ...params,
         });
       }
     },
-    [fetchLogsInternal, pagination]
+    [fetchLogsInternal, pagination.page, pagination.hasNextPage]
   );
 
   const previousPage = useCallback(
     (params?: Partial<GetMqttLogsQueryParams>) => {
       if (pagination.hasPreviousPage) {
+        setPagination((prev) => ({
+          ...prev,
+          page: Math.max(prev.page - 1, 1),
+        }));
         fetchLogsInternal({
           page: pagination.page - 1,
-          size: pagination.size,
+          size: 10,
           ...params,
         });
       }
     },
-    [fetchLogsInternal, pagination]
+    [fetchLogsInternal, pagination.page, pagination.hasPreviousPage]
   );
 
   const goToPage = useCallback(
@@ -119,14 +145,15 @@ export function useGetMqttLog(): UseGetMqttLogReturn {
         params.page >= 1 &&
         params.page <= pagination.pageCount
       ) {
+        setPagination((prev) => ({ ...prev, page: params.page! }));
         fetchLogsInternal({
           page: params.page,
-          size: pagination.size,
+          size: 10,
           ...params,
         });
       }
     },
-    [fetchLogsInternal, pagination]
+    [fetchLogsInternal, pagination.pageCount]
   );
 
   const reload = useCallback(() => {
@@ -140,6 +167,7 @@ export function useGetMqttLog(): UseGetMqttLogReturn {
     setLogs([]);
     setLoading(false);
     setError(null);
+    setSearch("");
     setPagination({
       page: 1,
       itemCount: 0,
@@ -150,14 +178,25 @@ export function useGetMqttLog(): UseGetMqttLogReturn {
     });
   }, []);
 
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    fetchLogsInternal({
+      page: 1,
+      size: 10,
+      deviceId: debouncedSearch,
+    });
+  }, [debouncedSearch, fetchLogsInternal]);
+
   return {
     logs,
     loading,
     error,
     pagination,
+    search,
     nextPage,
     previousPage,
     goToPage,
+    setSearch,
     reload,
     fetchLogs,
     reset,

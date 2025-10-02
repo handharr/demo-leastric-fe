@@ -1,7 +1,8 @@
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
+import { MqttLogModel } from "@/features/admin-management/domain/entity/admin-management-model";
 
 interface MqttTableProps {
-  logs: string[];
+  logs: MqttLogModel[];
   loading: boolean;
 }
 
@@ -21,14 +22,14 @@ export function MqttTable({ logs, loading }: MqttTableProps) {
         </thead>
         <tbody>
           {loading ? (
-            <TableSkeletonLoading />
+            <TableSkeletonLoading colCount={3} />
           ) : (
             logsArray.map((d, i) => {
               return (
                 <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                  <td className="px-4 py-3">Date time {i}</td>
-                  <td className="px-4 py-3">Topic {i}</td>
-                  <td className="px-4 py-3">Payload {i}</td>
+                  <td className="px-4 py-3">{d.dateTime}</td>
+                  <td className="px-4 py-3">{d.topic}</td>
+                  <td className="px-4 py-3">{d.payload}</td>
                 </tr>
               );
             })

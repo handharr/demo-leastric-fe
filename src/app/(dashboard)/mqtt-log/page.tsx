@@ -3,35 +3,48 @@
 import Image from "next/image";
 import { MqttTable } from "@/features/admin-management/presentation/components/mqtt-table";
 import { Pagination } from "@/shared/presentation/components/pagination";
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
-import { useState } from "react";
+import { useEffect } from "react";
+import { useGetMqttLog } from "@/features/admin-management/presentation/hooks/use-get-mqtt-log";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
 
 export default function MqttLogPage() {
-  const [search, setSearch] = useState("");
-  const pagination: PaginationModel = {
-    page: 1,
-    itemCount: 10,
-    pageCount: 1,
-    hasPreviousPage: false,
-    hasNextPage: false,
-    size: 10,
-  };
+  const { showPopup } = usePopup();
+  const {
+    logs,
+    loading,
+    error,
+    pagination,
+    search,
+    nextPage,
+    previousPage,
+    goToPage,
+    setSearch,
+    reset,
+  } = useGetMqttLog();
+
+  useEffect(() => {
+    if (error) {
+      showPopup(error, PopupType.ERROR);
+      reset();
+    }
+  }, [error, showPopup, reset]);
 
   const mainContent = (
     <>
       {/* Device Table */}
       <div>
-        <MqttTable logs={[]} loading={false} />
+        <MqttTable logs={logs} loading={loading} />
         {/* Pagination */}
         <Pagination
           model={pagination}
           onPageChange={(page) => {
-            console.log(page);
+            goToPage({ page });
           }}
-          onPreviousPage={() => {
-            console.log("previous");
-          }}
-          onNextPage={() => {}}
+          onPreviousPage={previousPage}
+          onNextPage={nextPage}
         />
       </div>
     </>
@@ -77,7 +90,7 @@ export default function MqttLogPage() {
           )}
         </div>
       </div>
-      {mainContent}
+      <div>{mainContent}</div>
     </div>
   );
 }

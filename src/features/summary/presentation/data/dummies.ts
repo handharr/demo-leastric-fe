@@ -1,6 +1,5 @@
 import {
   ChartDataPoint,
-  RealTimeDataPoint,
   ElectricUsageRecord,
 } from "@/features/summary/presentation/types/ui";
 
@@ -68,19 +67,6 @@ export const anotherChartDataDummies: ChartDataPoint[] = [
   { day: 28, usage: 130 },
   { day: 29, usage: 85 },
   { day: 30, usage: 100 },
-];
-
-export const realTimeDataDummies: RealTimeDataPoint[] = [
-  { time: "-9s", usage: 110 },
-  { time: "-8s", usage: 95 },
-  { time: "-7s", usage: 70 },
-  { time: "-6s", usage: 65 },
-  { time: "-5s", usage: 75 },
-  { time: "-4s", usage: 95 },
-  { time: "-3s", usage: 85 },
-  { time: "-2s", usage: 90 },
-  { time: "-1s", usage: 105 },
-  { time: "0s", usage: 95 },
 ];
 
 export const electricUsageHistoryDummies: ElectricUsageRecord[] = [

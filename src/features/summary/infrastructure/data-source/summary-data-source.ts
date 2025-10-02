@@ -3,6 +3,7 @@ import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-res
 import {
   GetUsageSummaryResponse,
   GetElectricityUsageResponse,
+  GetExportToCsvResponse,
 } from "@/features/summary/infrastructure/models/summary-responses";
 
 export interface SummaryDataSource {
@@ -21,4 +22,9 @@ export interface SummaryDataSource {
   }: {
     params: Record<string, unknown>;
   }): Promise<BaseResponse<GetElectricityUsageResponse> | BaseErrorResponse>;
+  getExportToCsv({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<BaseResponse<GetExportToCsvResponse> | BaseErrorResponse>;
 }

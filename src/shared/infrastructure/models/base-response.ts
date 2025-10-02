@@ -6,7 +6,6 @@ export interface BaseResponse<T> {
   };
   meta?: {
     page?: string;
-    take?: string;
     itemCount?: number;
     pageCount?: number;
     hasPreviousPage?: boolean;

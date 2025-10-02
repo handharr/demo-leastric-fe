@@ -14,9 +14,22 @@ export function Pagination({
 }: PaginationProps) {
   const { itemCount, page, size } = model;
   const totalPages = Math.ceil(itemCount / size);
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  // const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
   const start = (page - 1) * size + 1;
   const end = Math.min(page * size, itemCount);
+  const maxPageControls = 5;
+  let startPage = Math.max(1, page - Math.floor(maxPageControls / 2));
+  let endPage = startPage + maxPageControls - 1;
+
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(1, endPage - maxPageControls + 1);
+  }
+
+  const pageNumbers = Array.from(
+    { length: endPage - startPage + 1 },
+    (_, i) => startPage + i
+  );
 
   return (
     <div className="w-full bg-gray-50 border-t rounded-b-xl">

@@ -16,3 +16,10 @@ export enum TimePeriod {
   Weekly = "Weekly",
   Monthly = "Monthly",
 }
+
+export enum RealTimeInterval {
+  Ten = 10,
+  Fifteen = 15,
+  Thirty = 30,
+  Sixty = 60,
+}

@@ -12,7 +12,6 @@ import {
   summaryFilterDefaultValue,
   summaryFilterMeta,
 } from "@/features/summary/presentation/components/summary-filter-modal";
-import { realTimeDataDummies } from "@/features/summary/presentation/data/dummies";
 import { useGetUsageSummary } from "@/features/summary/presentation/hooks/use-get-usage-summary";
 import {
   usePopup,
@@ -76,9 +75,6 @@ export default function SummaryPage() {
     fetchUsageHistory: fetchElectricityUsageHistory,
     reset: resetElectricityUsageHistory,
   } = useGetElectricityUsageHistory();
-
-  // Sample real-time monitoring data
-  const realTimeData = realTimeDataDummies;
 
   const handleFilterApply = (filters: SummaryFilterState) => {
     setActiveFilters(filters);
@@ -290,11 +286,7 @@ export default function SummaryPage() {
 
       {/* Real-Time Monitoring and Usage History */}
       <div className="grid grid-cols-1 lg:flex lg:flex-row gap-[16px]">
-        <RealTimeMonitoringChart
-          data={realTimeData}
-          currentUsage={172.45}
-          className="lg:flex-1"
-        />
+        <RealTimeMonitoringChart className="lg:flex-1" />
         <ElectricUsageHistoryTable
           data={aggregateElectricityUsageByPeriod(electricityUsageHistory)}
           className="lg:flex-1"

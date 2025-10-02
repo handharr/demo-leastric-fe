@@ -3,7 +3,10 @@ import { GetElectricityUsageHistoryQueryParams } from "@/features/summary/domain
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { Logger } from "@/shared/utils/logger/logger";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import {
+  optional,
+  optionalValue,
+} from "@/shared/utils/wrappers/optional-wrapper";
 import { useCallback, useState } from "react";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { TimePeriod } from "@/shared/domain/enum/enums";
@@ -17,29 +20,11 @@ export interface UseGetElectricityUsageHistoryReturn {
   loading: boolean;
   error: string | null;
   pagination: PaginationModel;
-  nextPage: ({
-    startDate,
-    endDate,
-  }: {
-    startDate: string;
-    endDate: string;
-  }) => void;
-  previousPage: ({
-    startDate,
-    endDate,
-  }: {
-    startDate: string;
-    endDate: string;
-  }) => void;
-  goToPage: ({
-    page,
-    startDate,
-    endDate,
-  }: {
-    page: number;
-    startDate: string;
-    endDate: string;
-  }) => void;
+  nextPage: (params: Partial<GetElectricityUsageHistoryQueryParams>) => void;
+  previousPage: (
+    params: Partial<GetElectricityUsageHistoryQueryParams>
+  ) => void;
+  goToPage: (params: Partial<GetElectricityUsageHistoryQueryParams>) => void;
   reload: () => void;
   fetchUsageHistory: (
     params: Partial<GetElectricityUsageHistoryQueryParams>
@@ -53,7 +38,6 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationModel>({
     page: 1,
-    take: 10,
     itemCount: 0,
     pageCount: 1,
     hasPreviousPage: false,
@@ -68,6 +52,7 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
       let startDate = params.startDate;
       let endDate = params.endDate;
       const period = params.period || TimePeriod.Daily;
+      const size = optionalValue(params.size).orDefault(10);
 
       if (!startDate || !endDate) {
         const dateRange = getDateRangeByTimePeriod(TimePeriod.Daily);
@@ -80,7 +65,7 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
         startDate,
         endDate,
         period: period.toLocaleLowerCase(),
-        size: 10,
+        size,
       };
 
       try {
@@ -119,48 +104,44 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
   );
 
   const nextPage = useCallback(
-    ({ startDate, endDate }: { startDate: string; endDate: string }) => {
+    (params: Partial<GetElectricityUsageHistoryQueryParams>) => {
+      const { startDate, endDate } = params;
       if (!pagination.hasNextPage) return;
       const newPage = pagination.page + 1;
       setPagination((prev) => ({
         ...prev,
         page: newPage,
       }));
-      fetchUsageHistory({ page: newPage, startDate, endDate });
+      fetchUsageHistory({ ...params, page: newPage, startDate, endDate });
     },
     [pagination.hasNextPage, pagination.page, fetchUsageHistory]
   );
 
   const previousPage = useCallback(
-    ({ startDate, endDate }: { startDate: string; endDate: string }) => {
+    (params: Partial<GetElectricityUsageHistoryQueryParams>) => {
+      const { startDate, endDate } = params;
       if (!pagination.hasPreviousPage) return;
       const newPage = Math.max(pagination.page - 1, 1);
       setPagination((prev) => ({
         ...prev,
         page: newPage,
       }));
-      fetchUsageHistory({ page: newPage, startDate, endDate });
+      fetchUsageHistory({ ...params, page: newPage, startDate, endDate });
     },
     [pagination.hasPreviousPage, pagination.page, fetchUsageHistory]
   );
 
   const goToPage = useCallback(
-    ({
-      page,
-      startDate,
-      endDate,
-    }: {
-      page: number;
-      startDate: string;
-      endDate: string;
-    }) => {
-      if (page < 1 || page > pagination.pageCount) return;
-      if (page === pagination.page) return;
+    (params: Partial<GetElectricityUsageHistoryQueryParams>) => {
+      const { page, startDate, endDate } = params;
+      const _page = optionalValue(page).orZero();
+      if (_page < 1 || _page > pagination.pageCount) return;
+      if (_page === pagination.page) return;
       setPagination((prev) => ({
         ...prev,
-        page: page,
+        page: _page,
       }));
-      fetchUsageHistory({ page, startDate, endDate });
+      fetchUsageHistory({ ...params, page: _page, startDate, endDate });
     },
     [pagination.pageCount, pagination.page, fetchUsageHistory]
   );
@@ -177,7 +158,6 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
     setError(null);
     setPagination({
       page: 1,
-      take: 10,
       itemCount: 0,
       pageCount: 1,
       hasPreviousPage: false,

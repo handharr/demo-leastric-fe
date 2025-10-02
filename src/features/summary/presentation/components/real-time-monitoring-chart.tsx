@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
 import {
   LineChart,
@@ -11,51 +8,115 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import {
-  RealTimeDataPoint,
-  SecondsIntervalOption,
-} from "@/features/summary/presentation/types/ui";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
+import { RealTimeInterval } from "@/shared/domain/enum/enums";
+import {
+  getDateStringAfterSubstractingSeconds,
+  getLabelFromRealTimeInterval,
+  mapUsageDataToRealTimeDataPoints,
+} from "@/features/summary/utils/summary-helper";
+import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
+import { useGetElectricityUsageRealTime } from "@/features/summary/presentation/hooks/use-get-electricity-usage-real-time";
+import { useRef, useEffect, useMemo } from "react";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
 
 const availableIntervals = [
-  SecondsIntervalOption.Ten,
-  SecondsIntervalOption.Fifteen,
-  SecondsIntervalOption.Thirty,
-  SecondsIntervalOption.Sixty,
+  getLabelFromRealTimeInterval(RealTimeInterval.Ten),
+  getLabelFromRealTimeInterval(RealTimeInterval.Fifteen),
+  getLabelFromRealTimeInterval(RealTimeInterval.Thirty),
+  getLabelFromRealTimeInterval(RealTimeInterval.Sixty),
 ];
 
 interface RealTimeMonitoringChartProps {
-  data: RealTimeDataPoint[];
-  currentUsage: number;
   className?: string;
 }
 
 export function RealTimeMonitoringChart({
-  data,
-  currentUsage,
   className = "",
 }: RealTimeMonitoringChartProps) {
-  const [selectedInterval, setSelectedInterval] =
-    useState<SecondsIntervalOption>(SecondsIntervalOption.Ten);
-  const isEmpty = !data || data.length === 0;
+  const { showPopup } = usePopup();
+  const {
+    periodicData,
+    selectedInterval,
+    error: electricityUsageRealTimeError,
+    loading: isLoading,
+    setSelectedInterval,
+    fetchElectricityUsage,
+    reset: resetElectricityUsageRealTime,
+  } = useGetElectricityUsageRealTime();
+  const fetchRealTimeRef = useRef(fetchElectricityUsage);
+
+  const isEmpty = useMemo(
+    () => !periodicData || periodicData.length === 0,
+    [periodicData]
+  );
+
+  const lastData = useMemo(
+    () => periodicData.findLast((d) => d.totalKwh !== undefined),
+    [periodicData]
+  );
+
+  const currentUsage = useMemo(
+    () => formatNumberIndonesian(optionalValue(lastData?.totalKwh).orZero(), 2),
+    [lastData]
+  );
+
+  useEffect(() => {
+    fetchRealTimeRef.current = fetchElectricityUsage;
+  }, [fetchElectricityUsage]);
+
+  useEffect(() => {
+    if (electricityUsageRealTimeError) {
+      showPopup(
+        `Error fetching real-time electricity usage: ${electricityUsageRealTimeError.message}`,
+        PopupType.ERROR
+      );
+      resetElectricityUsageRealTime();
+    }
+  }, [electricityUsageRealTimeError, showPopup, resetElectricityUsageRealTime]);
+
+  useEffect(() => {
+    if (!selectedInterval) return;
+
+    // Fetch once immediately
+    fetchRealTimeRef.current();
+
+    const intervalId = setInterval(() => {
+      fetchRealTimeRef.current();
+    }, selectedInterval * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [selectedInterval]);
 
   const controlsSection = (
     <div className="flex flex-row items-center justify-between gap-4 mb-6">
       <div className="w-fit">
         <Dropdown
           options={availableIntervals}
-          value={selectedInterval}
-          onChange={setSelectedInterval}
+          value={getLabelFromRealTimeInterval(
+            selectedInterval || RealTimeInterval.Ten
+          )}
+          onChange={(option) => {
+            const interval = parseInt(option) as RealTimeInterval;
+            if (setSelectedInterval) {
+              setSelectedInterval(interval);
+            }
+          }}
         />
       </div>
 
       <div className="text-right">
         <div className="text-2xl font-bold text-typography-headline">
-          {currentUsage.toFixed(2)}
+          {currentUsage}
           <span className="text-sm font-normal text-typography-secondary ml-1">
-            Watt
+            Kwh
           </span>
         </div>
       </div>
@@ -66,7 +127,10 @@ export function RealTimeMonitoringChart({
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={data}
+          data={mapUsageDataToRealTimeDataPoints(
+            periodicData,
+            selectedInterval || RealTimeInterval.Sixty
+          )}
           margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#dedede" />
@@ -78,13 +142,38 @@ export function RealTimeMonitoringChart({
             className="text-xs"
           />
           <YAxis
+            dataKey={"usage"}
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 12, fill: "#6B7280" }}
-            domain={[0, 150]}
-            ticks={[0, 50, 100, 150]}
+            tickFormatter={(value) => {
+              return formatNumberIndonesian(value, 0);
+            }}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip
+            content={(props) => {
+              if (
+                !props.active ||
+                !props.payload ||
+                props.payload.length === 0
+              ) {
+                return null;
+              }
+              const item = props.payload[0].payload.time;
+              return (
+                <CustomTooltip
+                  titles={["Usage"]}
+                  active={props.active}
+                  payload={props.payload}
+                  label={getDateStringAfterSubstractingSeconds(
+                    new Date(),
+                    item
+                  )}
+                  timeUnit="Time:"
+                />
+              );
+            }}
+          />
           <Line
             type="linear"
             dataKey="usage"
@@ -100,7 +189,13 @@ export function RealTimeMonitoringChart({
   const contents = (
     <>
       {controlsSection}
-      {chartSection}
+      {isLoading && isEmpty ? (
+        <LoadingSpinner />
+      ) : !isLoading && isEmpty ? (
+        <EmptyData />
+      ) : (
+        chartSection
+      )}
     </>
   );
 
@@ -110,7 +205,7 @@ export function RealTimeMonitoringChart({
       description="Track your electricity usage in real-time"
       className={className}
     >
-      {isEmpty ? <EmptyData /> : contents}
+      {contents}
     </TilePrimary>
   );
 }

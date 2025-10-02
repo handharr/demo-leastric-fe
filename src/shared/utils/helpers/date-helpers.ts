@@ -12,6 +12,43 @@ export function formatDateToStringUTCWithoutMs(date: Date): string {
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`;
 }
 
+export function getStartAndEndDateOfYear(year: number): DateRange {
+  const startDate = new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0)); // January 1st
+  const endDate = new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999)); // December 31st
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
+export function getStartAndEndDateOfMonthFromDate(date: Date): DateRange {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth(); // 0-based (0 = January, 11 = December)
+
+  const startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
+  const endDate = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999)); // Last day of the month
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
+export function getStartAndEndDateOfDayFromDate(date: Date): DateRange {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth(); // 0-based (0 = January, 11 = December)
+  const day = date.getUTCDate();
+
+  const startDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+  const endDate = new Date(Date.UTC(year, month, day, 23, 59, 59, 999));
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
 export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -81,4 +118,51 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
     default:
       throw new Error(`Unsupported time period: ${timePeriod}`);
   }
+}
+
+export function get10YearsRangeFromCurrentYear(): string[] {
+  const currentYear = new Date().getFullYear();
+  const years: string[] = [];
+
+  for (let i = 0; i < 10; i++) {
+    years.push((currentYear - i).toString());
+  }
+
+  return years;
+}
+
+/// Get date string with format String
+/// YYYY-MM-DD for default
+export function getDateStringFromDate(
+  date: Date,
+  withTime: boolean = false
+): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  if (withTime) {
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
+// Substract date by seconds
+export function substractDateBySeconds(date: Date, seconds: number): Date {
+  const newDate = new Date(date);
+  newDate.setSeconds(newDate.getSeconds() - seconds);
+  return newDate;
+}
+
+// Get date string eg: 19:45:30
+export function getTimeStringFromDate(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${hours}:${minutes}:${seconds}`;
 }

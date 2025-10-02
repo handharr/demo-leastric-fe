@@ -16,7 +16,7 @@ import { EmptyData } from "@/shared/presentation/components/empty-data";
 import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
 import { getTimePeriodUnit } from "@/shared/utils/helpers/enum-helpers";
-import { PeriodValueData } from "@/features/summary/domain/entities/summary-models";
+import { PeriodValueModel } from "@/features/summary/domain/entities/summary-models";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 import {
@@ -33,8 +33,8 @@ interface UsageChartProps {
   selectedUnit: EnergyUnit;
   periodOptions?: TimePeriod[];
   unitOptions?: EnergyUnit[];
-  usageData: PeriodValueData[] | null;
-  usageComparedData: PeriodValueData[] | null;
+  usageData: PeriodValueModel[] | null;
+  usageComparedData: PeriodValueModel[] | null;
   isLoading?: boolean;
   compareEnabled: boolean;
   legendLabel?: string;
@@ -158,7 +158,9 @@ export function UsageChart({
               ];
               return (
                 <CustomTooltip
-                  {...props}
+                  active={props.active}
+                  payload={props.payload}
+                  label={props.label}
                   unit={selectedUnit}
                   titles={titles}
                   timeUnit={getTimePeriodUnit(selectedPeriod)}

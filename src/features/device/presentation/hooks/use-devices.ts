@@ -54,7 +54,6 @@ export function useDevices(): UseDevicesReturn {
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationModel>({
     page: 1,
-    take: 10,
     itemCount: 10,
     pageCount: 1,
     hasPreviousPage: false,
@@ -185,7 +184,6 @@ export function useDevices(): UseDevicesReturn {
     setError(null);
     setPagination({
       page: 1,
-      take: 10,
       itemCount: 10,
       pageCount: 1,
       hasPreviousPage: false,

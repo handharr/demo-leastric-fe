@@ -1,12 +1,20 @@
 import {
   ElectricityUsageModel,
-  PeriodValueData,
+  PeriodValueModel,
 } from "@/features/summary/domain/entities/summary-models";
-import { TimePeriod } from "@/shared/domain/enum/enums";
+import { RealTimeInterval, TimePeriod } from "@/shared/domain/enum/enums";
+import {
+  formatDateToStringUTCWithoutMs,
+  getStartAndEndDateOfYear,
+  getTimeStringFromDate,
+  substractDateBySeconds,
+} from "@/shared/utils/helpers/date-helpers";
+import { RealTimeDataPoint } from "../presentation/types/ui";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 export function aggregateElectricityUsageByPeriod(
   usageData: ElectricityUsageModel[]
-): PeriodValueData[] {
+): PeriodValueModel[] {
   if (!usageData || usageData.length === 0) {
     return [];
   }
@@ -24,7 +32,7 @@ export function aggregateElectricityUsageByPeriod(
   });
 
   // Aggregate grouped data
-  const result: PeriodValueData[] = [];
+  const result: PeriodValueModel[] = [];
 
   groupedData.forEach((usages, periodKey) => {
     const totalKwh = usages.reduce(
@@ -152,8 +160,8 @@ export function mergeCurrentAndLastPeriodData({
   lastData,
   period,
 }: {
-  currentData: PeriodValueData[];
-  lastData: PeriodValueData[] | null;
+  currentData: PeriodValueModel[];
+  lastData: PeriodValueModel[] | null;
   period: TimePeriod;
 }): { period: string; value: number | null; comparedValue: number | null }[] {
   if (!currentData) return [];
@@ -166,4 +174,72 @@ export function mergeCurrentAndLastPeriodData({
     };
   });
   return mergedData;
+}
+
+export function getStartAndEndDateFormattedUTCWithoutMsFromYear(year: number) {
+  const dateRange = getStartAndEndDateOfYear(year);
+
+  return {
+    startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
+    endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+  };
+}
+
+export function getLabelFromRealTimeInterval(interval: number): string {
+  switch (interval) {
+    case 10:
+      return "10 seconds";
+    case 15:
+      return "15 seconds";
+    case 30:
+      return "30 seconds";
+    case 60:
+      return "60 seconds";
+    default:
+      return `${interval} seconds`;
+  }
+}
+
+export function mapUsageDataToRealTimeDataPoints(
+  usageData: ElectricityUsageModel[],
+  interval: RealTimeInterval
+): RealTimeDataPoint[] {
+  if (!usageData || usageData.length === 0) {
+    return [];
+  }
+
+  /// For time, the latest is 0, and the oldest is
+  /// e.g., for 10 interval:
+  /// when the length is 0 the time is 0
+  /// when the length is 1 the time is -10, 0
+  /// when the length is 2 the time is -20, -10, 0
+  /// the max usageData length is 10, so when the length is 10 the time from right to left will be:
+  /// -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, 0
+  /// for 15 interval:
+  /// when the length is 0 the time is 0
+  /// when the length is 1 the time is -15, 0
+  /// when the length is 2 the time is -30, -15, 0
+  /// the max usageData length is 15, so when the length is 15 the time from right to left will be:
+  /// -225, -210, -195, -180, -165, -150, -135, -120, -105, -90, -75, -60, -45, -30, -15, 0
+  /// and so on for 30 and 60 interval
+  return usageData.map((usage, index) => ({
+    time: (-1 * (interval * (usageData.length - 1 - index))).toString(), // in seconds
+    usage: optionalValue(usage.totalKwh).orZero(),
+  }));
+}
+
+export function getDateStringAfterSubstractingSeconds(
+  date: Date,
+  seconds: number
+): string {
+  // If seconds is 0, return time string from date
+  if (seconds === 0) {
+    return getTimeStringFromDate(date);
+  }
+  // check seconds if less than 0 then give absolute value
+  if (seconds < 0) {
+    seconds = Math.abs(seconds);
+  }
+  const substractedDate = substractDateBySeconds(date, seconds);
+  return getTimeStringFromDate(substractedDate);
 }

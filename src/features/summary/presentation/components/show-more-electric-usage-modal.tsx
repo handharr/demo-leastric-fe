@@ -72,11 +72,11 @@ export function ShowMoreElectricUsageModalButton() {
         onClose={() => setOpen(false)}
         onClickOutside={() => setOpen(false)}
         title="Electricity Usage History"
-        description="This is for description"
+        description="Overview of electricity consumption trends."
         zValue={52}
       >
         {/* Content container */}
-        <div className="w-auto max-h-[50vh] lg:max-h-[50vh] mb-[16px]">
+        <div className="w-auto h-[50vh] mb-[16px] flex flex-col">
           {/* Date range filter placeholder */}
           <div className="mb-4">
             <DateRangeModal
@@ -91,10 +91,10 @@ export function ShowMoreElectricUsageModalButton() {
             />
           </div>
           {/* Table content */}
-          <div className="overflow-x-auto">
+          <div className="flex-1 overflow-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-default-border">
+                <tr className="sticky top-0 z-10 bg-white border-b border-default-border">
                   <th className="text-left py-3 px-2 text-sm font-medium text-typography-secondary">
                     No.
                   </th>

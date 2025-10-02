@@ -234,7 +234,6 @@ export class SummaryRepositoryImpl implements SummaryRepository {
           },
           pagination: {
             page: optionalValue(result.meta?.page).orZero(),
-            take: optionalValue(result.meta?.take).orZero(),
             itemCount: optionalValue(result.meta?.itemCount).orZero(),
             pageCount: optionalValue(result.meta?.pageCount).orZero(),
             hasPreviousPage: optionalValue(

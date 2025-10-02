@@ -38,7 +38,6 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationModel>({
     page: 1,
-    take: 10,
     itemCount: 0,
     pageCount: 1,
     hasPreviousPage: false,
@@ -159,7 +158,6 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
     setError(null);
     setPagination({
       page: 1,
-      take: 10,
       itemCount: 0,
       pageCount: 1,
       hasPreviousPage: false,

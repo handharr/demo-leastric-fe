@@ -60,7 +60,6 @@ export default function UserManagementPage() {
   const [search, setSearch] = useState("");
   const pagination: PaginationModel = {
     page: 1,
-    take: 10,
     itemCount: 10,
     pageCount: 1,
     hasPreviousPage: false,

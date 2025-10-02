@@ -10,7 +10,6 @@ export default function MqttLogPage() {
   const [search, setSearch] = useState("");
   const pagination: PaginationModel = {
     page: 1,
-    take: 10,
     itemCount: 10,
     pageCount: 1,
     hasPreviousPage: false,
@@ -43,7 +42,7 @@ export default function MqttLogPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-typography-headline">
-          Mqtt Log
+          Monitoring Broker Connection
         </h1>
       </div>
 

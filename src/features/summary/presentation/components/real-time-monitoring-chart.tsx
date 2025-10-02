@@ -116,7 +116,6 @@ export function RealTimeMonitoringChart({
                 return null;
               }
               const item = props.payload[0].payload.time;
-              console.log("[debugTest] item", item);
               return (
                 <CustomTooltip
                   titles={["Usage"]}

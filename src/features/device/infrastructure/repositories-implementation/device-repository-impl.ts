@@ -125,7 +125,6 @@ export class DeviceRepositoryImpl implements DeviceRepository {
         devices: mappedDevices,
         pagination: {
           page: Number(optionalValue(result.meta?.page).orEmpty()),
-          take: Number(optionalValue(result.meta?.take).orEmpty()),
           itemCount: optionalValue(result.meta?.itemCount).orZero(),
           pageCount: optionalValue(result.meta?.pageCount).orZero(),
           hasPreviousPage: optionalValue(

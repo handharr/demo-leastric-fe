@@ -17,10 +17,15 @@ import {
   getLabelFromRealTimeInterval,
   mapUsageDataToRealTimeDataPoints,
 } from "@/features/summary/utils/summary-helper";
-import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
+import { useGetElectricityUsageRealTime } from "@/features/summary/presentation/hooks/use-get-electricity-usage-real-time";
+import { useRef, useEffect, useMemo } from "react";
+import {
+  usePopup,
+  PopupType,
+} from "@/shared/presentation/hooks/top-popup-context";
 
 const availableIntervals = [
   getLabelFromRealTimeInterval(RealTimeInterval.Ten),
@@ -30,26 +35,65 @@ const availableIntervals = [
 ];
 
 interface RealTimeMonitoringChartProps {
-  data: ElectricityUsageModel[];
   className?: string;
-  selectedInterval?: RealTimeInterval;
-  isLoading?: boolean;
-  onIntervalChange?: (interval: RealTimeInterval) => void;
 }
 
 export function RealTimeMonitoringChart({
-  data,
   className = "",
-  selectedInterval,
-  isLoading = false,
-  onIntervalChange: setSelectedInterval,
 }: RealTimeMonitoringChartProps) {
-  const isEmpty = !data || data.length === 0;
-  const lastData = data.findLast((d) => d.totalKwh !== undefined);
-  const currentUsage = formatNumberIndonesian(
-    optionalValue(lastData?.totalKwh).orZero(),
-    2
+  const { showPopup } = usePopup();
+  const {
+    periodicData,
+    selectedInterval,
+    error: electricityUsageRealTimeError,
+    loading: isLoading,
+    setSelectedInterval,
+    fetchElectricityUsage,
+    reset: resetElectricityUsageRealTime,
+  } = useGetElectricityUsageRealTime();
+  const fetchRealTimeRef = useRef(fetchElectricityUsage);
+
+  const isEmpty = useMemo(
+    () => !periodicData || periodicData.length === 0,
+    [periodicData]
   );
+
+  const lastData = useMemo(
+    () => periodicData.findLast((d) => d.totalKwh !== undefined),
+    [periodicData]
+  );
+
+  const currentUsage = useMemo(
+    () => formatNumberIndonesian(optionalValue(lastData?.totalKwh).orZero(), 2),
+    [lastData]
+  );
+
+  useEffect(() => {
+    fetchRealTimeRef.current = fetchElectricityUsage;
+  }, [fetchElectricityUsage]);
+
+  useEffect(() => {
+    if (electricityUsageRealTimeError) {
+      showPopup(
+        `Error fetching real-time electricity usage: ${electricityUsageRealTimeError.message}`,
+        PopupType.ERROR
+      );
+      resetElectricityUsageRealTime();
+    }
+  }, [electricityUsageRealTimeError, showPopup, resetElectricityUsageRealTime]);
+
+  useEffect(() => {
+    if (!selectedInterval) return;
+
+    // Fetch once immediately
+    fetchRealTimeRef.current();
+
+    const intervalId = setInterval(() => {
+      fetchRealTimeRef.current();
+    }, selectedInterval * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [selectedInterval]);
 
   const controlsSection = (
     <div className="flex flex-row items-center justify-between gap-4 mb-6">
@@ -84,7 +128,7 @@ export function RealTimeMonitoringChart({
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={mapUsageDataToRealTimeDataPoints(
-            data,
+            periodicData,
             selectedInterval || RealTimeInterval.Sixty
           )}
           margin={{ top: 5, right: 5, left: 5, bottom: 5 }}

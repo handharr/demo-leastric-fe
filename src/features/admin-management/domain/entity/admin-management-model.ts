@@ -1,3 +1,5 @@
+import { PaginationModel } from "@/shared/domain/entities/models-interface";
+
 export interface MqttLog1PhaseModel {
   devid: string;
   v: number;
@@ -49,12 +51,10 @@ export interface MqttLog3PhaseModel {
 export interface MqttLogModel {
   dateTime: string;
   topic: string;
-  payload: {
-    "1phases": MqttLog1PhaseModel[];
-    "3phases": MqttLog3PhaseModel[];
-  };
+  payload: string;
 }
 
 export interface GetMqttLogsModel {
   logs: MqttLogModel[];
+  pagination: PaginationModel;
 }

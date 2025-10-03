@@ -231,6 +231,10 @@ function mergeDailyDataWithAlignment(
   const today = new Date();
   today.setHours(23, 59, 59, 999); // Set to end of today to include today
 
+  // Get current month and year for filtering
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
   // Create maps for both current and last data by day number for quick lookup
   const currentDataMap = new Map<string, number>();
   const lastDataMap = new Map<string, number>();
@@ -238,10 +242,18 @@ function mergeDailyDataWithAlignment(
   // Collect all unique day labels from both datasets
   const allDayLabels = new Set<string>();
 
-  // Filter current data to only include dates <= today
+  // Filter current data to only include dates from current month and <= today
   const filteredCurrentData = currentData.filter((item) => {
     const itemDate = new Date(item.period);
-    return itemDate <= today;
+    const itemMonth = itemDate.getMonth();
+    const itemYear = itemDate.getFullYear();
+
+    // Must be same month and year as today, and not in the future
+    return (
+      itemYear === currentYear &&
+      itemMonth === currentMonth &&
+      itemDate <= today
+    );
   });
 
   filteredCurrentData.forEach((item) => {
@@ -266,6 +278,8 @@ function mergeDailyDataWithAlignment(
   const sortedDayLabels = Array.from(allDayLabels).sort((a, b) => {
     return parseInt(a) - parseInt(b);
   });
+
+  console.log("[debugTest] currentDataMap:", currentDataMap);
 
   // Create merged data for all days from both periods
   return sortedDayLabels.map((dayLabel) => {

@@ -41,9 +41,7 @@ const downloadCsv = (fileUrl: string, fileName: string): Promise<void> => {
       link.click();
       document.body.removeChild(link);
       resolve();
-      console.log("[debugTest] Download initiated for:", fileName);
     } catch (error) {
-      console.log("[debugTest] Download error:", error);
       reject(error);
     }
   });

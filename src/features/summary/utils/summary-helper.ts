@@ -216,7 +216,7 @@ export function mergeCurrentAndLastPeriodData({
 /*
   Helper function to merge daily data with proper alignment for months with different day counts
   This ensures that day 1 of current month aligns with day 1 of last month, etc.
-  Only includes days that exist in the current month for a clean chart
+  Shows all days from both current and comparison months, with appropriate undefined values
 */
 function mergeDailyDataWithAlignment(
   currentData: PeriodValueModel[],
@@ -226,27 +226,42 @@ function mergeDailyDataWithAlignment(
   value: number | undefined;
   comparedValue: number | undefined;
 }[] {
-  // Create a map of last data by day number for quick lookup
+  // Create maps for both current and last data by day number for quick lookup
+  const currentDataMap = new Map<string, number>();
   const lastDataMap = new Map<string, number>();
+
+  // Collect all unique day labels from both datasets
+  const allDayLabels = new Set<string>();
+
+  currentData.forEach((item) => {
+    const dayLabel = getXAxisLabelForPeriod({
+      period: TimePeriod.Daily,
+      value: item.period,
+    });
+    currentDataMap.set(dayLabel, item.totalKwh);
+    allDayLabels.add(dayLabel);
+  });
+
   lastData.forEach((item) => {
     const dayLabel = getXAxisLabelForPeriod({
       period: TimePeriod.Daily,
       value: item.period,
     });
     lastDataMap.set(dayLabel, item.totalKwh);
+    allDayLabels.add(dayLabel);
   });
 
-  // Map current data and align with corresponding days from last period
-  return currentData.map((currentItem) => {
-    const periodLabel = getXAxisLabelForPeriod({
-      period: TimePeriod.Daily,
-      value: currentItem.period,
-    });
+  // Convert to array and sort numerically by day number
+  const sortedDayLabels = Array.from(allDayLabels).sort((a, b) => {
+    return parseInt(a) - parseInt(b);
+  });
 
+  // Create merged data for all days from both periods
+  return sortedDayLabels.map((dayLabel) => {
     return {
-      period: periodLabel,
-      value: currentItem.totalKwh,
-      comparedValue: lastDataMap.get(periodLabel), // Will be undefined if day doesn't exist in last month
+      period: dayLabel,
+      value: currentDataMap.get(dayLabel), // Will be undefined if day doesn't exist in current month
+      comparedValue: lastDataMap.get(dayLabel), // Will be undefined if day doesn't exist in last month
     };
   });
 }

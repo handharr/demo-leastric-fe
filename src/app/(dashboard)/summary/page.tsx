@@ -173,7 +173,7 @@ export default function SummaryPage() {
       />
 
       {/* Summary Cards Grid */}
-      <div className="overflow-x-auto pb-4">
+      <div className="overflow-x-auto">
         <div className="flex gap-[16px] md:grid md:grid-cols-2 xl:grid-cols-4 min-w-max md:min-w-0 md:items-stretch">
           {/* Electricity Usage Card */}
           <div className="flex-shrink-0 w-80 md:w-auto md:flex">

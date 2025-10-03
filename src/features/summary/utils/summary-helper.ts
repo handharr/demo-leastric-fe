@@ -171,8 +171,8 @@ export function mergeCurrentAndLastPeriodData({
   if (!currentData) return [];
 
   // For daily period, we need special handling to align months with different day counts
-  if (period === TimePeriod.Daily && lastData && lastData.length > 0) {
-    return mergeDailyDataWithAlignment(currentData, lastData);
+  if (period === TimePeriod.Daily) {
+    return mergeDailyDataWithAlignment(currentData, lastData || []);
   }
 
   // For non-daily periods, use the original logic
@@ -218,6 +218,7 @@ export function mergeCurrentAndLastPeriodData({
   This ensures that day 1 of current month aligns with day 1 of last month, etc.
   Shows all days from both current and comparison months, with appropriate undefined values
   Filters out future dates from current data (only shows dates <= today)
+  Always shows full month X-axis (1-31) even when comparison is disabled
 */
 function mergeDailyDataWithAlignment(
   currentData: PeriodValueModel[],
@@ -265,6 +266,7 @@ function mergeDailyDataWithAlignment(
     allDayLabels.add(dayLabel);
   });
 
+  // Process last data (comparison data)
   lastData.forEach((item) => {
     const dayLabel = getXAxisLabelForPeriod({
       period: TimePeriod.Daily,
@@ -274,12 +276,22 @@ function mergeDailyDataWithAlignment(
     allDayLabels.add(dayLabel);
   });
 
+  // Always include all days of current month (1-31) on X-axis for better UX
+  // This ensures the X-axis shows the full month even when comparison is disabled
+  const daysInCurrentMonth = new Date(
+    currentYear,
+    currentMonth + 1,
+    0
+  ).getDate();
+  for (let day = 1; day <= daysInCurrentMonth; day++) {
+    const dayLabel = day.toString().padStart(2, "0");
+    allDayLabels.add(dayLabel);
+  }
+
   // Convert to array and sort numerically by day number
   const sortedDayLabels = Array.from(allDayLabels).sort((a, b) => {
     return parseInt(a) - parseInt(b);
   });
-
-  console.log("[debugTest] currentDataMap:", currentDataMap);
 
   // Create merged data for all days from both periods
   return sortedDayLabels.map((dayLabel) => {

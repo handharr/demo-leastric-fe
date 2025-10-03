@@ -97,7 +97,7 @@ export const useGetElectricityUsageRealTime =
       } finally {
         setLoading(false);
       }
-    }, [selectedInterval]);
+    }, []);
 
     const reset = () => {
       setPeriodicData([]);

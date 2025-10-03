@@ -152,10 +152,15 @@ export function UsageChart({
           />
           <Tooltip
             content={(props) => {
-              const titles = [
-                getLegendLabelForPeriod(selectedPeriod),
+              let titles = [
                 getComparedLegendLabelForPeriod(selectedPeriod),
+                getLegendLabelForPeriod(selectedPeriod),
               ];
+
+              if (props.payload.length === 1) {
+                titles = [getLegendLabelForPeriod(selectedPeriod)];
+              }
+
               return (
                 <CustomTooltip
                   active={props.active}
@@ -166,19 +171,6 @@ export function UsageChart({
                   timeUnit={getTimePeriodUnit(selectedPeriod)}
                 />
               );
-            }}
-          />
-          <Line
-            type="linear"
-            dataKey="value"
-            stroke="#2a6335"
-            strokeWidth={2}
-            dot={<CustomDot />}
-            activeDot={{
-              r: 5,
-              fill: "#2a6335",
-              stroke: "#2a6335",
-              strokeWidth: 2,
             }}
           />
           {compareEnabled && (
@@ -196,6 +188,19 @@ export function UsageChart({
               }}
             />
           )}
+          <Line
+            type="linear"
+            dataKey="value"
+            stroke="#2a6335"
+            strokeWidth={2}
+            dot={<CustomDot />}
+            activeDot={{
+              r: 5,
+              fill: "#2a6335",
+              stroke: "#2a6335",
+              strokeWidth: 2,
+            }}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

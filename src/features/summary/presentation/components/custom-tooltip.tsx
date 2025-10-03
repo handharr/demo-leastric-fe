@@ -31,7 +31,11 @@ export function CustomTooltip({
           <p
             key={index}
             className={`text-sm ${
-              index == 0 ? "text-leastric-primary" : "text-typography-subhead"
+              payload.length === 1
+                ? "text-leastric-primary"
+                : index == 0
+                ? "text-typography-subhead"
+                : "text-leastric-primary"
             }`}
           >
             {`${optional(titles[index]).orEmpty()}: ${formatNumberIndonesian(

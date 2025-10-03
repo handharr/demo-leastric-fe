@@ -51,7 +51,7 @@ export default function SummaryPage() {
   const [compareEnabled, setCompareEnabled] = useState(false);
   const { showPopup } = usePopup();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
-    TimePeriod.Monthly
+    TimePeriod.Daily
   );
   const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(EnergyUnit.KWH);
   const {

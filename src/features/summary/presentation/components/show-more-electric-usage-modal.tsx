@@ -94,7 +94,7 @@ export function ShowMoreElectricUsageModalButton() {
           <div className="flex-1 overflow-auto">
             <table className="w-full">
               <thead>
-                <tr className="sticky top-0 z-10 bg-white border-b border-default-border">
+                <tr className="bg-white border-b border-default-border">
                   <th className="text-left py-3 px-2 text-sm font-medium text-typography-secondary">
                     No.
                   </th>

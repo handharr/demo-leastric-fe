@@ -73,7 +73,7 @@ export const useGetElectricityUsageRealTime =
         );
         if (result.usage && result.usage.data.length > 0 && currentData) {
           setPeriodicData((prevData) => {
-            if (prevData.length < (selectedInterval as number)) {
+            if (prevData.length < 12) {
               // If less than selectedInterval, append new data
               const newData = [...prevData, currentData];
               return newData;

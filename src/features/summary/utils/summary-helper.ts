@@ -163,17 +163,92 @@ export function mergeCurrentAndLastPeriodData({
   currentData: PeriodValueModel[];
   lastData: PeriodValueModel[] | null;
   period: TimePeriod;
-}): { period: string; value: number | null; comparedValue: number | null }[] {
+}): {
+  period: string;
+  value: number | undefined;
+  comparedValue: number | undefined;
+}[] {
   if (!currentData) return [];
-  const mergedData = currentData.map((currentItem, index) => {
-    const lastItem = lastData?.[index];
+
+  // For daily period, we need special handling to align months with different day counts
+  if (period === TimePeriod.Daily && lastData && lastData.length > 0) {
+    return mergeDailyDataWithAlignment(currentData, lastData);
+  }
+
+  // For non-daily periods, use the original logic
+  const mergedData: {
+    period: string;
+    value: number | undefined;
+    comparedValue: number | undefined;
+  }[] = currentData.map((currentItem) => {
     return {
       period: getXAxisLabelForPeriod({ period, value: currentItem.period }),
       value: currentItem.totalKwh,
-      comparedValue: lastItem ? lastItem.totalKwh : null,
+      comparedValue: undefined,
     };
   });
+
+  if (lastData && lastData.length > 0) {
+    lastData.forEach((lastItem) => {
+      const periodLabel = getXAxisLabelForPeriod({
+        period,
+        value: lastItem.period,
+      });
+      const existingIndex = mergedData.findIndex(
+        (item) => item.period === periodLabel
+      );
+      if (existingIndex !== -1) {
+        // If exists, update comparedValue
+        mergedData[existingIndex].comparedValue = lastItem.totalKwh;
+      } else {
+        // If not exists, add new entry with null value
+        mergedData.push({
+          period: periodLabel,
+          value: undefined,
+          comparedValue: lastItem.totalKwh,
+        });
+      }
+    });
+  }
   return mergedData;
+}
+
+/*
+  Helper function to merge daily data with proper alignment for months with different day counts
+  This ensures that day 1 of current month aligns with day 1 of last month, etc.
+  Only includes days that exist in the current month for a clean chart
+*/
+function mergeDailyDataWithAlignment(
+  currentData: PeriodValueModel[],
+  lastData: PeriodValueModel[]
+): {
+  period: string;
+  value: number | undefined;
+  comparedValue: number | undefined;
+}[] {
+  // Create a map of last data by day number for quick lookup
+  const lastDataMap = new Map<string, number>();
+  lastData.forEach((item) => {
+    const dayLabel = getXAxisLabelForPeriod({
+      period: TimePeriod.Daily,
+      value: item.period,
+    });
+    lastDataMap.set(dayLabel, item.totalKwh);
+  });
+
+  // Map current data and align with corresponding days from last period
+  return currentData.map((currentItem) => {
+    const periodLabel = getXAxisLabelForPeriod({
+      period: TimePeriod.Daily,
+      value: currentItem.period,
+    });
+
+    return {
+      period: periodLabel,
+      value: currentItem.totalKwh,
+      comparedValue: lastDataMap.get(periodLabel), // Will be undefined if day doesn't exist in last month
+    };
+  });
 }
 
 export function getStartAndEndDateFormattedUTCWithoutMsFromYear(year: number) {

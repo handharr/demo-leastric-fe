@@ -218,18 +218,18 @@ export function UsageChart({
             strokeWidth={2}
             dot={(props: DotProps) => {
               // Only render dot if value is not undefined
-              if (props.payload?.value === undefined) {
-                return <g />; // Return empty SVG group instead of null
+              if (props.payload?.value) {
+                return (
+                  <CustomDot
+                    cx={props.cx}
+                    cy={props.cy}
+                    fill="#2a6335"
+                    stroke="#2a6335"
+                    strokeWidth={2}
+                  />
+                );
               }
-              return (
-                <CustomDot
-                  cx={props.cx}
-                  cy={props.cy}
-                  fill="#2a6335"
-                  stroke="#2a6335"
-                  strokeWidth={2}
-                />
-              );
+              return <g />;
             }}
             activeDot={{
               r: 5,

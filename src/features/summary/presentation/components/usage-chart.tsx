@@ -25,6 +25,15 @@ import {
   mergeCurrentAndLastPeriodData,
 } from "@/features/summary/utils/summary-helper";
 
+interface DotProps {
+  cx?: number;
+  cy?: number;
+  payload?: {
+    value?: number;
+    comparedValue?: number;
+  };
+}
+
 interface UsageChartProps {
   title?: string;
   description?: string;
@@ -179,7 +188,21 @@ export function UsageChart({
               dataKey="comparedValue"
               stroke="#BABABA"
               strokeWidth={2}
-              dot={<CustomDot />}
+              dot={(props: DotProps) => {
+                // Only render dot if comparedValue is not undefined
+                if (props.payload?.comparedValue === undefined) {
+                  return <g />; // Return empty SVG group instead of null
+                }
+                return (
+                  <CustomDot
+                    cx={props.cx}
+                    cy={props.cy}
+                    fill="#BABABA"
+                    stroke="#BABABA"
+                    strokeWidth={2}
+                  />
+                );
+              }}
               activeDot={{
                 r: 5,
                 fill: "#BABABA",
@@ -193,7 +216,21 @@ export function UsageChart({
             dataKey="value"
             stroke="#2a6335"
             strokeWidth={2}
-            dot={<CustomDot />}
+            dot={(props: DotProps) => {
+              // Only render dot if value is not undefined
+              if (props.payload?.value === undefined) {
+                return <g />; // Return empty SVG group instead of null
+              }
+              return (
+                <CustomDot
+                  cx={props.cx}
+                  cy={props.cy}
+                  fill="#2a6335"
+                  stroke="#2a6335"
+                  strokeWidth={2}
+                />
+              );
+            }}
             activeDot={{
               r: 5,
               fill: "#2a6335",

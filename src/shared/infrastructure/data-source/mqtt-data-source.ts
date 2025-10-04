@@ -6,7 +6,7 @@ import {
 } from "@/shared/utils/helpers/retry-helper";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { Observable, Subject, BehaviorSubject } from "rxjs";
-import { filter, share } from "rxjs/operators";
+import { filter, share, map } from "rxjs/operators";
 
 export type MqttMessage<T = unknown> = {
   topic: string;
@@ -39,7 +39,7 @@ export class MqttDataSource {
   private connectionAttempts = 0;
   private maxConnectionAttempts = 3;
 
-  // Replace single subscription with multiple subscriptions
+  // Replace single subscription with multiple subscriptions - keep as unknown
   private subscriptions: Map<
     string,
     {
@@ -235,7 +235,7 @@ export class MqttDataSource {
   /**
    * Subscribe to MQTT topic and return an Observable
    */
-  subscribeToTopic<T>({
+  subscribeToTopic<T = unknown>({
     topic,
     options = { qos: 0, autoConnect: true },
   }: {
@@ -251,9 +251,17 @@ export class MqttDataSource {
     return new Observable<MqttMessage<T>>((subscriber) => {
       const subscriptionKey = `${topic}_${qos}`;
 
-      const messageCallback = (message: MqttMessage<T>) => {
+      // Type-safe callback that properly converts unknown to T
+      const messageCallback = (message: MqttMessage<unknown>) => {
         if (this.topicMatches(message.topic, topic)) {
-          subscriber.next(message);
+          // Safe casting with explicit type assertion
+          const typedMessage: MqttMessage<T> = {
+            topic: message.topic,
+            payload: message.payload as T,
+            timestamp: message.timestamp,
+            qos: message.qos,
+          };
+          subscriber.next(typedMessage);
         }
       };
 
@@ -261,9 +269,9 @@ export class MqttDataSource {
         subscriber.error(error);
       };
 
-      // Store subscription
+      // Store subscription with type-erased callback
       this.subscriptions.set(subscriptionKey, {
-        callback: messageCallback,
+        callback: messageCallback, // This works because unknown is the top type
         errorHandler,
         qos,
       });
@@ -319,11 +327,21 @@ export class MqttDataSource {
   }
 
   /**
-   * Filter messages by topic pattern
+   * Filter messages by topic pattern with type casting
    */
-  getMessagesByTopic$(topicPattern: string): Observable<MqttMessage<unknown>> {
+  getMessagesByTopic$<T = unknown>(
+    topicPattern: string
+  ): Observable<MqttMessage<T>> {
     return this.messageSubject.pipe(
-      filter((message) => this.topicMatches(message.topic, topicPattern))
+      filter((message) => this.topicMatches(message.topic, topicPattern)),
+      map(
+        (message): MqttMessage<T> => ({
+          topic: message.topic,
+          payload: message.payload as T,
+          timestamp: message.timestamp,
+          qos: message.qos,
+        })
+      )
     );
   }
 
@@ -635,7 +653,34 @@ export function createMqttDataSource(
   return new MqttDataSource(config);
 }
 
-// Define specific types for your use case
+// Enhanced factory function with type support
+export function createTypedMqttDataSource<T = unknown>(
+  config: MqttDataSourceConfig
+): {
+  dataSource: MqttDataSource;
+  subscribeToTopic: (
+    topic: string,
+    options?: { qos?: 0 | 1 | 2; autoConnect?: boolean }
+  ) => Observable<MqttMessage<T>>;
+  getMessagesByTopic: (topicPattern: string) => Observable<MqttMessage<T>>;
+} {
+  const dataSource = new MqttDataSource(config);
+
+  return {
+    dataSource,
+    subscribeToTopic: (topic: string, options?) =>
+      dataSource.subscribeToTopic<T>({ topic, options }),
+    getMessagesByTopic: (topicPattern: string) =>
+      dataSource.getMessagesByTopic$<T>(topicPattern),
+  };
+}
+
+// Define specific types for your use cases
+export interface MqttUsageResponse {
+  "1phases": Array<{ devid: string; p: number }>;
+  "3phases": Array<{ devid: string; pR: number; pS: number; pT: number }>;
+}
+
 export interface DeviceDataPayload {
   deviceId: string;
   power: number;
@@ -644,7 +689,31 @@ export interface DeviceDataPayload {
   timestamp?: string;
 }
 
-// Default instance for device data
+// Create typed instances for specific use cases
+export const usageMqttDataSource = createTypedMqttDataSource<MqttUsageResponse>(
+  {
+    brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
+      "ws://localhost:9001"
+    ),
+    username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+    password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+    enableRetry: true,
+    enableLogging: true,
+  }
+);
+
+export const deviceMqttDataSource =
+  createTypedMqttDataSource<DeviceDataPayload>({
+    brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
+      "ws://localhost:9001"
+    ),
+    username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+    password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+    enableRetry: true,
+    enableLogging: true,
+  });
+
+// Keep existing instances for backward compatibility
 export const mqttDataSource = createMqttDataSource({
   brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
     "ws://localhost:9001"
@@ -655,7 +724,6 @@ export const mqttDataSource = createMqttDataSource({
   enableLogging: true,
 });
 
-// For general purpose (if needed)
 export const generalMqttDataSource = createMqttDataSource({
   brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
     "ws://localhost:9001"

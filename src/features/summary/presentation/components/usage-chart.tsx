@@ -24,6 +24,10 @@ import {
   getLegendLabelForPeriod,
   mergeCurrentAndLastPeriodData,
 } from "@/features/summary/utils/summary-helper";
+import {
+  CustomToolTipPayload,
+  CustomToolTipTextColor,
+} from "@/features/summary/presentation/components/custom-tooltip";
 
 interface DotProps {
   cx?: number;
@@ -161,22 +165,27 @@ export function UsageChart({
           />
           <Tooltip
             content={(props) => {
-              let titles = [
-                getComparedLegendLabelForPeriod(selectedPeriod),
-                getLegendLabelForPeriod(selectedPeriod),
-              ];
-
-              if (props.payload.length === 1) {
-                titles = [getLegendLabelForPeriod(selectedPeriod)];
-              }
+              const _payload: CustomToolTipPayload[] = props.payload.map(
+                (entry) => {
+                  return {
+                    value: formatNumberIndonesian(Number(entry.value), 2),
+                    textColor:
+                      entry.dataKey === "comparedValue"
+                        ? CustomToolTipTextColor.secondary
+                        : CustomToolTipTextColor.primary,
+                    prefix:
+                      entry.dataKey === "comparedValue"
+                        ? `${getComparedLegendLabelForPeriod(selectedPeriod)}: `
+                        : `${getLegendLabelForPeriod(selectedPeriod)}: `,
+                  };
+                }
+              );
 
               return (
                 <CustomTooltip
                   active={props.active}
-                  payload={props.payload}
+                  payload={_payload}
                   label={props.label}
-                  unit={selectedUnit}
-                  titles={titles}
                   timeUnit={getTimePeriodUnit(selectedPeriod)}
                 />
               );
@@ -223,6 +232,7 @@ export function UsageChart({
               }
               return (
                 <CustomDot
+                  key={props.payload?.value}
                   cx={props.cx}
                   cy={props.cy}
                   fill="#2a6335"

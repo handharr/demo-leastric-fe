@@ -131,8 +131,8 @@ export function UsageChart({
           data={mergedData}
           margin={{
             top: 5,
-            right: 30,
-            left: 20,
+            right: 5,
+            left: 5, // Add small left margin for Y-axis labels
             bottom: 5,
           }}
         >
@@ -162,6 +162,7 @@ export function UsageChart({
             }}
             tickFormatter={(value) => formatNumberIndonesian(Number(value), 0)}
             tickCount={4}
+            domain={["dataMin", "dataMax"]}
           />
           <Tooltip
             content={(props) => {

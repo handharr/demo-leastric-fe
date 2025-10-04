@@ -5,6 +5,8 @@ import {
   RetryOptions,
 } from "@/shared/utils/helpers/retry-helper";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { Observable, Subject, BehaviorSubject } from "rxjs";
+import { filter, share } from "rxjs/operators";
 
 export type MqttMessage<T = unknown> = {
   topic: string;
@@ -37,11 +39,23 @@ export class MqttDataSource<T = unknown> {
   private connectionAttempts = 0;
   private maxConnectionAttempts = 3;
 
-  // Single topic subscription
-  private topic: string | null = null;
-  private messageCallback: ((message: MqttMessage<T>) => void) | null = null;
-  private errorHandler: ((error: Error) => void) | null = null;
-  private subscriptionQos: 0 | 1 | 2 = 0;
+  // Replace single subscription with multiple subscriptions
+  private subscriptions: Map<
+    string,
+    {
+      callback: (message: MqttMessage<T>) => void;
+      errorHandler?: (error: Error) => void;
+      qos: 0 | 1 | 2;
+    }
+  > = new Map();
+
+  // Observable subjects for reactive support
+  private messageSubject = new Subject<MqttMessage<T>>();
+  private connectionStatusSubject = new BehaviorSubject<{
+    connected: boolean;
+    connecting: boolean;
+    error?: Error;
+  }>({ connected: false, connecting: false });
 
   constructor(config: MqttDataSourceConfig) {
     this.config = {
@@ -170,13 +184,25 @@ export class MqttDataSource<T = unknown> {
       this.isConnecting = false;
       this.connectionAttempts = 0;
       this.connectionPromise = null;
-      this.resubscribe();
+
+      // Update connection status
+      this.connectionStatusSubject.next({ connected: true, connecting: false });
+
+      this.resubscribeAll();
       resolve();
     });
 
     client.on("error", (error) => {
       this.logError("MQTT connection error:", error);
       this.isConnecting = false;
+
+      // Update connection status
+      this.connectionStatusSubject.next({
+        connected: false,
+        connecting: false,
+        error,
+      });
+
       if (this.connectionAttempts === 1) {
         reject(error);
       }
@@ -207,6 +233,98 @@ export class MqttDataSource<T = unknown> {
   }
 
   /**
+   * Subscribe to MQTT topic and return an Observable
+   */
+  subscribeToTopic(
+    topic: string,
+    options?: {
+      qos?: 0 | 1 | 2;
+      autoConnect?: boolean;
+    }
+  ): Observable<MqttMessage<T>> {
+    const qos = options?.qos || 0;
+    const autoConnect = options?.autoConnect !== false;
+
+    return new Observable<MqttMessage<T>>((subscriber) => {
+      const subscriptionKey = `${topic}_${qos}`;
+
+      const messageCallback = (message: MqttMessage<T>) => {
+        if (this.topicMatches(message.topic, topic)) {
+          subscriber.next(message);
+        }
+      };
+
+      const errorHandler = (error: Error) => {
+        subscriber.error(error);
+      };
+
+      // Store subscription
+      this.subscriptions.set(subscriptionKey, {
+        callback: messageCallback,
+        errorHandler,
+        qos,
+      });
+
+      const setupSubscription = async () => {
+        try {
+          if (autoConnect) {
+            await this.connect();
+          }
+
+          if (this.client?.connected) {
+            await this.performSubscription(topic, qos);
+          }
+        } catch (error) {
+          errorHandler(
+            error instanceof Error ? error : new Error(String(error))
+          );
+        }
+      };
+
+      setupSubscription();
+
+      // Cleanup function
+      return () => {
+        this.subscriptions.delete(subscriptionKey);
+        if (this.client?.connected) {
+          this.client.unsubscribe(topic, (error) => {
+            if (error) {
+              this.logError(`Failed to unsubscribe from ${topic}:`, error);
+            }
+          });
+        }
+      };
+    }).pipe(share()); // Share the subscription among multiple observers
+  }
+
+  /**
+   * Get connection status as Observable
+   */
+  getConnectionStatus$(): Observable<{
+    connected: boolean;
+    connecting: boolean;
+    error?: Error;
+  }> {
+    return this.connectionStatusSubject.asObservable();
+  }
+
+  /**
+   * Get all messages as Observable (can be filtered by topic)
+   */
+  getAllMessages$(): Observable<MqttMessage<T>> {
+    return this.messageSubject.asObservable();
+  }
+
+  /**
+   * Filter messages by topic pattern
+   */
+  getMessagesByTopic$(topicPattern: string): Observable<MqttMessage<T>> {
+    return this.messageSubject.pipe(
+      filter((message) => this.topicMatches(message.topic, topicPattern))
+    );
+  }
+
+  /**
    * Handle incoming MQTT messages
    */
   private handleMessage(topic: string, message: Buffer, qos?: 0 | 1 | 2): void {
@@ -221,21 +339,17 @@ export class MqttDataSource<T = unknown> {
 
       this.log(`Received message on topic ${topic}:`, payload);
 
-      // Notify subscription callback if topic matches
-      if (
-        this.topic &&
-        this.messageCallback &&
-        this.topicMatches(topic, this.topic)
-      ) {
+      // Emit to message subject
+      this.messageSubject.next(mqttMessage);
+
+      // Call all matching subscription callbacks
+      for (const [, subscription] of this.subscriptions) {
         try {
-          this.messageCallback(mqttMessage);
+          subscription.callback(mqttMessage);
         } catch (error) {
-          this.logError(
-            `Error in subscription callback for topic ${this.topic}:`,
-            error
-          );
-          if (this.errorHandler) {
-            this.errorHandler(
+          this.logError("Error in subscription callback:", error);
+          if (subscription.errorHandler) {
+            subscription.errorHandler(
               error instanceof Error ? error : new Error(String(error))
             );
           }
@@ -246,119 +360,25 @@ export class MqttDataSource<T = unknown> {
     }
   }
 
-  /**
-   * Parse message payload
-   */
-  private parseMessage<TPayload = T>(message: Buffer): TPayload {
+  private topicMatches(topic: string, pattern: string): boolean {
+    if (pattern === "#") return true; // Match all topics
+    const regex = new RegExp(
+      "^" +
+        pattern
+          .replace(/\+/g, "[^/]+") // Single-level wildcard
+          .replace(/#/g, ".*") + // Multi-level wildcard
+        "$"
+    );
+    return regex.test(topic);
+  }
+
+  private parseMessage<TPayload>(message: Buffer): TPayload {
+    const messageString = message.toString();
     try {
-      const messageString = message.toString();
-      const messageWrapper = optionalValue(messageString);
-
-      if (messageWrapper.isNullOrEmpty()) {
-        return messageString as TPayload;
-      }
-
-      // Try to parse as JSON, fallback to string
-      try {
-        return JSON.parse(messageString) as TPayload;
-      } catch {
-        return messageString as TPayload;
-      }
+      return JSON.parse(messageString) as TPayload;
     } catch {
-      return message.toString() as TPayload;
-    }
-  }
-
-  /**
-   * Check if topic matches subscription pattern
-   */
-  private topicMatches(actualTopic: string, subscribedTopic: string): boolean {
-    const actualTopicWrapper = optionalValue(actualTopic);
-    const subscribedTopicWrapper = optionalValue(subscribedTopic);
-
-    if (
-      actualTopicWrapper.isNullOrEmpty() ||
-      subscribedTopicWrapper.isNullOrEmpty()
-    ) {
-      return false;
-    }
-
-    if (subscribedTopic === "*") return true;
-
-    // Handle MQTT wildcards: + (single level), # (multi level)
-    const actualParts = actualTopic.split("/");
-    const subscribedParts = subscribedTopic.split("/");
-
-    // Handle multi-level wildcard (#)
-    if (subscribedParts.includes("#")) {
-      const hashIndex = subscribedParts.indexOf("#");
-      if (hashIndex !== subscribedParts.length - 1) return false;
-
-      for (let i = 0; i < hashIndex; i++) {
-        if (
-          subscribedParts[i] !== "+" &&
-          subscribedParts[i] !== actualParts[i]
-        ) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    // Handle single-level wildcard (+)
-    const actualPartsWrapper = optionalValue(actualParts);
-    const subscribedPartsWrapper = optionalValue(subscribedParts);
-
-    if (
-      actualPartsWrapper.arrayLength() !== subscribedPartsWrapper.arrayLength()
-    ) {
-      return false;
-    }
-
-    for (let i = 0; i < subscribedParts.length; i++) {
-      if (subscribedParts[i] !== "+" && subscribedParts[i] !== actualParts[i]) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * Subscribe to MQTT topic (only one subscription allowed)
-   */
-  async subscribe({
-    topic,
-    callback,
-    options,
-  }: {
-    topic: string;
-    callback: (message: MqttMessage<T>) => void;
-    options?: {
-      qos?: 0 | 1 | 2;
-      errorHandler?: (error: Error) => void;
-    };
-  }): Promise<void> {
-    const topicWrapper = optionalValue(topic);
-    if (topicWrapper.isNullOrEmpty()) {
-      throw new Error("Topic cannot be null or empty");
-    }
-
-    // Unsubscribe from previous topic if exists
-    if (this.topic) {
-      await this.unsubscribe();
-    }
-
-    await this.connect();
-
-    this.topic = topic;
-    this.messageCallback = callback;
-    this.errorHandler = options?.errorHandler || null;
-    this.subscriptionQos = options?.qos || 0;
-
-    const clientWrapper = optionalValue(this.client);
-    if (clientWrapper.isPresent() && this.client!.connected) {
-      await this.performSubscription(topic, this.subscriptionQos);
+      // If parsing fails, return the raw string
+      return messageString as unknown as TPayload;
     }
   }
 
@@ -393,33 +413,31 @@ export class MqttDataSource<T = unknown> {
    * Unsubscribe from current MQTT topic
    */
   async unsubscribe(): Promise<void> {
-    if (!this.topic) {
-      return;
-    }
-
-    const currentTopic = this.topic;
-    this.topic = null;
-    this.messageCallback = null;
-    this.errorHandler = null;
-
     const clientWrapper = optionalValue(this.client);
-    if (clientWrapper.isPresent() && this.client!.connected) {
-      return new Promise((resolve, reject) => {
-        this.client!.unsubscribe(currentTopic, (error) => {
-          const errorWrapper = optionalValue(error);
-          if (errorWrapper.isPresent()) {
-            this.logError(
-              `Failed to unsubscribe from topic ${currentTopic}:`,
-              error
-            );
-            reject(error);
-          } else {
-            this.log(`Unsubscribed from topic: ${currentTopic}`);
-            resolve();
-          }
-        });
-      });
+    if (clientWrapper.isEmpty() || !this.client!.connected) {
+      throw new Error("MQTT client not connected");
     }
+
+    const unsubscribePromises = Array.from(this.subscriptions.keys()).map(
+      (subscriptionKey) => {
+        const topic = subscriptionKey.split("_")[0]; // Extract topic from key
+        return new Promise<void>((resolve, reject) => {
+          this.client!.unsubscribe(topic, (error) => {
+            const errorWrapper = optionalValue(error);
+            if (errorWrapper.isPresent()) {
+              this.logError(`Failed to unsubscribe from ${topic}:`, error);
+              reject(error);
+            } else {
+              this.log(`Unsubscribed from topic: ${topic}`);
+              resolve();
+            }
+          });
+        });
+      }
+    );
+
+    await Promise.all(unsubscribePromises);
+    this.subscriptions.clear();
   }
 
   /**
@@ -465,22 +483,20 @@ export class MqttDataSource<T = unknown> {
   }
 
   /**
-   * Resubscribe to topic after reconnection
+   * Resubscribe to all topics after reconnection
    */
-  private async resubscribe(): Promise<void> {
-    if (!this.topic) {
-      return;
-    }
-
-    this.log("Resubscribing to topic:", this.topic);
-    try {
-      await this.performSubscription(this.topic, this.subscriptionQos);
-    } catch (error) {
-      this.logError(`Failed to resubscribe to topic ${this.topic}:`, error);
-      if (this.errorHandler) {
-        this.errorHandler(
-          error instanceof Error ? error : new Error(String(error))
-        );
+  private async resubscribeAll(): Promise<void> {
+    for (const [subscriptionKey, subscription] of this.subscriptions) {
+      const topic = subscriptionKey.split("_")[0]; // Extract topic from key
+      try {
+        await this.performSubscription(topic, subscription.qos);
+      } catch (error) {
+        this.logError(`Failed to resubscribe to topic ${topic}:`, error);
+        if (subscription.errorHandler) {
+          subscription.errorHandler(
+            error instanceof Error ? error : new Error(String(error))
+          );
+        }
       }
     }
   }
@@ -489,22 +505,28 @@ export class MqttDataSource<T = unknown> {
    * Disconnect from MQTT broker
    */
   disconnect(): Promise<void> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const clientWrapper = optionalValue(this.client);
-      if (clientWrapper.isPresent()) {
-        this.client!.end(false, {}, () => {
-          this.log("MQTT client disconnected");
-          this.connectionPromise = null;
-          this.isConnecting = false;
-          this.connectionAttempts = 0;
-          this.topic = null;
-          this.messageCallback = null;
-          this.errorHandler = null;
-          resolve();
-        });
-      } else {
+      if (clientWrapper.isEmpty() || !this.client!.connected) {
+        this.log("MQTT client already disconnected");
         resolve();
+        return;
       }
+
+      this.client!.end(false, {}, (error) => {
+        const errorWrapper = optionalValue(error);
+        if (errorWrapper.isPresent()) {
+          this.logError("Failed to disconnect MQTT client:", error);
+          reject(error);
+        } else {
+          this.log("Disconnected from MQTT broker");
+          this.connectionStatusSubject.next({
+            connected: false,
+            connecting: false,
+          });
+          resolve();
+        }
+      });
     });
   }
 
@@ -522,13 +544,15 @@ export class MqttDataSource<T = unknown> {
     connected: boolean;
     connecting: boolean;
     attempts: number;
-    subscribedTopic: string | null;
+    subscribedTopic: string[] | null;
   } {
     return {
       connected: this.isConnected(),
       connecting: this.isConnecting,
       attempts: this.connectionAttempts,
-      subscribedTopic: this.topic,
+      subscribedTopic: this.subscriptions.size
+        ? Array.from(this.subscriptions.keys()).map((key) => key.split("_")[0])
+        : null,
     };
   }
 

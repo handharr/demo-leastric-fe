@@ -312,132 +312,73 @@ export class SummaryRepositoryImpl implements SummaryRepository {
   }
 
   subscribeRealTimeUsage(): Observable<MqttUsageModel | BaseErrorModel> {
-    return new Observable((subscriber) => {
-      Logger.info(
-        "SummaryRepositoryImpl",
-        "subscribeRealTimeUsage",
-        "Starting MQTT subscription"
-      );
+    const mqttConfig: MqttDataSourceConfig = {
+      brokerUrl: process.env.NEXT_PUBLIC_MQTT_BROKER_URL || "",
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME || "",
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD || "",
+      clientId:
+        process.env.NEXT_PUBLIC_MQTT_CLIENT_ID ||
+        `web-client-${Math.random().toString(16).slice(2)}`,
+      qos: 0,
+      connectTimeout: 4000,
+      reconnectPeriod: 4000,
+      enableLogging: true,
+    };
 
-      let dataSource: MqttDataSource<MqttUsageResponse> | null = null;
+    const dataSource = new MqttDataSource<MqttUsageResponse>(mqttConfig);
 
-      const initializeConnection = async () => {
+    return dataSource.subscribeToTopic("devices/+/usage").pipe(
+      map((message): MqttUsageModel | BaseErrorModel => {
         try {
-          const mqttConfig: MqttDataSourceConfig = {
-            brokerUrl: process.env.NEXT_PUBLIC_MQTT_BROKER_URL || "",
-            username: process.env.NEXT_PUBLIC_MQTT_USERNAME || "",
-            password: process.env.NEXT_PUBLIC_MQTT_PASSWORD || "",
-            clientId:
-              process.env.NEXT_PUBLIC_MQTT_CLIENT_ID ||
-              `web-client-${Math.random().toString(16).slice(2)}`,
-            qos: 0,
-            connectTimeout: 4000,
-            reconnectPeriod: 4000,
-          };
-
           Logger.info(
             "SummaryRepositoryImpl",
-            "subscribeRealTimeUsage",
-            "MQTT Configured"
+            "subscribeRealTimeUsage - message received",
+            message
           );
 
-          dataSource = new MqttDataSource<MqttUsageResponse>(mqttConfig);
+          const parsedMessage: MqttUsageModel = {
+            "1phases": optionalValue(message.payload["1phases"])
+              .orEmptyArray()
+              .map((log) => ({
+                devid: optionalValue(log.devid).orEmpty(),
+                p: optionalValue(log.p).orZero(),
+              })),
+            "3phases": optionalValue(message.payload["3phases"])
+              .orEmptyArray()
+              .map((log) => ({
+                devid: optionalValue(log.devid).orEmpty(),
+                pR: optionalValue(log.pR).orZero(),
+                pS: optionalValue(log.pS).orZero(),
+                pT: optionalValue(log.pT).orZero(),
+              })),
+          };
 
-          try {
-            await dataSource.connect();
-            Logger.info(
-              "SummaryRepositoryImpl",
-              "subscribeRealTimeUsage",
-              "MQTT Connected"
-            );
-          } catch (error) {
-            Logger.error(
-              "SummaryRepositoryImpl",
-              "subscribeRealTimeUsage - connection error",
-              error
-            );
-            subscriber.next(
-              createErrorModel({
-                type: ErrorType.NETWORK,
-                message: "Failed to connect to MQTT broker.",
-              })
-            );
-            return;
-          }
-
-          dataSource.subscribe({
-            topic: "devices/+/usage",
-            options: {
-              qos: 0,
-              errorHandler: (error) => {
-                Logger.error(
-                  "SummaryRepositoryImpl",
-                  "subscribeRealTimeUsage - subscription error",
-                  error
-                );
-                subscriber.next(
-                  createErrorModel({
-                    type: ErrorType.NETWORK,
-                    message: "MQTT subscription error occurred.",
-                  })
-                );
-              },
-            },
-            callback: (message) => {
-              Logger.info(
-                "SummaryRepositoryImpl",
-                "subscribeRealTimeUsage - message received",
-                message
-              );
-              const parsedMessage: MqttUsageModel = {
-                "1phases": optionalValue(message.payload["1phases"])
-                  .orEmptyArray()
-                  .map((log) => ({
-                    devid: optionalValue(log.devid).orEmpty(),
-                    p: optionalValue(log.p).orZero(),
-                  })),
-                "3phases": optionalValue(message.payload["3phases"])
-                  .orEmptyArray()
-                  .map((log) => ({
-                    devid: optionalValue(log.devid).orEmpty(),
-                    pR: optionalValue(log.pR).orZero(),
-                    pS: optionalValue(log.pS).orZero(),
-                    pT: optionalValue(log.pT).orZero(),
-                  })),
-              };
-              subscriber.next(parsedMessage);
-            },
-          });
+          return parsedMessage;
         } catch (error) {
           Logger.error(
             "SummaryRepositoryImpl",
-            "subscribeRealTimeUsage - unexpected error",
+            "subscribeRealTimeUsage - parsing error",
             error
           );
-          subscriber.next(
-            createErrorModel({
-              type: ErrorType.UNEXPECTED,
-              message:
-                "An unexpected error occurred while subscribing to usage.",
-            })
-          );
+          return createErrorModel({
+            type: ErrorType.UNEXPECTED,
+            message: "Failed to parse MQTT usage data.",
+          });
         }
-      };
-
-      // Initialize connection
-      initializeConnection();
-
-      // Cleanup function
-      return () => {
-        Logger.info(
+      }),
+      catchError((error) => {
+        Logger.error(
           "SummaryRepositoryImpl",
-          "subscribeRealTimeUsage",
-          "Cleaning up MQTT connection"
+          "subscribeRealTimeUsage - MQTT error",
+          error
         );
-        if (dataSource) {
-          dataSource.disconnect?.();
-        }
-      };
-    });
+        return of(
+          createErrorModel({
+            type: ErrorType.NETWORK,
+            message: "MQTT connection error occurred.",
+          })
+        );
+      })
+    );
   }
 }

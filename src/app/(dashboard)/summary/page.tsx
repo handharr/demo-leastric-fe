@@ -142,7 +142,7 @@ export default function SummaryPage() {
   }, [fetchElectricityUsageHistory]);
 
   return (
-    <div className="flex min-h-screen flex-col gap-[16px]">
+    <div className="flex flex-col gap-[16px]">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-typography-headline">Summary</h1>

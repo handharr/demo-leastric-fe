@@ -131,7 +131,7 @@ export default function SettingLayout({
   }, [logoutError, showPopup, clearError]);
 
   return (
-    <div className="flex min-h-screen flex-col gap-[16px]">
+    <div className="flex flex-col gap-[16px]">
       <span className="items-center justify-center text-2xl font-bold text-typography-headline">
         Setting
       </span>

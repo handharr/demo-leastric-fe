@@ -168,7 +168,10 @@ export function UsageChart({
               const _payload: CustomToolTipPayload[] = props.payload.map(
                 (entry) => {
                   return {
-                    value: formatNumberIndonesian(Number(entry.value), 2),
+                    value: `${formatNumberIndonesian(
+                      Number(entry.value),
+                      2
+                    )} ${selectedUnit}`,
                     textColor:
                       entry.dataKey === "comparedValue"
                         ? CustomToolTipTextColor.secondary

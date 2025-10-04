@@ -53,7 +53,7 @@ export function DateRangeModal({
         )}
       </button>
       <Modal open={open} onClose={handleClose} zValue={51}>
-        <div className="p-4 w-auto max-h-[50vh]">
+        <div className="p-4 w-auto">
           {/* Replace below with your calendar picker */}
           <div className="flex flex-row">
             <DayPicker

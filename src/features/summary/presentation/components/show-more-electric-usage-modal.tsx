@@ -76,9 +76,9 @@ export function ShowMoreElectricUsageModalButton() {
         zValue={52}
       >
         {/* Content container */}
-        <div className="w-auto h-[50vh] mb-[16px] flex flex-col">
+        <div className="w-auto mb-[16px] flex flex-col gap-y-[16px]">
           {/* Date range filter placeholder */}
-          <div className="mb-4">
+          <div>
             <DateRangeModal
               dateRange={dateRange}
               onApply={(range) => {

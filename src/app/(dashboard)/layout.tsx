@@ -326,7 +326,7 @@ export default function DashboardLayout({
             )}
 
             {/* Top Navigation Bar */}
-            <header className="h-16 bg-white border-b border-[#dedede] flex items-center justify-between px-4 lg:px-6 shrink-0 relative z-30">
+            <header className="h-[64px] bg-white border-b border-[#dedede] flex items-center justify-between px-4 lg:px-6 shrink-0 relative z-30">
               <div className="flex items-center gap-4">
                 <button
                   className={mobileMenuButtonClasses}

@@ -12,6 +12,7 @@ import {
   GetExportToCsvQueryParams,
 } from "@/features/summary/domain/params/query-params";
 import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
+import { Observable } from "rxjs";
 
 export interface SummaryRepository {
   getUsageSummary({
@@ -34,5 +35,5 @@ export interface SummaryRepository {
   }: {
     queryParam: GetExportToCsvQueryParams;
   }): Promise<GetExportToCsvModel | BaseErrorModel>;
-  subscribeRealTimeUsage(): Promise<MqttUsageModel | BaseErrorModel>;
+  subscribeRealTimeUsage(): Observable<MqttUsageModel | BaseErrorModel>;
 }

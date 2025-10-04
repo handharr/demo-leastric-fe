@@ -63,6 +63,7 @@ export function DateRangeModal({
                 navLayout="around"
                 numberOfMonths={2}
                 timeZone="Asia/Jakarta"
+                disabled={{ after: new Date() }}
                 selected={{
                   from: selectedRange?.startDate,
                   to: selectedRange?.endDate,

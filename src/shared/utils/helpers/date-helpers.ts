@@ -120,6 +120,30 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
   }
 }
 
+/// Get range of current month dates starting from 1 to current date
+export function getCurrentMonthDateRangeUntilToday(): DateRange {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-based (0 = January, 11 = December)
+  const currentDate = now.getDate();
+
+  const startDate = new Date(currentYear, currentMonth, 1, 0, 0, 0, 0);
+  const endDate = new Date(
+    currentYear,
+    currentMonth,
+    currentDate,
+    23,
+    59,
+    59,
+    999
+  );
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
 export function get10YearsRangeFromCurrentYear(): string[] {
   const currentYear = new Date().getFullYear();
   const years: string[] = [];

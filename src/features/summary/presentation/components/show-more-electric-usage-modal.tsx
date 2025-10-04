@@ -4,9 +4,8 @@ import { DateRangeModal } from "@/shared/presentation/components/date-range-moda
 import { Pagination } from "@/shared/presentation/components/pagination";
 import {
   formatDateToStringUTCWithoutMs,
-  getDateRangeByTimePeriod,
+  getCurrentMonthDateRangeUntilToday,
 } from "@/shared/utils/helpers/date-helpers";
-import { TimePeriod } from "@/shared/domain/enum/enums";
 import { DateRange } from "@/shared/domain/entities/models";
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
 import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
@@ -21,7 +20,7 @@ import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 export function ShowMoreElectricUsageModalButton() {
   const [open, setOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange>(
-    getDateRangeByTimePeriod(TimePeriod.Daily)
+    getCurrentMonthDateRangeUntilToday()
   );
   const { showPopup } = usePopup();
   const {

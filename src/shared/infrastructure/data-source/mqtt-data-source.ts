@@ -508,6 +508,7 @@ export class MqttDataSource<TDefault = unknown> {
    */
   addMessageHandler<T = TDefault>(
     topicPattern: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handler: (message: MqttMessage<T>) => void
   ): void {
     const topicWrapper = optionalValue(topicPattern);

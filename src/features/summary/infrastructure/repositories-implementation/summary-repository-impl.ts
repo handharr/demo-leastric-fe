@@ -325,60 +325,46 @@ export class SummaryRepositoryImpl implements SummaryRepository {
       enableLogging: true,
     };
 
-    const dataSource = new MqttDataSource<MqttUsageResponse>(mqttConfig);
+    const dataSource = new MqttDataSource(mqttConfig);
 
-    return dataSource.subscribeToTopic("devices/+/usage").pipe(
-      map((message): MqttUsageModel | BaseErrorModel => {
-        try {
-          Logger.info(
-            "SummaryRepositoryImpl",
-            "subscribeRealTimeUsage - message received",
-            message
-          );
-
-          const parsedMessage: MqttUsageModel = {
-            "1phases": optionalValue(message.payload["1phases"])
-              .orEmptyArray()
-              .map((log) => ({
-                devid: optionalValue(log.devid).orEmpty(),
-                p: optionalValue(log.p).orZero(),
-              })),
-            "3phases": optionalValue(message.payload["3phases"])
-              .orEmptyArray()
-              .map((log) => ({
-                devid: optionalValue(log.devid).orEmpty(),
-                pR: optionalValue(log.pR).orZero(),
-                pS: optionalValue(log.pS).orZero(),
-                pT: optionalValue(log.pT).orZero(),
-              })),
-          };
-
-          return parsedMessage;
-        } catch (error) {
-          Logger.error(
-            "SummaryRepositoryImpl",
-            "subscribeRealTimeUsage - parsing error",
-            error
-          );
-          return createErrorModel({
-            type: ErrorType.UNEXPECTED,
-            message: "Failed to parse MQTT usage data.",
-          });
-        }
-      }),
-      catchError((error) => {
-        Logger.error(
-          "SummaryRepositoryImpl",
-          "subscribeRealTimeUsage - MQTT error",
-          error
-        );
-        return of(
-          createErrorModel({
-            type: ErrorType.NETWORK,
-            message: "MQTT connection error occurred.",
-          })
-        );
+    return dataSource
+      .subscribeToTopic<MqttUsageResponse>({
+        topic: "device/+/usage",
+        options: { qos: 0, autoConnect: true },
       })
-    );
+      .pipe(
+        // Map the incoming messages to MqttUsageModel or BaseErrorModel
+        // Assuming the payload is of type MqttUsageResponse
+        // and needs to be transformed to MqttUsageModel
+        // You might need to adjust this mapping based on actual payload structure
+        // and error handling requirements
+        // Here we assume that if payload has an 'error' field, it's an error response
+        // Otherwise, it's a valid MqttUsageModel
+        // This is a simplistic approach; you might want to implement more robust error handling
+        // based on your application's needs
+        // For example, you might want to validate the payload structure more thoroughly
+        // or handle specific error codes/messages
+        // Adjust the mapping logic as necessary
+        // The following is just a basic example
+        map((message) => {
+          const payload = message.payload;
+          if (
+            payload &&
+            typeof payload === "object" &&
+            "error" in payload &&
+            typeof (payload as any).error === "string"
+          ) {
+            return createErrorModel({
+              type: ErrorType.UNEXPECTED,
+              message: (payload as any).error,
+            });
+          } else {
+            return {
+              "1phases": (payload as MqttUsageResponse)["1phases"] || [],
+              "3phases": (payload as MqttUsageResponse)["3phases"] || [],
+            } as MqttUsageModel;
+          }
+        })
+      );
   }
 }

@@ -31,7 +31,7 @@ export interface MqttDataSourceConfig {
   enableLogging?: boolean;
 }
 
-export class MqttDataSource<T = unknown> {
+export class MqttDataSource {
   private client: MqttClient | null = null;
   private config: MqttDataSourceConfig;
   private connectionPromise: Promise<void> | null = null;
@@ -43,14 +43,14 @@ export class MqttDataSource<T = unknown> {
   private subscriptions: Map<
     string,
     {
-      callback: (message: MqttMessage<T>) => void;
+      callback: (message: MqttMessage<unknown>) => void;
       errorHandler?: (error: Error) => void;
       qos: 0 | 1 | 2;
     }
   > = new Map();
 
   // Observable subjects for reactive support
-  private messageSubject = new Subject<MqttMessage<T>>();
+  private messageSubject = new Subject<MqttMessage<unknown>>();
   private connectionStatusSubject = new BehaviorSubject<{
     connected: boolean;
     connecting: boolean;
@@ -235,13 +235,16 @@ export class MqttDataSource<T = unknown> {
   /**
    * Subscribe to MQTT topic and return an Observable
    */
-  subscribeToTopic(
-    topic: string,
+  subscribeToTopic<T>({
+    topic,
+    options = { qos: 0, autoConnect: true },
+  }: {
+    topic: string;
     options?: {
       qos?: 0 | 1 | 2;
       autoConnect?: boolean;
-    }
-  ): Observable<MqttMessage<T>> {
+    };
+  }): Observable<MqttMessage<T>> {
     const qos = options?.qos || 0;
     const autoConnect = options?.autoConnect !== false;
 
@@ -311,14 +314,14 @@ export class MqttDataSource<T = unknown> {
   /**
    * Get all messages as Observable (can be filtered by topic)
    */
-  getAllMessages$(): Observable<MqttMessage<T>> {
+  getAllMessages$(): Observable<MqttMessage<unknown>> {
     return this.messageSubject.asObservable();
   }
 
   /**
    * Filter messages by topic pattern
    */
-  getMessagesByTopic$(topicPattern: string): Observable<MqttMessage<T>> {
+  getMessagesByTopic$(topicPattern: string): Observable<MqttMessage<unknown>> {
     return this.messageSubject.pipe(
       filter((message) => this.topicMatches(message.topic, topicPattern))
     );
@@ -329,8 +332,8 @@ export class MqttDataSource<T = unknown> {
    */
   private handleMessage(topic: string, message: Buffer, qos?: 0 | 1 | 2): void {
     try {
-      const payload = this.parseMessage<T>(message);
-      const mqttMessage: MqttMessage<T> = {
+      const payload = this.parseMessage<unknown>(message);
+      const mqttMessage: MqttMessage<unknown> = {
         topic,
         payload,
         timestamp: new Date(),
@@ -443,7 +446,7 @@ export class MqttDataSource<T = unknown> {
   /**
    * Publish message to MQTT topic
    */
-  async publish<TPayload = T>(
+  async publish<TPayload = unknown>(
     topic: string,
     message: TPayload,
     options?: {
@@ -626,10 +629,10 @@ export class MqttDataSource<T = unknown> {
 }
 
 // Create typed instance factory
-export function createMqttDataSource<T = unknown>(
+export function createMqttDataSource(
   config: MqttDataSourceConfig
-): MqttDataSource<T> {
-  return new MqttDataSource<T>(config);
+): MqttDataSource {
+  return new MqttDataSource(config);
 }
 
 // Define specific types for your use case
@@ -642,7 +645,7 @@ export interface DeviceDataPayload {
 }
 
 // Default instance for device data
-export const mqttDataSource = createMqttDataSource<DeviceDataPayload>({
+export const mqttDataSource = createMqttDataSource({
   brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
     "ws://localhost:9001"
   ),
@@ -653,7 +656,7 @@ export const mqttDataSource = createMqttDataSource<DeviceDataPayload>({
 });
 
 // For general purpose (if needed)
-export const generalMqttDataSource = createMqttDataSource<unknown>({
+export const generalMqttDataSource = createMqttDataSource({
   brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
     "ws://localhost:9001"
   ),

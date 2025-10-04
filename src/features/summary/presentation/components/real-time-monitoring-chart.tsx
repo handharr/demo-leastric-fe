@@ -96,8 +96,8 @@ export function RealTimeMonitoringChart({
   }, [selectedInterval]);
 
   const controlsSection = (
-    <div className="flex flex-row items-center justify-between gap-4 mb-6">
-      <div className="w-fit">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-4 sm:mb-6">
+      <div className="w-full sm:w-fit">
         <Dropdown
           options={availableIntervals}
           value={getLabelFromRealTimeInterval(
@@ -112,8 +112,8 @@ export function RealTimeMonitoringChart({
         />
       </div>
 
-      <div className="text-right">
-        <div className="text-2xl font-bold text-typography-headline">
+      <div className="text-left sm:text-right">
+        <div className="text-xl sm:text-2xl font-bold text-typography-headline">
           {currentUsage}
           <span className="text-sm font-normal text-typography-secondary ml-1">
             Kwh
@@ -124,7 +124,7 @@ export function RealTimeMonitoringChart({
   );
 
   const chartSection = (
-    <div className="h-full w-full">
+    <div className="h-48 sm:h-full w-full">
       <ResponsiveContainer width="100%" height="90%">
         <LineChart
           data={mapUsageDataToRealTimeDataPoints(
@@ -138,14 +138,14 @@ export function RealTimeMonitoringChart({
             dataKey="time"
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 12, fill: "#6B7280" }}
+            tick={{ fontSize: 10, fill: "#6B7280" }}
             className="text-xs"
           />
           <YAxis
             dataKey={"usage"}
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 12, fill: "#6B7280" }}
+            tick={{ fontSize: 10, fill: "#6B7280" }}
             tickFormatter={(value) => {
               return formatNumberIndonesian(value, 0);
             }}

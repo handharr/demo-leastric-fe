@@ -151,6 +151,14 @@ export default function DashboardLayout({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth", // Optional: adds smooth scrolling animation
+    });
+  }, [pathname]);
+
   // Memoized handlers to prevent unnecessary re-renders
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((prev) => !prev);

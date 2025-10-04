@@ -98,10 +98,7 @@ export function EditDeviceModal({
   }, [updateSuccess, showPopup, resetUpdateSuccess, onSuccessUpdate]);
 
   const formContent = () => (
-    <form
-      className="flex flex-col gap-[16px] min-w-[30vw]"
-      onSubmit={handleSubmit}
-    >
+    <form className="flex flex-col gap-[16px]" onSubmit={handleSubmit}>
       <div>
         <label className="block text-sm font-medium mb-1">
           Device name <span className="text-typography-negative">*</span>

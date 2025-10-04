@@ -174,7 +174,9 @@ export function EditDeviceModal({
         description=""
       >
         {loadingDevice ? (
-          <LoadingSpinner size="md" className="h-40 w-40" />
+          <div className="flex justify-center items-center">
+            <LoadingSpinner size="md" className="h-40 w-40" />
+          </div>
         ) : errorDevice ? (
           <EmptyData message={errorDevice} state={EmptyDataState.ERROR} />
         ) : fetchedDevice ? (

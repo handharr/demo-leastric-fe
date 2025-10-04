@@ -45,7 +45,7 @@ export default function SidebarMenuItem({
 
       {/* Label */}
       {isSidebarOpen && (
-        <span className={`${textColor} ${fontWeight} flex-1 hidden lg:block`}>
+        <span className={`${textColor} ${fontWeight} flex-1 lg:block`}>
           {label}
         </span>
       )}

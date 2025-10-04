@@ -327,14 +327,18 @@ export class MqttDataSource<T = unknown> {
   /**
    * Subscribe to MQTT topic (only one subscription allowed)
    */
-  async subscribe(
-    topic: string,
-    callback: (message: MqttMessage<T>) => void,
+  async subscribe({
+    topic,
+    callback,
+    options,
+  }: {
+    topic: string;
+    callback: (message: MqttMessage<T>) => void;
     options?: {
       qos?: 0 | 1 | 2;
       errorHandler?: (error: Error) => void;
-    }
-  ): Promise<void> {
+    };
+  }): Promise<void> {
     const topicWrapper = optionalValue(topic);
     if (topicWrapper.isNullOrEmpty()) {
       throw new Error("Topic cannot be null or empty");
@@ -350,9 +354,7 @@ export class MqttDataSource<T = unknown> {
     this.topic = topic;
     this.messageCallback = callback;
     this.errorHandler = options?.errorHandler || null;
-    this.subscriptionQos = optionalValue(options?.qos).orDefault(
-      this.config.qos
-    );
+    this.subscriptionQos = options?.qos || 0;
 
     const clientWrapper = optionalValue(this.client);
     if (clientWrapper.isPresent() && this.client!.connected) {
@@ -445,7 +447,7 @@ export class MqttDataSource<T = unknown> {
 
     const payload =
       typeof message === "string" ? message : JSON.stringify(message);
-    const qos = optionalValue(options?.qos).orDefault(this.config.qos);
+    const qos = options?.qos || 0;
     const retain = optionalValue(options?.retain).orFalse();
 
     return new Promise((resolve, reject) => {

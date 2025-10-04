@@ -6,7 +6,7 @@ import {
   formatDateToStringUTCWithoutMs,
   getCurrentMonthDateRangeUntilToday,
 } from "@/shared/utils/helpers/date-helpers";
-import { DateRange } from "@/shared/domain/entities/models";
+import { DateRange } from "@/shared/domain/entities/shared-models";
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
 import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";

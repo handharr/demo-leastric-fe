@@ -1,5 +1,5 @@
 import { TimePeriod } from "@/shared/domain/enum/enums";
-import { DateRange } from "@/shared/domain/entities/models";
+import { DateRange } from "@/shared/domain/entities/shared-models";
 
 export function formatDateToStringUTCWithoutMs(date: Date): string {
   const year = date.getUTCFullYear();

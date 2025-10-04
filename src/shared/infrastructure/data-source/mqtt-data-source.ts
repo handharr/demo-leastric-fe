@@ -6,12 +6,12 @@ import {
 } from "@/shared/utils/helpers/retry-helper";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
-export interface MqttMessage<T = unknown> {
+export type MqttMessage<T = unknown> = {
   topic: string;
   payload: T;
   timestamp: Date;
   qos?: 0 | 1 | 2;
-}
+};
 
 export interface MqttDataSourceConfig {
   brokerUrl: string;
@@ -27,28 +27,21 @@ export interface MqttDataSourceConfig {
   onConnectionLost?: () => void;
   onReconnect?: () => void;
   enableLogging?: boolean;
-  maxSubscriptions?: number;
 }
 
-export interface MqttSubscription<T = unknown> {
-  topic: string;
-  callback: (message: MqttMessage<T>) => void;
-  errorHandler?: (error: Error) => void;
-  qos?: 0 | 1 | 2;
-}
-
-export class MqttDataSource<TDefault = unknown> {
+export class MqttDataSource<T = unknown> {
   private client: MqttClient | null = null;
-  private config: Required<MqttDataSourceConfig>;
-  private subscriptions: Map<string, MqttSubscription<TDefault>> = new Map();
+  private config: MqttDataSourceConfig;
   private connectionPromise: Promise<void> | null = null;
   private isConnecting = false;
   private connectionAttempts = 0;
   private maxConnectionAttempts = 3;
-  private messageHandlers: Map<
-    string,
-    (message: MqttMessage<TDefault>) => void
-  > = new Map();
+
+  // Single topic subscription
+  private topic: string | null = null;
+  private messageCallback: ((message: MqttMessage<T>) => void) | null = null;
+  private errorHandler: ((error: Error) => void) | null = null;
+  private subscriptionQos: 0 | 1 | 2 = 0;
 
   constructor(config: MqttDataSourceConfig) {
     this.config = {
@@ -56,8 +49,8 @@ export class MqttDataSource<TDefault = unknown> {
       clientId: optionalValue(config.clientId).orDefault(
         `webapp_${Date.now()}`
       ),
-      username: optionalValue(config.username).orEmpty(),
-      password: optionalValue(config.password).orEmpty(),
+      username: config.username,
+      password: config.password,
       enableRetry: optionalValue(config.enableRetry).orTrue(),
       retryOptions: optionalValue(config.retryOptions).orDefault({
         maxRetries: 3,
@@ -75,8 +68,7 @@ export class MqttDataSource<TDefault = unknown> {
       onReconnect: optionalValue(config.onReconnect).orDefault(() =>
         this.defaultReconnectHandler()
       ),
-      enableLogging: optionalValue(config.enableLogging).orTrue(),
-      maxSubscriptions: optionalValue(config.maxSubscriptions).orDefault(100),
+      enableLogging: config.enableLogging,
     };
   }
 
@@ -169,8 +161,7 @@ export class MqttDataSource<TDefault = unknown> {
     resolve: () => void,
     reject: (error: Error) => void
   ): void {
-    const clientWrapper = optionalValue(this.client);
-    if (clientWrapper.isEmpty()) return;
+    if (!this.client) return;
 
     const client = this.client!;
 
@@ -179,7 +170,7 @@ export class MqttDataSource<TDefault = unknown> {
       this.isConnecting = false;
       this.connectionAttempts = 0;
       this.connectionPromise = null;
-      this.resubscribeAll();
+      this.resubscribe();
       resolve();
     });
 
@@ -198,12 +189,12 @@ export class MqttDataSource<TDefault = unknown> {
 
     client.on("reconnect", () => {
       this.log("Reconnecting to MQTT broker");
-      this.config.onReconnect();
+      this.config.onReconnect?.();
     });
 
     client.on("close", () => {
       this.log("MQTT connection closed");
-      this.config.onConnectionLost();
+      this.config.onConnectionLost?.();
     });
 
     client.on("offline", () => {
@@ -220,8 +211,8 @@ export class MqttDataSource<TDefault = unknown> {
    */
   private handleMessage(topic: string, message: Buffer, qos?: 0 | 1 | 2): void {
     try {
-      const payload = this.parseMessage<TDefault>(message);
-      const mqttMessage: MqttMessage<TDefault> = {
+      const payload = this.parseMessage<T>(message);
+      const mqttMessage: MqttMessage<T> = {
         topic,
         payload,
         timestamp: new Date(),
@@ -230,39 +221,26 @@ export class MqttDataSource<TDefault = unknown> {
 
       this.log(`Received message on topic ${topic}:`, payload);
 
-      // Notify all matching subscriptions
-      this.subscriptions.forEach((subscription, subscribedTopic) => {
-        if (this.topicMatches(topic, subscribedTopic)) {
-          try {
-            subscription.callback(mqttMessage);
-          } catch (error) {
-            this.logError(
-              `Error in subscription callback for topic ${subscribedTopic}:`,
-              error
-            );
-            const errorHandler = optionalValue(subscription.errorHandler);
-            if (errorHandler.isPresent()) {
-              subscription.errorHandler!(
-                error instanceof Error ? error : new Error(String(error))
-              );
-            }
-          }
-        }
-      });
-
-      // Notify generic message handlers (for backward compatibility)
-      this.messageHandlers.forEach((handler, handlerTopic) => {
-        if (this.topicMatches(topic, handlerTopic)) {
-          try {
-            handler(mqttMessage);
-          } catch (error) {
-            this.logError(
-              `Error in message handler for topic ${handlerTopic}:`,
-              error
+      // Notify subscription callback if topic matches
+      if (
+        this.topic &&
+        this.messageCallback &&
+        this.topicMatches(topic, this.topic)
+      ) {
+        try {
+          this.messageCallback(mqttMessage);
+        } catch (error) {
+          this.logError(
+            `Error in subscription callback for topic ${this.topic}:`,
+            error
+          );
+          if (this.errorHandler) {
+            this.errorHandler(
+              error instanceof Error ? error : new Error(String(error))
             );
           }
         }
-      });
+      }
     } catch (error) {
       this.logError("Error handling MQTT message:", error);
     }
@@ -271,23 +249,23 @@ export class MqttDataSource<TDefault = unknown> {
   /**
    * Parse message payload
    */
-  private parseMessage<T = TDefault>(message: Buffer): T {
+  private parseMessage<TPayload = T>(message: Buffer): TPayload {
     try {
       const messageString = message.toString();
       const messageWrapper = optionalValue(messageString);
 
       if (messageWrapper.isNullOrEmpty()) {
-        return messageString as T;
+        return messageString as TPayload;
       }
 
       // Try to parse as JSON, fallback to string
       try {
-        return JSON.parse(messageString) as T;
+        return JSON.parse(messageString) as TPayload;
       } catch {
-        return messageString as T;
+        return messageString as TPayload;
       }
     } catch {
-      return message.toString() as T;
+      return message.toString() as TPayload;
     }
   }
 
@@ -347,9 +325,9 @@ export class MqttDataSource<TDefault = unknown> {
   }
 
   /**
-   * Subscribe to MQTT topic with specific typing that overrides default
+   * Subscribe to MQTT topic (only one subscription allowed)
    */
-  async subscribe<T = TDefault>(
+  async subscribe(
     topic: string,
     callback: (message: MqttMessage<T>) => void,
     options?: {
@@ -362,26 +340,23 @@ export class MqttDataSource<TDefault = unknown> {
       throw new Error("Topic cannot be null or empty");
     }
 
-    await this.connect();
-
-    if (this.subscriptions.size >= this.config.maxSubscriptions) {
-      throw new Error(
-        `Maximum subscriptions limit (${this.config.maxSubscriptions}) reached`
-      );
+    // Unsubscribe from previous topic if exists
+    if (this.topic) {
+      await this.unsubscribe();
     }
 
-    const subscription: MqttSubscription<T> = {
-      topic,
-      callback: callback as (message: MqttMessage<T>) => void,
-      errorHandler: options?.errorHandler,
-      qos: optionalValue(options?.qos).orDefault(this.config.qos),
-    };
+    await this.connect();
 
-    // this.subscriptions.set(topic, subscription as MqttSubscription<TDefault>);
+    this.topic = topic;
+    this.messageCallback = callback;
+    this.errorHandler = options?.errorHandler || null;
+    this.subscriptionQos = optionalValue(options?.qos).orDefault(
+      this.config.qos
+    );
 
     const clientWrapper = optionalValue(this.client);
     if (clientWrapper.isPresent() && this.client!.connected) {
-      await this.performSubscription(topic, subscription.qos!);
+      await this.performSubscription(topic, this.subscriptionQos);
     }
   }
 
@@ -413,26 +388,31 @@ export class MqttDataSource<TDefault = unknown> {
   }
 
   /**
-   * Unsubscribe from MQTT topic
+   * Unsubscribe from current MQTT topic
    */
-  async unsubscribe(topic: string): Promise<void> {
-    const topicWrapper = optionalValue(topic);
-    if (topicWrapper.isNullOrEmpty()) {
+  async unsubscribe(): Promise<void> {
+    if (!this.topic) {
       return;
     }
 
-    this.subscriptions.delete(topic);
+    const currentTopic = this.topic;
+    this.topic = null;
+    this.messageCallback = null;
+    this.errorHandler = null;
 
     const clientWrapper = optionalValue(this.client);
     if (clientWrapper.isPresent() && this.client!.connected) {
       return new Promise((resolve, reject) => {
-        this.client!.unsubscribe(topic, (error) => {
+        this.client!.unsubscribe(currentTopic, (error) => {
           const errorWrapper = optionalValue(error);
           if (errorWrapper.isPresent()) {
-            this.logError(`Failed to unsubscribe from topic ${topic}:`, error);
+            this.logError(
+              `Failed to unsubscribe from topic ${currentTopic}:`,
+              error
+            );
             reject(error);
           } else {
-            this.log(`Unsubscribed from topic: ${topic}`);
+            this.log(`Unsubscribed from topic: ${currentTopic}`);
             resolve();
           }
         });
@@ -443,9 +423,9 @@ export class MqttDataSource<TDefault = unknown> {
   /**
    * Publish message to MQTT topic
    */
-  async publish<T = TDefault>(
+  async publish<TPayload = T>(
     topic: string,
-    message: T,
+    message: TPayload,
     options?: {
       qos?: 0 | 1 | 2;
       retain?: boolean;
@@ -483,47 +463,23 @@ export class MqttDataSource<TDefault = unknown> {
   }
 
   /**
-   * Resubscribe to all topics after reconnection
+   * Resubscribe to topic after reconnection
    */
-  private async resubscribeAll(): Promise<void> {
-    this.log("Resubscribing to all topics");
-    for (const [topic, subscription] of this.subscriptions) {
-      try {
-        const qos = optionalValue(subscription.qos).orDefault(this.config.qos);
-        await this.performSubscription(topic, qos);
-      } catch (error) {
-        this.logError(`Failed to resubscribe to topic ${topic}:`, error);
-        const errorHandler = optionalValue(subscription.errorHandler);
-        if (errorHandler.isPresent()) {
-          subscription.errorHandler!(
-            error instanceof Error ? error : new Error(String(error))
-          );
-        }
+  private async resubscribe(): Promise<void> {
+    if (!this.topic) {
+      return;
+    }
+
+    this.log("Resubscribing to topic:", this.topic);
+    try {
+      await this.performSubscription(this.topic, this.subscriptionQos);
+    } catch (error) {
+      this.logError(`Failed to resubscribe to topic ${this.topic}:`, error);
+      if (this.errorHandler) {
+        this.errorHandler(
+          error instanceof Error ? error : new Error(String(error))
+        );
       }
-    }
-  }
-
-  /**
-   * Add message handler (for backward compatibility)
-   */
-  addMessageHandler<T = TDefault>(
-    topicPattern: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    handler: (message: MqttMessage<T>) => void
-  ): void {
-    const topicWrapper = optionalValue(topicPattern);
-    if (topicWrapper.isNotNullOrEmpty()) {
-      // this.messageHandlers.set(topicPattern, handler);
-    }
-  }
-
-  /**
-   * Remove message handler (for backward compatibility)
-   */
-  removeMessageHandler(topicPattern: string): void {
-    const topicWrapper = optionalValue(topicPattern);
-    if (topicWrapper.isNotNullOrEmpty()) {
-      this.messageHandlers.delete(topicPattern);
     }
   }
 
@@ -539,6 +495,9 @@ export class MqttDataSource<TDefault = unknown> {
           this.connectionPromise = null;
           this.isConnecting = false;
           this.connectionAttempts = 0;
+          this.topic = null;
+          this.messageCallback = null;
+          this.errorHandler = null;
           resolve();
         });
       } else {
@@ -561,13 +520,13 @@ export class MqttDataSource<TDefault = unknown> {
     connected: boolean;
     connecting: boolean;
     attempts: number;
-    subscriptions: number;
+    subscribedTopic: string | null;
   } {
     return {
       connected: this.isConnected(),
       connecting: this.isConnecting,
       attempts: this.connectionAttempts,
-      subscriptions: this.subscriptions.size,
+      subscribedTopic: this.topic,
     };
   }
 

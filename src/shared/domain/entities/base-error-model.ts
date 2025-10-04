@@ -1,6 +1,6 @@
 import { ErrorType, validErrorTypes } from "@/shared/domain/enum/base-enum";
 import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 export interface BaseErrorModel {
   type: ErrorType;
   message: string;
@@ -16,9 +16,9 @@ export function mapErrorResponseToModel({
   response: BaseErrorResponse;
 }): BaseErrorModel {
   return createErrorModel({
-    message: optional(response?.meta?.message).orEmpty(),
-    details: optional(response?.meta?.error).orEmpty(),
-    statusCode: optional(response?.meta?.statusCode).orZero(),
+    message: optionalValue(response?.meta?.message).orEmpty(),
+    details: optionalValue(response?.meta?.error).orEmpty(),
+    statusCode: optionalValue(response?.meta?.statusCode).orZero(),
   });
 }
 
@@ -92,7 +92,7 @@ export function handleErrorResponse({
   error: BaseErrorResponse; // More flexible error type to handle different error structures
   defaultMessage: string;
 }): BaseErrorModel {
-  const statusCode = optional(error.statusCode).orDefault(500);
+  const statusCode = optionalValue(error.statusCode).orDefault(500);
 
   const errorType = determineErrorType({
     statusCode,

@@ -9,7 +9,6 @@ import {
   createErrorModel,
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { UserModel } from "@/shared/domain/entities/user-model";
 import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
@@ -19,6 +18,7 @@ import { UpdatePasswordFormData } from "@/features/auth/domain/params/data/auth-
 import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
 import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
 import { Logger } from "@/shared/utils/logger/logger";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(
@@ -62,17 +62,17 @@ export class AuthRepositoryImpl implements AuthRepository {
       }
 
       return {
-        id: optional(result.data.user?.id).orZero(),
-        email: optional(result.data.user?.email).orEmpty(),
-        name: optional(result.data.user?.name).orEmpty(),
-        phoneNumber: optional(result.data.user?.phoneNumber).orEmpty(),
-        createdAt: optional(result.data.user?.createdAt).orEmpty(),
-        updatedAt: optional(result.data.user?.updatedAt).orEmpty(),
+        id: optionalValue(result.data.user?.id).orZero(),
+        email: optionalValue(result.data.user?.email).orEmpty(),
+        name: optionalValue(result.data.user?.name).orEmpty(),
+        phoneNumber: optionalValue(result.data.user?.phoneNumber).orEmpty(),
+        createdAt: optionalValue(result.data.user?.createdAt).orEmpty(),
+        updatedAt: optionalValue(result.data.user?.updatedAt).orEmpty(),
       } as UserModel;
     } else {
       return createErrorModel({
         message: "Invalid credentials",
-        details: optional(result.flash?.message).orDefault(
+        details: optionalValue(result.flash?.message).orDefault(
           "Authentication failed"
         ),
         type: ErrorType.AUTHENTICATION,
@@ -144,7 +144,7 @@ export class AuthRepositoryImpl implements AuthRepository {
       return false;
     }
 
-    return optional(result.valid).orFalse();
+    return optionalValue(result.valid).orFalse();
   }
 
   async resetPassword({
@@ -167,8 +167,8 @@ export class AuthRepositoryImpl implements AuthRepository {
     }
 
     return {
-      success: optional(result.success).orFalse(),
-      message: optional(result.message).orEmpty(),
+      success: optionalValue(result.success).orFalse(),
+      message: optionalValue(result.message).orEmpty(),
     } as ResetPasswordModel;
   }
 
@@ -188,7 +188,7 @@ export class AuthRepositoryImpl implements AuthRepository {
 
     return {
       success: result.flash?.type === "success",
-      message: optional(result.data?.message).orEmpty(),
+      message: optionalValue(result.data?.message).orEmpty(),
     } as UpdatePasswordModel;
   }
 }

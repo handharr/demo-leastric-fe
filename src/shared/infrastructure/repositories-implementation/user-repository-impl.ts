@@ -5,7 +5,7 @@ import {
 import { UpdateUserFormData } from "@/shared/domain/params/data-params";
 import { mapUpdateUserFormDataToDto } from "@/shared/domain/mapper/params-mapper";
 import { UserModel } from "@/shared/domain/entities/user-model";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { UserRepository } from "@/shared/domain/repositories/user-repository";
 import { UserDataSource } from "@/shared/infrastructure/data-source/user-data-source";
@@ -32,12 +32,12 @@ export class UserRepositoryImpl implements UserRepository {
     }
 
     return {
-      id: optional(result.data?.user?.id).orZero(),
-      email: optional(result.data?.user?.email).orEmpty(),
-      name: optional(result.data?.user?.name).orEmpty(),
-      phoneNumber: optional(result.data?.user?.phoneNumber).orEmpty(),
-      createdAt: optional(result.data?.user?.createdAt).orEmpty(),
-      updatedAt: optional(result.data?.user?.updatedAt).orEmpty(),
+      id: optionalValue(result.data?.user?.id).orZero(),
+      email: optionalValue(result.data?.user?.email).orEmpty(),
+      name: optionalValue(result.data?.user?.name).orEmpty(),
+      phoneNumber: optionalValue(result.data?.user?.phoneNumber).orEmpty(),
+      createdAt: optionalValue(result.data?.user?.createdAt).orEmpty(),
+      updatedAt: optionalValue(result.data?.user?.updatedAt).orEmpty(),
     };
   }
 

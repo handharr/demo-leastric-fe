@@ -3,10 +3,7 @@ import {
   createErrorModel,
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
-import {
-  optional,
-  optionalValue,
-} from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
@@ -55,45 +52,45 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     if (result.flash?.type === "success" && result.data?.summaries) {
       return {
         threePhase: {
-          estUsage: optional(
+          estUsage: optionalValue(
             result.data?.summaries?.threePhase?.estUsage
           ).orZero(),
-          estBill: optional(
+          estBill: optionalValue(
             result.data?.summaries?.threePhase?.estBill
           ).orZero(),
-          totalCO2Emission: optional(
+          totalCO2Emission: optionalValue(
             result.data?.summaries?.threePhase?.totalCO2Emission
           ).orZero(),
           deviceStatus: {
-            activeDevices: optional(
+            activeDevices: optionalValue(
               result.data?.summaries?.threePhase?.deviceStatus?.activeDevices
             ).orZero(),
-            inactiveDevices: optional(
+            inactiveDevices: optionalValue(
               result.data?.summaries?.threePhase?.deviceStatus?.inactiveDevices
             ).orZero(),
-            totalDevices: optional(
+            totalDevices: optionalValue(
               result.data?.summaries?.threePhase?.deviceStatus?.totalDevices
             ).orZero(),
           },
         },
         singlePhase: {
-          estUsage: optional(
+          estUsage: optionalValue(
             result.data?.summaries?.singlePhase?.estUsage
           ).orZero(),
-          estBill: optional(
+          estBill: optionalValue(
             result.data?.summaries?.singlePhase?.estBill
           ).orZero(),
-          totalCO2Emission: optional(
+          totalCO2Emission: optionalValue(
             result.data?.summaries?.singlePhase?.totalCO2Emission
           ).orZero(),
           deviceStatus: {
-            activeDevices: optional(
+            activeDevices: optionalValue(
               result.data?.summaries?.singlePhase?.deviceStatus?.activeDevices
             ).orZero(),
-            inactiveDevices: optional(
+            inactiveDevices: optionalValue(
               result.data?.summaries?.singlePhase?.deviceStatus?.inactiveDevices
             ).orZero(),
-            totalDevices: optional(
+            totalDevices: optionalValue(
               result.data?.summaries?.singlePhase?.deviceStatus?.totalDevices
             ).orZero(),
           },

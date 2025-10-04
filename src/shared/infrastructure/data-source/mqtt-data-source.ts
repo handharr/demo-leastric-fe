@@ -372,12 +372,12 @@ export class MqttDataSource<TDefault = unknown> {
 
     const subscription: MqttSubscription<T> = {
       topic,
-      callback: callback as (message: MqttMessage<TDefault>) => void,
-      errorHandler: optionalValue(options?.errorHandler).orNull(),
+      callback: callback as (message: MqttMessage<T>) => void,
+      errorHandler: options?.errorHandler,
       qos: optionalValue(options?.qos).orDefault(this.config.qos),
     };
 
-    this.subscriptions.set(topic, subscription as MqttSubscription<TDefault>);
+    // this.subscriptions.set(topic, subscription as MqttSubscription<TDefault>);
 
     const clientWrapper = optionalValue(this.client);
     if (clientWrapper.isPresent() && this.client!.connected) {
@@ -512,10 +512,7 @@ export class MqttDataSource<TDefault = unknown> {
   ): void {
     const topicWrapper = optionalValue(topicPattern);
     if (topicWrapper.isNotNullOrEmpty()) {
-      this.messageHandlers.set(
-        topicPattern,
-        handler as (message: MqttMessage<TDefault>) => void
-      );
+      // this.messageHandlers.set(topicPattern, handler);
     }
   }
 

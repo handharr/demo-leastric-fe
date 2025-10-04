@@ -1,4 +1,4 @@
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 export interface BaseErrorResponse {
   statusCode?: number;
   timestamp?: string;
@@ -19,9 +19,10 @@ export function isErrorResponse<T>(
     response !== null &&
     typeof (response as BaseErrorResponse).meta?.message === "string" &&
     typeof (response as BaseErrorResponse).meta?.statusCode === "number" &&
-    (optional((response as BaseErrorResponse).meta?.statusCode).orZero() <
+    (optionalValue((response as BaseErrorResponse).meta?.statusCode).orZero() <
       200 ||
-      optional((response as BaseErrorResponse).meta?.statusCode).orZero() >=
-        300)
+      optionalValue(
+        (response as BaseErrorResponse).meta?.statusCode
+      ).orZero() >= 300)
   );
 }

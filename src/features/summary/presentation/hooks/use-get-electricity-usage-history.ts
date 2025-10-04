@@ -3,10 +3,7 @@ import { GetElectricityUsageHistoryQueryParams } from "@/features/summary/domain
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { Logger } from "@/shared/utils/logger/logger";
-import {
-  optional,
-  optionalValue,
-} from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { useCallback, useState } from "react";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { TimePeriod } from "@/shared/domain/enum/enums";
@@ -81,7 +78,7 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
           setPagination(result.pagination);
         }
       } catch (e: unknown) {
-        const errorMessage = optional((e as Error)?.message).orDefault(
+        const errorMessage = optionalValue((e as Error)?.message).orDefault(
           "Failed to fetch electricity usage history"
         );
         Logger.error("useGetElectricityUsageHistory", "error", errorMessage);

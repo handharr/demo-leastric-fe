@@ -5,6 +5,7 @@ import {
 import { RealTimeInterval, TimePeriod } from "@/shared/domain/enum/enums";
 import {
   formatDateToStringUTCWithoutMs,
+  getDateRangeFromString,
   getStartAndEndDateOfYear,
   getTimeStringFromDate,
   parseDateString,
@@ -128,9 +129,20 @@ export function getXAxisLabelForPeriod({
       return date.getDate().toString().padStart(2, "0");
     }
     case TimePeriod.Weekly: {
-      // Extract week number from "Week 3 - 2025-09"
-      const match = value.match(/Week (\d+)/);
-      return match ? `W${match[1]}` : value;
+      // Extract week number from "2025-09-28 - 2025-10-04"
+      // Return as "W{n} Oct: 28 Sep to 04 Oct"
+      const dateRange = getDateRangeFromString(value);
+      if (dateRange) {
+        const weekNumber = getWeekNumber(dateRange.startDate);
+        const startMonthDay = `${dateRange.startDate.toLocaleString("default", {
+          month: "short",
+        })} ${dateRange.startDate.getDate().toString().padStart(2, "0")}`;
+        const endMonthDay = `${dateRange.endDate.toLocaleString("default", {
+          month: "short",
+        })} ${dateRange.endDate.getDate().toString().padStart(2, "0")}`;
+        return `W${weekNumber}: ${startMonthDay} to ${endMonthDay}`;
+      }
+      return value; // Fallback to original value if parsing fails
     }
     case TimePeriod.Monthly: {
       // Extract month from "2023-10"
@@ -140,6 +152,13 @@ export function getXAxisLabelForPeriod({
     default:
       return value; // For yearly or unknown periods, return the original value
   }
+}
+
+// Helper to get week number in month (1-4)
+function getWeekNumber(date: Date): number {
+  const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const weekNumber = Math.ceil((date.getDate() + startOfMonth.getDay()) / 7);
+  return weekNumber;
 }
 
 /*
@@ -184,6 +203,10 @@ export function mergeCurrentAndLastPeriodData({
     return mergeMonthlyDataWithAlignment(_currentData, _lastData);
   }
 
+  if (period === TimePeriod.Weekly) {
+    return mergeWeeklyDataWithAlignment(_currentData, _lastData);
+  }
+
   // For non-daily periods, use the original logic
   const mergedData: {
     period: string;
@@ -219,6 +242,123 @@ export function mergeCurrentAndLastPeriodData({
       }
     });
   }
+  return mergedData;
+}
+
+/*
+  Helper function to merge weekly data in a month with proper alignment
+  Shows all weeks, with appropriate undefined values
+  Filters out future dates from current data (only shows dates <= today)
+  Always shows full weeks X-axis (1-4) even when comparison is disabled
+  Period format: "2025-09-28 - 2025-10-04".
+*/
+function mergeWeeklyDataWithAlignment(
+  currentData: PeriodValueModel[],
+  lastData: PeriodValueModel[]
+): {
+  period: string;
+  value: number | undefined;
+  comparedValue: number | undefined;
+}[] {
+  // Get today's date for filtering
+  const today = new Date();
+  today.setHours(23, 59, 59, 999); // Set to end of today to include today
+
+  // Get current month and year for filtering
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
+  // Create maps for both current and last data by week start date for quick lookup
+  const currentDataMap = new Map<
+    string,
+    { label: string; value: number; startDate: Date }
+  >();
+  const lastDataMap = new Map<
+    string,
+    { label: string; value: number; startDate: Date }
+  >();
+
+  // Process current data
+  const filteredCurrentData = currentData.filter((item) => {
+    const itemDateRange = optionalValue(
+      getDateRangeFromString(item.period)
+    ).orDefault({
+      startDate: new Date(),
+      endDate: new Date(),
+    });
+    const itemDateStart = itemDateRange.startDate;
+    const itemDateEnd = itemDateRange.endDate;
+
+    // Include if the week overlaps with current month or includes today
+    return (
+      (itemDateStart.getFullYear() === currentYear &&
+        itemDateStart.getMonth() === currentMonth) ||
+      (itemDateEnd.getFullYear() === currentYear &&
+        itemDateEnd.getMonth() === currentMonth) ||
+      (itemDateStart <= today && itemDateEnd >= today)
+    );
+  });
+
+  filteredCurrentData.forEach((item) => {
+    const weekLabel = getXAxisLabelForPeriod({
+      period: TimePeriod.Weekly,
+      value: item.period,
+    });
+    const dateRange = getDateRangeFromString(item.period);
+    if (dateRange) {
+      const key = dateRange.startDate.toISOString();
+      currentDataMap.set(key, {
+        label: weekLabel,
+        value: item.totalKwh,
+        startDate: dateRange.startDate,
+      });
+    }
+  });
+
+  // Process last data (comparison data)
+  lastData.forEach((item) => {
+    const weekLabel = getXAxisLabelForPeriod({
+      period: TimePeriod.Weekly,
+      value: item.period,
+    });
+    const dateRange = getDateRangeFromString(item.period);
+    if (dateRange) {
+      const key = dateRange.startDate.toISOString();
+      lastDataMap.set(key, {
+        label: weekLabel,
+        value: item.totalKwh,
+        startDate: dateRange.startDate,
+      });
+    }
+  });
+
+  // Collect all unique weeks from both datasets and sort by start date
+  const allWeeks = new Map<string, { label: string; startDate: Date }>();
+
+  currentDataMap.forEach((data, key) => {
+    allWeeks.set(key, { label: data.label, startDate: data.startDate });
+  });
+
+  lastDataMap.forEach((data, key) => {
+    allWeeks.set(key, { label: data.label, startDate: data.startDate });
+  });
+
+  // Sort weeks by start date
+  const sortedWeeks = Array.from(allWeeks.entries()).sort((a, b) => {
+    return a[1].startDate.getTime() - b[1].startDate.getTime();
+  });
+
+  // Create merged data for all weeks from both periods
+  const mergedData = sortedWeeks.map(([key, weekInfo]) => {
+    return {
+      period: weekInfo.label,
+      value: currentDataMap.get(key)?.value,
+      comparedValue: lastDataMap.get(key)?.value,
+    };
+  });
+
+  console.log("[debugTest] Merged Weekly Data:", mergedData);
+
   return mergedData;
 }
 

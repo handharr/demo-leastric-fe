@@ -223,6 +223,28 @@ export function parseDateString(dateString: string): Date | null {
   return null;
 }
 
+// Get date range from "YYYY-MM-DD - YYYY-MM-DD"
+export function getDateRangeFromString(
+  dateRangeString: string
+): DateRange | null {
+  const parts = dateRangeString.split(" - ");
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const startDate = parseDateString(parts[0]);
+  const endDate = parseDateString(parts[1]);
+
+  if (!startDate || !endDate) {
+    return null;
+  }
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
 // Get date end of date
 export function getDateEndOfDate(date: Date): Date {
   const endDate = new Date(date);

@@ -190,3 +190,49 @@ export function getTimeStringFromDate(date: Date): string {
 
   return `${hours}:${minutes}:${seconds}`;
 }
+
+// Convert date string to Date object with some possibility format
+// Supported format: YYYY-MM-DD, YYYY/MM/DD, YYYY-MM, YYYY/MM/DDTHH:mm:ssZ
+export function parseDateString(dateString: string): Date | null {
+  // Try to parse ISO 8601 format first
+  const isoDate = new Date(dateString);
+  if (!isNaN(isoDate.getTime())) {
+    return isoDate;
+  }
+
+  // Try to parse YYYY-MM-DD or YYYY/MM/DD
+  const dateOnlyRegex = /^\d{4}[-/]\d{2}[-/]\d{2}$/;
+  if (dateOnlyRegex.test(dateString)) {
+    const parts = dateString.split(/[-/]/);
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are zero-based
+    const day = parseInt(parts[2], 10);
+    return new Date(Date.UTC(year, month, day));
+  }
+
+  // Try to parse YYYY-MM or YYYY/MM
+  const monthOnlyRegex = /^\d{4}[-/]\d{2}$/;
+  if (monthOnlyRegex.test(dateString)) {
+    const parts = dateString.split(/[-/]/);
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are zero-based
+    return new Date(Date.UTC(year, month, 1));
+  }
+
+  // If all parsing attempts fail, return null
+  return null;
+}
+
+// Get date end of date with locale
+export function getDateEndOfDate(date: Date): Date {
+  const endDate = new Date(date);
+  endDate.setHours(23, 59, 59, 999);
+  return endDate;
+}
+
+// Get date start of date
+export function getDateStartOfDate(date: Date): Date {
+  const startDate = new Date(date);
+  startDate.setHours(0, 0, 0, 0);
+  return startDate;
+}

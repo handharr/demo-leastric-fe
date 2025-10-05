@@ -82,19 +82,6 @@ export function RealTimeMonitoringChart({
     }
   }, [electricityUsageRealTimeError, showPopup, resetElectricityUsageRealTime]);
 
-  useEffect(() => {
-    if (!selectedInterval) return;
-
-    // Fetch once immediately
-    fetchRealTimeRef.current();
-
-    const intervalId = setInterval(() => {
-      fetchRealTimeRef.current();
-    }, selectedInterval * 1000);
-
-    return () => clearInterval(intervalId);
-  }, [selectedInterval]);
-
   const controlsSection = (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-4 sm:mb-6">
       <div className="w-full sm:w-fit">

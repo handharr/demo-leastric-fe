@@ -103,16 +103,19 @@ export default function DashboardLayout({
   // Sync activeMenu with current path
   useEffect(() => {
     const found = MENU_ITEMS.find((item) => pathname.startsWith(item.route));
-    if (!found) {
+    if (found) {
+      setActiveMenu(found);
+    } else {
       const settingRoutes = ["/profile", "/security", "/customer-support"];
       const isSettingRoute = settingRoutes.some((route) =>
         pathname.startsWith(route)
       );
-      console.log("Found setting route:", isSettingRoute);
-      console.log("Current pathname:", pathname);
-      setActiveMenu(isSettingRoute ? MENU_ITEMS[4] : MENU_ITEMS[0]);
-    } else {
-      setActiveMenu(found);
+      console.log("[debugTest] Found setting route:", isSettingRoute);
+      console.log("[debugTest] Current pathname:", pathname);
+      const settingMenu = MENU_ITEMS.find((item) => item.label === "Setting");
+      if (isSettingRoute && settingMenu) {
+        setActiveMenu(settingMenu);
+      }
     }
   }, [pathname]);
 

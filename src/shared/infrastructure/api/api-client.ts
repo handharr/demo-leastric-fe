@@ -12,8 +12,8 @@ import {
 } from "@/shared/utils/helpers/retry-helper";
 import { Logger } from "@/shared/utils/logger/logger";
 import { BaseResponse } from "@/shared/infrastructure/models/base-response";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
 import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 export interface ApiClientConfig {
   baseURL?: string;
@@ -215,7 +215,7 @@ export class ApiClient {
           Logger.warn(
             "ApiClient",
             "Token refresh API returned failure:",
-            optional(response.data.flash?.message).orEmpty()
+            optionalValue(response.data.flash?.message).orEmpty()
           );
           return { success: false };
         } catch (error) {
@@ -367,8 +367,10 @@ export class ApiClient {
 
       if (result.success && result.data?.tokens) {
         AuthHelper.setAuthTokens({
-          authToken: optional(result.data.tokens.access_token).orEmpty(),
-          refreshToken: optional(result.data.tokens.refresh_token).orEmpty(),
+          authToken: optionalValue(result.data.tokens.access_token).orEmpty(),
+          refreshToken: optionalValue(
+            result.data.tokens.refresh_token
+          ).orEmpty(),
         });
         this.customTokenRefreshHandler.onRefreshSuccess?.(result.data);
         Logger.info("ApiClient", "Token refresh successful", result.data);

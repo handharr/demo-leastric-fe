@@ -1,11 +1,12 @@
 import { Pagination } from "@/shared/presentation/components/pagination";
 import Image from "next/image";
-import { PeriodValueModel } from "@/features/summary/domain/entities/summary-models";
+import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
+import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
 
 interface ReportTableProps {
-  data: PeriodValueModel[];
+  data: ElectricityUsageModel[];
   pagination: PaginationModel;
   isLoading?: boolean;
   selectedIds: string[];
@@ -14,6 +15,7 @@ interface ReportTableProps {
   gotoPage?: (page: number) => void;
   previousPage?: () => void;
   nextPage?: () => void;
+  onDownloadSingle?: (id: ElectricityUsageModel) => void;
 }
 
 export function ReportTable({
@@ -26,8 +28,10 @@ export function ReportTable({
   gotoPage,
   previousPage,
   nextPage,
+  onDownloadSingle,
 }: ReportTableProps) {
   const isAllSelected = selectedIds.length === data.length && data.length > 0;
+  const mappedData = aggregateElectricityUsageByPeriod(data);
 
   return (
     <div className="w-full">
@@ -63,7 +67,7 @@ export function ReportTable({
             {isLoading ? (
               <TableSkeletonLoading colCount={4} />
             ) : (
-              data.map((row, index) => (
+              mappedData.map((row, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <button
@@ -98,7 +102,19 @@ export function ReportTable({
                     {new Date(row.period).getFullYear()}
                   </td>
                   <td className="px-4 py-3">
-                    <button className="text-gray-400 hover:text-gray-600">
+                    <button
+                      className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                      onClick={() => {
+                        if (onDownloadSingle) {
+                          const rowData = data.find(
+                            (item) => item.period === row.period
+                          );
+                          if (rowData) {
+                            onDownloadSingle(rowData);
+                          }
+                        }
+                      }}
+                    >
                       <Image
                         src="/resources/icons/arrow/download.svg"
                         alt="Edit"

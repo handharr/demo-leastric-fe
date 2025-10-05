@@ -7,7 +7,7 @@ import {
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { PaginationModel } from "@/shared/domain/entities/models-interface";
 import { Logger } from "@/shared/utils/logger/logger";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { useCallback, useEffect, useState } from "react";
 
 export interface UseDevicesReturn {
@@ -88,9 +88,9 @@ export function useDevices(): UseDevicesReturn {
         const result = await useCase.execute({
           queryParam: {
             sortOrder: "ASC",
-            page: optional(page).orDefault(1),
-            name: optional(search).orDefault(""),
-            size: optional(size).orDefault(10),
+            page: optionalValue(page).orDefault(1),
+            name: optionalValue(search).orDefault(""),
+            size: optionalValue(size).orDefault(10),
             location: locationParam ?? undefined,
           },
         });
@@ -107,7 +107,9 @@ export function useDevices(): UseDevicesReturn {
         }
       } catch (e: unknown) {
         setError(
-          optional((e as Error)?.message).orDefault("Failed to fetch devices")
+          optionalValue((e as Error)?.message).orDefault(
+            "Failed to fetch devices"
+          )
         );
       } finally {
         setLoading(false);

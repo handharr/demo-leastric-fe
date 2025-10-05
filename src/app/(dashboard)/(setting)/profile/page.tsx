@@ -96,7 +96,7 @@ export default function ProfilePage() {
                 phone === (userDetails?.phoneNumber || ""))
             }
           >
-            {updating ? "Saving..." : "Update Password"}
+            {updating ? "Saving..." : "Update Profile"}
           </button>
         </div>
       </form>

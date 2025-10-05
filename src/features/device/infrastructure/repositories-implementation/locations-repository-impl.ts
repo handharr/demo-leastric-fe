@@ -3,7 +3,7 @@ import {
   createErrorModel,
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { Logger } from "@/shared/utils/logger/logger";
@@ -34,12 +34,12 @@ export class LocationsRepositoryImpl implements LocationsRepository {
 
     if (result.flash?.type === "success" && result.data?.locations) {
       return result.data.locations.map((location) =>
-        optional(location).orEmpty()
+        optionalValue(location).orEmpty()
       );
     } else {
       return createErrorModel({
         type: ErrorType.UNEXPECTED,
-        message: optional(result.flash?.message).orEmpty(),
+        message: optionalValue(result.flash?.message).orEmpty(),
         statusCode: 400,
       });
     }
@@ -58,15 +58,15 @@ export class LocationsRepositoryImpl implements LocationsRepository {
 
     if (result.flash?.type === "success" && result.data?.locations) {
       return result.data.locations.map((location) => ({
-        location: optional(location.location).orEmpty(),
-        subLocations: optional(location.subLocations).orEmpty(),
-        detailLocations: optional(location.detailLocations).orEmpty(),
-        deviceCount: optional(location.deviceCount).orZero(),
+        location: optionalValue(location.location).orEmpty(),
+        subLocations: optionalValue(location.subLocations).orEmptyArray(),
+        detailLocations: optionalValue(location.detailLocations).orEmptyArray(),
+        deviceCount: optionalValue(location.deviceCount).orZero(),
       }));
     } else {
       return createErrorModel({
         type: ErrorType.UNEXPECTED,
-        message: optional(result.flash?.message).orEmpty(),
+        message: optionalValue(result.flash?.message).orEmpty(),
         statusCode: 400,
       });
     }
@@ -90,7 +90,7 @@ export class LocationsRepositoryImpl implements LocationsRepository {
     } else {
       return createErrorModel({
         type: ErrorType.UNEXPECTED,
-        message: optional(result.flash?.message).orEmpty(),
+        message: optionalValue(result.flash?.message).orEmpty(),
         statusCode: 400,
       });
     }

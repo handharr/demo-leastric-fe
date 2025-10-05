@@ -1,5 +1,5 @@
 import { TimePeriod } from "@/shared/domain/enum/enums";
-import { DateRange } from "@/shared/domain/entities/models";
+import { DateRange } from "@/shared/domain/entities/shared-models";
 
 export function formatDateToStringUTCWithoutMs(date: Date): string {
   const year = date.getUTCFullYear();
@@ -120,6 +120,30 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
   }
 }
 
+/// Get range of current month dates starting from 1 to current date
+export function getCurrentMonthDateRangeUntilToday(): DateRange {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-based (0 = January, 11 = December)
+  const currentDate = now.getDate();
+
+  const startDate = new Date(currentYear, currentMonth, 1, 0, 0, 0, 0);
+  const endDate = new Date(
+    currentYear,
+    currentMonth,
+    currentDate,
+    23,
+    59,
+    59,
+    999
+  );
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
 export function get10YearsRangeFromCurrentYear(): string[] {
   const currentYear = new Date().getFullYear();
   const years: string[] = [];
@@ -165,4 +189,50 @@ export function getTimeStringFromDate(date: Date): string {
   const seconds = String(date.getSeconds()).padStart(2, "0");
 
   return `${hours}:${minutes}:${seconds}`;
+}
+
+// Convert date string to Date object with some possibility format
+// Supported format: YYYY-MM-DD, YYYY/MM/DD, YYYY-MM, YYYY/MM/DDTHH:mm:ssZ
+export function parseDateString(dateString: string): Date | null {
+  // Try to parse ISO 8601 format first
+  const isoDate = new Date(dateString);
+  if (!isNaN(isoDate.getTime())) {
+    return isoDate;
+  }
+
+  // Try to parse YYYY-MM-DD or YYYY/MM/DD
+  const dateOnlyRegex = /^\d{4}[-/]\d{2}[-/]\d{2}$/;
+  if (dateOnlyRegex.test(dateString)) {
+    const parts = dateString.split(/[-/]/);
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are zero-based
+    const day = parseInt(parts[2], 10);
+    return new Date(Date.UTC(year, month, day));
+  }
+
+  // Try to parse YYYY-MM or YYYY/MM
+  const monthOnlyRegex = /^\d{4}[-/]\d{2}$/;
+  if (monthOnlyRegex.test(dateString)) {
+    const parts = dateString.split(/[-/]/);
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Months are zero-based
+    return new Date(Date.UTC(year, month, 1));
+  }
+
+  // If all parsing attempts fail, return null
+  return null;
+}
+
+// Get date end of date
+export function getDateEndOfDate(date: Date): Date {
+  const endDate = new Date(date);
+  endDate.setHours(23, 59, 59, 999);
+  return endDate;
+}
+
+// Get date start of date
+export function getDateStartOfDate(date: Date): Date {
+  const startDate = new Date(date);
+  startDate.setHours(0, 0, 0, 0);
+  return startDate;
 }

@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
-import { DateRange } from "@/shared/domain/entities/models";
+import { DateRange } from "@/shared/domain/entities/shared-models";
 import "react-day-picker/dist/style.css";
 import "@/features/summary/presentation/styles/date-range-modal.css";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
@@ -53,34 +53,36 @@ export function DateRangeModal({
         )}
       </button>
       <Modal open={open} onClose={handleClose} zValue={51}>
-        <div className="p-4 w-auto max-h-[50vh]">
-          {/* Replace below with your calendar picker */}
-          <div className="flex flex-row">
-            <DayPicker
-              captionLayout="label"
-              mode="range"
-              navLayout="around"
-              numberOfMonths={2}
-              timeZone="Asia/Jakarta"
-              selected={{
-                from: selectedRange?.startDate,
-                to: selectedRange?.endDate,
-              }}
-              onSelect={(range) => {
-                console.log("debugTest range", range);
-                if (range && range.from && range.to) {
-                  setSelectedRange({
-                    startDate: range.from,
-                    endDate: range.to,
-                  });
-                } else {
-                  setSelectedRange(undefined);
-                }
-              }}
-            />
+        <div className="w-auto flex flex-col h-full max-h-[500px]">
+          {/* Content area that can scroll */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="flex flex-row">
+              <DayPicker
+                captionLayout="label"
+                mode="range"
+                navLayout="around"
+                numberOfMonths={2}
+                timeZone="Asia/Jakarta"
+                disabled={{ after: new Date() }}
+                selected={{
+                  from: selectedRange?.startDate,
+                  to: selectedRange?.endDate,
+                }}
+                onSelect={(range) => {
+                  if (range && range.from && range.to) {
+                    setSelectedRange({
+                      startDate: range.from,
+                      endDate: range.to,
+                    });
+                  } else {
+                    setSelectedRange(undefined);
+                  }
+                }}
+              />
+            </div>
           </div>
-          {/* Footer */}
-          <div className="flex flex-grow justify-end gap-3 border-t border-t-default-border py-[16px] my-[16px]">
+          {/* Fixed floating footer */}
+          <div className="flex-shrink-0 flex justify-end gap-3 border-t border-t-default-border py-[16px] mt-[16px] bg-white">
             <button
               className="border rounded-lg px-4 py-1 text-typography-headline font-semibold cursor-pointer"
               onClick={handleClose}

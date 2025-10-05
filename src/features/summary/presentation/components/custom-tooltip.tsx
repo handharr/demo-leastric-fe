@@ -1,12 +1,17 @@
-import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+export enum CustomToolTipTextColor {
+  primary = "text-leastric-primary",
+  secondary = "text-typography-subhead",
+}
+
+export interface CustomToolTipPayload {
+  value: string;
+  textColor: CustomToolTipTextColor;
+  prefix?: string;
+}
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: Array<{
-    value: number;
-    dataKey: string;
-  }>;
+  payload?: CustomToolTipPayload[];
   label?: string | number;
   unit?: string;
   titles?: string[];
@@ -17,8 +22,6 @@ export function CustomTooltip({
   active,
   payload,
   label,
-  unit = "KWh",
-  titles = [],
   timeUnit,
 }: CustomTooltipProps) {
   if (active && payload && payload.length) {
@@ -27,18 +30,18 @@ export function CustomTooltip({
         {timeUnit && (
           <p className="text-sm text-gray-600">{`${timeUnit} ${label}`}</p>
         )}
-        {payload.map((entry, index) => (
-          <p
-            key={index}
-            className={`text-sm ${
-              index == 0 ? "text-leastric-primary" : "text-typography-subhead"
-            }`}
-          >
-            {`${optional(titles[index]).orEmpty()}: ${formatNumberIndonesian(
-              entry.value
-            )} ${unit}`}
-          </p>
-        ))}
+        {payload &&
+          payload.length > 0 &&
+          payload.map((entry, index) => (
+            <p key={index} className={`text-sm ${entry.textColor} mt-1`}>
+              {
+                entry.prefix && (
+                  <span className="mr-1">{entry.prefix}</span>
+                ) /* Render prefix if it exists */
+              }
+              {entry.value}
+            </p>
+          ))}
       </div>
     );
   }

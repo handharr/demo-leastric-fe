@@ -3,10 +3,7 @@ import {
   createErrorModel,
   mapErrorResponseToModel,
 } from "@/shared/domain/entities/base-error-model";
-import {
-  optional,
-  optionalValue,
-} from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
@@ -29,6 +26,10 @@ import {
   parseDeviceType,
 } from "@/shared/utils/helpers/enum-helpers";
 import { RemoteSummaryDataSource } from "@/features/summary/infrastructure/data-source/remote-summary-data-source";
+import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
+import { usageMqttDataSource } from "@/shared/infrastructure/data-source/mqtt-data-source";
+import { Observable, of } from "rxjs";
+import { map, catchError } from "rxjs/operators";
 
 export class SummaryRepositoryImpl implements SummaryRepository {
   constructor(
@@ -55,45 +56,45 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     if (result.flash?.type === "success" && result.data?.summaries) {
       return {
         threePhase: {
-          estUsage: optional(
+          estUsage: optionalValue(
             result.data?.summaries?.threePhase?.estUsage
           ).orZero(),
-          estBill: optional(
+          estBill: optionalValue(
             result.data?.summaries?.threePhase?.estBill
           ).orZero(),
-          totalCO2Emission: optional(
+          totalCO2Emission: optionalValue(
             result.data?.summaries?.threePhase?.totalCO2Emission
           ).orZero(),
           deviceStatus: {
-            activeDevices: optional(
+            activeDevices: optionalValue(
               result.data?.summaries?.threePhase?.deviceStatus?.activeDevices
             ).orZero(),
-            inactiveDevices: optional(
+            inactiveDevices: optionalValue(
               result.data?.summaries?.threePhase?.deviceStatus?.inactiveDevices
             ).orZero(),
-            totalDevices: optional(
+            totalDevices: optionalValue(
               result.data?.summaries?.threePhase?.deviceStatus?.totalDevices
             ).orZero(),
           },
         },
         singlePhase: {
-          estUsage: optional(
+          estUsage: optionalValue(
             result.data?.summaries?.singlePhase?.estUsage
           ).orZero(),
-          estBill: optional(
+          estBill: optionalValue(
             result.data?.summaries?.singlePhase?.estBill
           ).orZero(),
-          totalCO2Emission: optional(
+          totalCO2Emission: optionalValue(
             result.data?.summaries?.singlePhase?.totalCO2Emission
           ).orZero(),
           deviceStatus: {
-            activeDevices: optional(
+            activeDevices: optionalValue(
               result.data?.summaries?.singlePhase?.deviceStatus?.activeDevices
             ).orZero(),
-            inactiveDevices: optional(
+            inactiveDevices: optionalValue(
               result.data?.summaries?.singlePhase?.deviceStatus?.inactiveDevices
             ).orZero(),
-            totalDevices: optional(
+            totalDevices: optionalValue(
               result.data?.summaries?.singlePhase?.deviceStatus?.totalDevices
             ).orZero(),
           },
@@ -140,15 +141,14 @@ export class SummaryRepositoryImpl implements SummaryRepository {
             optionalValue(usage.deviceType).orEmpty()
           ),
           period: optionalValue(usage.period).orEmpty(),
-          value: optionalValue(usage.value).orZero(),
           unit: parseEnergyUnit(optionalValue(usage.unit).orEmpty()),
-          avgVoltage: optionalValue(usage.avgVoltage).orZero(),
-          avgVoltageLine: optionalValue(usage.avgVoltageLine).orZero(),
-          avgCurrent: optionalValue(usage.avgCurrent).orZero(),
-          avgRealPower: optionalValue(usage.avgRealPower).orZero(),
-          totalKwh: optionalValue(usage.totalKwh).orZero(),
-          totalEstBilling: optionalValue(usage.totalEstBilling).orZero(),
-          totalCO2Emission: optionalValue(usage.totalCO2Emission).orZero(),
+          avgVoltage: optionalValue(usage.avgVoltage).orDefault(-1),
+          avgVoltageLine: optionalValue(usage.avgVoltageLine).orDefault(-1),
+          avgCurrent: optionalValue(usage.avgCurrent).orDefault(-1),
+          avgRealPower: optionalValue(usage.avgRealPower).orDefault(-1),
+          totalKwh: optionalValue(usage.totalKwh).orDefault(-1),
+          totalEstBilling: optionalValue(usage.totalEstBilling).orDefault(-1),
+          totalCO2Emission: optionalValue(usage.totalCO2Emission).orDefault(-1),
         }));
         Logger.info("SummaryRepositoryImpl", "Mapped usages", mappedUsages);
         return {
@@ -217,15 +217,14 @@ export class SummaryRepositoryImpl implements SummaryRepository {
             optionalValue(usage.deviceType).orEmpty()
           ),
           period: optionalValue(usage.period).orEmpty(),
-          value: optionalValue(usage.value).orZero(),
           unit: parseEnergyUnit(optionalValue(usage.unit).orEmpty()),
-          avgVoltage: optionalValue(usage.avgVoltage).orZero(),
-          avgVoltageLine: optionalValue(usage.avgVoltageLine).orZero(),
-          avgCurrent: optionalValue(usage.avgCurrent).orZero(),
-          avgRealPower: optionalValue(usage.avgRealPower).orZero(),
-          totalKwh: optionalValue(usage.totalKwh).orZero(),
-          totalEstBilling: optionalValue(usage.totalEstBilling).orZero(),
-          totalCO2Emission: optionalValue(usage.totalCO2Emission).orZero(),
+          avgVoltage: optionalValue(usage.avgVoltage).orDefault(-1),
+          avgVoltageLine: optionalValue(usage.avgVoltageLine).orDefault(-1),
+          avgCurrent: optionalValue(usage.avgCurrent).orDefault(-1),
+          avgRealPower: optionalValue(usage.avgRealPower).orDefault(-1),
+          totalKwh: optionalValue(usage.totalKwh).orDefault(-1),
+          totalEstBilling: optionalValue(usage.totalEstBilling).orDefault(-1),
+          totalCO2Emission: optionalValue(usage.totalCO2Emission).orDefault(-1),
         }));
         Logger.info("SummaryRepositoryImpl", "Mapped usages", mappedUsages);
         return {
@@ -305,5 +304,116 @@ export class SummaryRepositoryImpl implements SummaryRepository {
           "Failed to retrieve export to CSV. Please try again.",
       });
     }
+  }
+
+  subscribeRealTimeUsage(): Observable<MqttUsageModel | BaseErrorModel> {
+    Logger.info(
+      "SummaryRepositoryImpl",
+      "subscribeRealTimeUsage - starting subscription"
+    );
+
+    return usageMqttDataSource
+      .subscribeToTopic("device/+/usage", {
+        qos: 0,
+        autoConnect: true,
+      })
+      .pipe(
+        map((message): MqttUsageModel | BaseErrorModel => {
+          try {
+            Logger.info(
+              "SummaryRepositoryImpl",
+              "subscribeRealTimeUsage - message received",
+              {
+                topic: message.topic,
+                timestamp: message.timestamp,
+                qos: message.qos,
+                payload: message.payload,
+              }
+            );
+
+            const payload = message.payload;
+
+            // Validate payload structure
+            if (!payload || typeof payload !== "object") {
+              Logger.error(
+                "SummaryRepositoryImpl",
+                "subscribeRealTimeUsage - invalid payload structure",
+                payload
+              );
+              return createErrorModel({
+                type: ErrorType.UNEXPECTED,
+                message: "Invalid MQTT message payload structure.",
+              });
+            }
+
+            // Check for error in payload
+            if ("error" in payload && typeof payload.error === "string") {
+              Logger.error(
+                "SummaryRepositoryImpl",
+                "subscribeRealTimeUsage - error in payload",
+                payload.error
+              );
+              return createErrorModel({
+                type: ErrorType.UNEXPECTED,
+                message: payload.error,
+              });
+            }
+
+            // Map to MqttUsageModel with proper validation
+            const mappedUsage: MqttUsageModel = {
+              "1phases": optionalValue(payload["1phases"])
+                .orEmptyArray()
+                .map((log) => ({
+                  devid: optionalValue(log?.devid).orEmpty(),
+                  p: optionalValue(log?.p).orZero(),
+                })),
+              "3phases": optionalValue(payload["3phases"])
+                .orEmptyArray()
+                .map((log) => ({
+                  devid: optionalValue(log?.devid).orEmpty(),
+                  pR: optionalValue(log?.pR).orZero(),
+                  pS: optionalValue(log?.pS).orZero(),
+                  pT: optionalValue(log?.pT).orZero(),
+                })),
+            };
+
+            Logger.info(
+              "SummaryRepositoryImpl",
+              "subscribeRealTimeUsage - successfully mapped usage",
+              mappedUsage
+            );
+
+            return mappedUsage;
+          } catch (error) {
+            Logger.error(
+              "SummaryRepositoryImpl",
+              "subscribeRealTimeUsage - parsing error",
+              error
+            );
+            return createErrorModel({
+              type: ErrorType.UNEXPECTED,
+              message: "Failed to parse MQTT usage data.",
+            });
+          }
+        }),
+        catchError((error) => {
+          Logger.error(
+            "SummaryRepositoryImpl",
+            "subscribeRealTimeUsage - MQTT connection error",
+            error
+          );
+
+          // Return an observable with error model instead of throwing
+          return of(
+            createErrorModel({
+              type: ErrorType.NETWORK,
+              message:
+                error instanceof Error
+                  ? `MQTT connection error: ${error.message}`
+                  : "MQTT connection error occurred.",
+            })
+          );
+        })
+      );
   }
 }

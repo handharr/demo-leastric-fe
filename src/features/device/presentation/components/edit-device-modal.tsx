@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DeviceModel } from "@/features/device/domain/entities/device-model";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { useGetDevice } from "@/features/device/presentation/hooks/use-get-device";
 import { useUpdateDevice } from "@/features/device/presentation/hooks/use-update-device";
 import {
@@ -31,9 +31,11 @@ export function EditDeviceModal({
   // Add local state for editable fields
   const [deviceName, setDeviceName] = useState(device.deviceName);
   const [tariffGroup, setTariffGroup] = useState(
-    optional(device.tariffGroup).orEmpty()
+    optionalValue(device.tariffGroup).orEmpty()
   );
-  const [location, setLocation] = useState(optional(device.location).orEmpty());
+  const [location, setLocation] = useState(
+    optionalValue(device.location).orEmpty()
+  );
   // Fetch latest device data when modal opens
   const {
     device: fetchedDevice,
@@ -54,19 +56,19 @@ export function EditDeviceModal({
   // Update local state when fetchedDevice changes
   useEffect(() => {
     if (fetchedDevice) {
-      const newDeviceName = optional(fetchedDevice.deviceName).orEmpty();
+      const newDeviceName = optionalValue(fetchedDevice.deviceName).orEmpty();
       if (newDeviceName !== "") {
         setDeviceName(newDeviceName);
       } else {
         setDeviceName(device.deviceName);
       }
-      const newTariffGroup = optional(fetchedDevice.tariffGroup).orEmpty();
+      const newTariffGroup = optionalValue(fetchedDevice.tariffGroup).orEmpty();
       if (newTariffGroup !== "") {
         setTariffGroup(newTariffGroup);
       } else {
         setTariffGroup(device.tariffGroup);
       }
-      const newLocation = optional(fetchedDevice.location).orEmpty();
+      const newLocation = optionalValue(fetchedDevice.location).orEmpty();
       if (newLocation !== "") {
         setLocation(newLocation);
       } else {
@@ -98,10 +100,7 @@ export function EditDeviceModal({
   }, [updateSuccess, showPopup, resetUpdateSuccess, onSuccessUpdate]);
 
   const formContent = () => (
-    <form
-      className="flex flex-col gap-[16px] min-w-[30vw]"
-      onSubmit={handleSubmit}
-    >
+    <form className="flex flex-col gap-[16px]" onSubmit={handleSubmit}>
       <div>
         <label className="block text-sm font-medium mb-1">
           Device name <span className="text-typography-negative">*</span>
@@ -177,7 +176,9 @@ export function EditDeviceModal({
         description=""
       >
         {loadingDevice ? (
-          <LoadingSpinner size="md" className="h-40 w-40" />
+          <div className="flex justify-center items-center">
+            <LoadingSpinner size="md" className="h-40 w-40" />
+          </div>
         ) : errorDevice ? (
           <EmptyData message={errorDevice} state={EmptyDataState.ERROR} />
         ) : fetchedDevice ? (

@@ -10,10 +10,7 @@ import {
 } from "@/features/setting/presentation/components/report-filter-modal";
 import { useCallback, useEffect, useState } from "react";
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
-import {
-  aggregateElectricityUsageByPeriod,
-  getStartAndEndDateFormattedUTCWithoutMsFromYear,
-} from "@/features/summary/utils/summary-helper";
+import { getStartAndEndDateFormattedUTCWithoutMsFromYear } from "@/features/summary/utils/summary-helper";
 import {
   usePopup,
   PopupType,
@@ -23,6 +20,7 @@ import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { useGetExportToCsv } from "@/features/summary/presentation/hooks/use-get-export-to-csv";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 import {
+  ElectricityUsageModel,
   ExportToCsvDownloadModel,
   GetExportToCsvModel,
 } from "@/features/summary/domain/entities/summary-models";
@@ -43,9 +41,7 @@ const downloadCsv = (fileUrl: string, fileName: string): Promise<void> => {
       link.click();
       document.body.removeChild(link);
       resolve();
-      console.log("[debugTest] Download initiated for:", fileName);
     } catch (error) {
-      console.log("[debugTest] Download error:", error);
       reject(error);
     }
   });
@@ -92,9 +88,11 @@ export default function ReportPage() {
   } = useGetElectricityUsageHistory();
   const { showPopup } = usePopup();
   const {
+    data: singleCsvData,
     bulkData: exportBulkData,
     loading: useGetExportToCsvLoading,
     error: useGetExportToCsvError,
+    fetchExportToCsv: fetchExportToCsv,
     fetchBulkData: fetchExportToCsvBulk,
     reset: resetExportToCsv,
   } = useGetExportToCsv();
@@ -146,6 +144,35 @@ export default function ReportPage() {
   }, [exportBulkData, showPopup, resetExportToCsv]);
 
   useEffect(() => {
+    async function processSingleDownload() {
+      if (singleCsvData && singleCsvData.fileUrl) {
+        try {
+          const fileName = singleCsvData.fileName || `export_${Date.now()}.csv`;
+          await downloadCsv(singleCsvData.fileUrl, fileName);
+          showPopup(
+            `File ${fileName} downloaded successfully.`,
+            PopupType.SUCCESS
+          );
+        } catch (error) {
+          Logger.error(
+            "processSingleDownload",
+            "Failed to download file",
+            error
+          );
+          showPopup("Failed to download the file.", PopupType.ERROR);
+        }
+      } else {
+        showPopup("No file available for download.", PopupType.INFO);
+      }
+      setExporting(false);
+      resetExportToCsv();
+    }
+    if (singleCsvData) {
+      processSingleDownload();
+    }
+  }, [singleCsvData, showPopup, resetExportToCsv]);
+
+  useEffect(() => {
     const selectedYear = optionalValue(
       activeFilters.singleSelection?.year
     ).orDefault(new Date().getFullYear().toString());
@@ -192,6 +219,26 @@ export default function ReportPage() {
     fetchExportToCsvBulk(paramsArray);
   }, [selectedIds, showPopup, usageHistory, exporting, fetchExportToCsvBulk]);
 
+  const handleDownloadSingle = useCallback(
+    (row: ElectricityUsageModel) => {
+      if (exporting) {
+        showPopup(
+          "Please wait until the current export is finished.",
+          PopupType.INFO
+        );
+        return;
+      }
+      setExporting(true);
+      const selectedPeriod = optionalValue(new Date(row.period)).orToday();
+      const dateRangeMonth = getStartAndEndDateOfMonthFromDate(selectedPeriod);
+      fetchExportToCsv({
+        startDate: formatDateToStringUTCWithoutMs(dateRangeMonth.startDate),
+        endDate: formatDateToStringUTCWithoutMs(dateRangeMonth.endDate),
+      });
+    },
+    [exporting, fetchExportToCsv, showPopup]
+  );
+
   return (
     <div className="flex min-h-screen space-y-[16px] flex-col">
       {/* Header */}
@@ -237,7 +284,7 @@ export default function ReportPage() {
 
       {/* Report Table */}
       <ReportTable
-        data={aggregateElectricityUsageByPeriod(usageHistory)}
+        data={usageHistory}
         pagination={pagination}
         isLoading={useGetElectricityUsageHistoryLoading}
         selectedIds={selectedIds}
@@ -306,6 +353,7 @@ export default function ReportPage() {
             size: 12,
           });
         }}
+        onDownloadSingle={handleDownloadSingle}
       />
     </div>
   );

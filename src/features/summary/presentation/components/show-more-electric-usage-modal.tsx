@@ -4,10 +4,9 @@ import { DateRangeModal } from "@/shared/presentation/components/date-range-moda
 import { Pagination } from "@/shared/presentation/components/pagination";
 import {
   formatDateToStringUTCWithoutMs,
-  getDateRangeByTimePeriod,
+  getCurrentMonthDateRangeUntilToday,
 } from "@/shared/utils/helpers/date-helpers";
-import { TimePeriod } from "@/shared/domain/enum/enums";
-import { DateRange } from "@/shared/domain/entities/models";
+import { DateRange } from "@/shared/domain/entities/shared-models";
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
 import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
@@ -21,7 +20,7 @@ import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 export function ShowMoreElectricUsageModalButton() {
   const [open, setOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange>(
-    getDateRangeByTimePeriod(TimePeriod.Daily)
+    getCurrentMonthDateRangeUntilToday()
   );
   const { showPopup } = usePopup();
   const {
@@ -76,9 +75,9 @@ export function ShowMoreElectricUsageModalButton() {
         zValue={52}
       >
         {/* Content container */}
-        <div className="w-auto h-[50vh] mb-[16px] flex flex-col">
+        <div className="w-auto mb-[16px] flex flex-col gap-y-[16px]">
           {/* Date range filter placeholder */}
-          <div className="mb-4">
+          <div>
             <DateRangeModal
               dateRange={dateRange}
               onApply={(range) => {
@@ -94,7 +93,7 @@ export function ShowMoreElectricUsageModalButton() {
           <div className="flex-1 overflow-auto">
             <table className="w-full">
               <thead>
-                <tr className="sticky top-0 z-10 bg-white border-b border-default-border">
+                <tr className="bg-white border-b border-default-border">
                   <th className="text-left py-3 px-2 text-sm font-medium text-typography-secondary">
                     No.
                   </th>

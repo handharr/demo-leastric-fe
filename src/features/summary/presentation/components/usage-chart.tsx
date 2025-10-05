@@ -24,6 +24,19 @@ import {
   getLegendLabelForPeriod,
   mergeCurrentAndLastPeriodData,
 } from "@/features/summary/utils/summary-helper";
+import {
+  CustomToolTipPayload,
+  CustomToolTipTextColor,
+} from "@/features/summary/presentation/components/custom-tooltip";
+
+interface DotProps {
+  cx?: number;
+  cy?: number;
+  payload?: {
+    value?: number;
+    comparedValue?: number;
+  };
+}
 
 interface UsageChartProps {
   title?: string;
@@ -118,8 +131,8 @@ export function UsageChart({
           data={mergedData}
           margin={{
             top: 5,
-            right: 30,
-            left: 20,
+            right: 5,
+            left: 5, // Add small left margin for Y-axis labels
             bottom: 5,
           }}
         >
@@ -149,36 +162,37 @@ export function UsageChart({
             }}
             tickFormatter={(value) => formatNumberIndonesian(Number(value), 0)}
             tickCount={4}
+            domain={["dataMin", "dataMax"]}
           />
           <Tooltip
             content={(props) => {
-              const titles = [
-                getLegendLabelForPeriod(selectedPeriod),
-                getComparedLegendLabelForPeriod(selectedPeriod),
-              ];
+              const _payload: CustomToolTipPayload[] = props.payload.map(
+                (entry) => {
+                  return {
+                    value: `${formatNumberIndonesian(
+                      Number(entry.value),
+                      2
+                    )} ${selectedUnit}`,
+                    textColor:
+                      entry.dataKey === "comparedValue"
+                        ? CustomToolTipTextColor.secondary
+                        : CustomToolTipTextColor.primary,
+                    prefix:
+                      entry.dataKey === "comparedValue"
+                        ? `${getComparedLegendLabelForPeriod(selectedPeriod)}: `
+                        : `${getLegendLabelForPeriod(selectedPeriod)}: `,
+                  };
+                }
+              );
+
               return (
                 <CustomTooltip
                   active={props.active}
-                  payload={props.payload}
+                  payload={_payload}
                   label={props.label}
-                  unit={selectedUnit}
-                  titles={titles}
                   timeUnit={getTimePeriodUnit(selectedPeriod)}
                 />
               );
-            }}
-          />
-          <Line
-            type="linear"
-            dataKey="value"
-            stroke="#2a6335"
-            strokeWidth={2}
-            dot={<CustomDot />}
-            activeDot={{
-              r: 5,
-              fill: "#2a6335",
-              stroke: "#2a6335",
-              strokeWidth: 2,
             }}
           />
           {compareEnabled && (
@@ -187,7 +201,25 @@ export function UsageChart({
               dataKey="comparedValue"
               stroke="#BABABA"
               strokeWidth={2}
-              dot={<CustomDot />}
+              dot={(props: DotProps) => {
+                // Only render dot if comparedValue is not undefined
+                if (
+                  props.payload?.comparedValue === undefined ||
+                  props.payload?.comparedValue < 0
+                ) {
+                  return <g key={`dot-compared-${props.cx}-${props.cy}`} />; // Return empty SVG group instead of null
+                }
+                return (
+                  <CustomDot
+                    key={`dot-compared-${props.cx}-${props.cy}`}
+                    cx={props.cx}
+                    cy={props.cy}
+                    fill="#BABABA"
+                    stroke="#BABABA"
+                    strokeWidth={2}
+                  />
+                );
+              }}
               activeDot={{
                 r: 5,
                 fill: "#BABABA",
@@ -196,6 +228,37 @@ export function UsageChart({
               }}
             />
           )}
+          <Line
+            type="linear"
+            dataKey="value"
+            stroke="#2a6335"
+            strokeWidth={2}
+            dot={(props: DotProps) => {
+              // Only render dot if value is not undefined
+              if (
+                props.payload?.value === undefined ||
+                props.payload?.value < 0
+              ) {
+                return <g key={`dot-${props.cx}-${props.cy}`} />; // Return empty SVG group instead of null
+              }
+              return (
+                <CustomDot
+                  key={`dot-${props.cx}-${props.cy}`}
+                  cx={props.cx}
+                  cy={props.cy}
+                  fill="#2a6335"
+                  stroke="#2a6335"
+                  strokeWidth={2}
+                />
+              );
+            }}
+            activeDot={{
+              r: 5,
+              fill: "#2a6335",
+              stroke: "#2a6335",
+              strokeWidth: 2,
+            }}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

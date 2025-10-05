@@ -39,7 +39,7 @@ export function Modal({
   return (
     <div
       className={`fixed inset-0 z-${zValue} flex items-center justify-center p-4`}
-      style={{ left: isMobile ? "0px" : `${sidebarWidth}px` }}
+      style={{ left: isMobile ? "0px" : `${sidebarWidth}px`, top: "64px" }}
     >
       {/* Overlay background - separate from content */}
       <div
@@ -75,9 +75,7 @@ export function Modal({
             </button>
           </div>
         )}
-        <div className="px-[16px] py-[16px] my-[16px] overflow-auto">
-          {children}
-        </div>
+        <div className="px-[16px] py-[16px] overflow-auto">{children}</div>
       </div>
     </div>
   );

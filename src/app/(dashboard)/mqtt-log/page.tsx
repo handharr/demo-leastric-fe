@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { MqttTable } from "@/features/admin-management/presentation/components/mqtt-table";
 import { Pagination } from "@/shared/presentation/components/pagination";
 import { useEffect } from "react";
@@ -9,6 +8,7 @@ import {
   usePopup,
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
+import { SearchBar } from "@/shared/presentation/components/search-bar/search-bar";
 
 export default function MqttLogPage() {
   const { showPopup } = usePopup();
@@ -51,7 +51,7 @@ export default function MqttLogPage() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col gap-[16px] bg-gray-50">
+    <div className="flex flex-col gap-[16px] bg-gray-50">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-typography-headline">
@@ -62,33 +62,12 @@ export default function MqttLogPage() {
       {/* Search Input Container */}
       <div className="flex items-center justify-between">
         {/* Search Input */}
-        <div className="flex-1 flex items-center bg-white rounded-lg border px-3 py-2 max-w-xs gap-[8px]">
-          <Image
-            src="/resources/icons/system/search.svg"
-            alt="Search"
-            width={16}
-            height={16}
-            className="w-[16px] h-[16px]"
-          />
-          <input
-            className="w-full outline-none bg-transparent text-gray-700"
-            placeholder="Search device name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          {/* Clear Search Button */}
-          {search && (
-            <button onClick={() => setSearch("")} className="cursor-pointer">
-              <Image
-                src="/resources/icons/menu/close"
-                alt="Clear"
-                width={12}
-                height={12}
-                className="w-[12px] h-[12px] object-contain opacity-50 hover:opacity-100"
-              />
-            </button>
-          )}
-        </div>
+        <SearchBar
+          className="flex-1"
+          placeholder="Search device name"
+          value={search}
+          onChange={setSearch}
+        />
       </div>
       <div>{mainContent}</div>
     </div>

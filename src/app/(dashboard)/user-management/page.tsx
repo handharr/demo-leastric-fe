@@ -88,7 +88,7 @@ export default function UserManagementPage() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col gap-[16px] bg-gray-50">
+    <div className="flex flex-col gap-[16px] bg-gray-50">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-typography-headline">

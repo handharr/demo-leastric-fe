@@ -51,7 +51,7 @@ export default function SummaryPage() {
   const [compareEnabled, setCompareEnabled] = useState(false);
   const { showPopup } = usePopup();
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>(
-    TimePeriod.Monthly
+    TimePeriod.Daily
   );
   const [selectedUnit, setSelectedUnit] = useState<EnergyUnit>(EnergyUnit.KWH);
   const {
@@ -142,7 +142,7 @@ export default function SummaryPage() {
   }, [fetchElectricityUsageHistory]);
 
   return (
-    <div className="flex min-h-screen flex-col gap-[16px]">
+    <div className="flex flex-col gap-[16px]">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-typography-headline">Summary</h1>
@@ -173,90 +173,72 @@ export default function SummaryPage() {
       />
 
       {/* Summary Cards Grid */}
-      <div className="overflow-x-auto pb-4">
-        <div className="flex gap-[16px] md:grid md:grid-cols-2 xl:grid-cols-4 min-w-max md:min-w-0 md:items-stretch">
-          {/* Electricity Usage Card */}
-          <div className="flex-shrink-0 w-80 md:w-auto md:flex">
-            <SummaryCard
-              title="This Month's Est. Usage"
-              description="Est. total electricity usage month to date"
-              value={formatNumberIndonesian(
-                optionalValue(usageSummary?.singlePhase?.estUsage).orZero() +
-                  optionalValue(usageSummary?.threePhase?.estUsage).orZero(),
-                2
-              )}
-              unit="kWh"
-              className="md:flex-1"
-            />
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+        {/* Electricity Usage Card */}
+        <SummaryCard
+          title="This Month's Est. Usage"
+          description="Est. total electricity usage month to date"
+          value={formatNumberIndonesian(
+            optionalValue(usageSummary?.singlePhase?.estUsage).orZero() +
+              optionalValue(usageSummary?.threePhase?.estUsage).orZero(),
+            2
+          )}
+          unit="kWh"
+        />
 
-          {/* Bill Card */}
-          <div className="flex-shrink-0 w-80 md:w-auto md:flex">
-            <SummaryCard
-              title="This Month's Est. Bill"
-              description="Est. total Bill month to date"
-              value={formatRupiahNumber(
-                optionalValue(usageSummary?.singlePhase?.estBill).orZero() +
-                  optionalValue(usageSummary?.threePhase?.estBill).orZero()
-              )}
-              prefix="Rp"
-              className="md:flex-1"
-            />
-          </div>
+        {/* Bill Card */}
+        <SummaryCard
+          title="This Month's Est. Bill"
+          description="Est. total Bill month to date"
+          value={formatRupiahNumber(
+            optionalValue(usageSummary?.singlePhase?.estBill).orZero() +
+              optionalValue(usageSummary?.threePhase?.estBill).orZero()
+          )}
+          prefix="Rp"
+        />
 
-          {/* CO2 Emission Card */}
-          <div className="flex-shrink-0 w-80 md:w-auto md:flex">
-            <SummaryCard
-              title="Total CO₂ Emission"
-              description="Est. total CO₂ Emission month to date"
-              value={formatNumberIndonesian(
-                optionalValue(
-                  usageSummary?.singlePhase?.totalCO2Emission
-                ).orZero() +
-                  optionalValue(
-                    usageSummary?.threePhase?.totalCO2Emission
-                  ).orZero(),
-                3
-              )}
-              unit="kg CO₂e/kWh"
-              className="md:flex-1"
-            />
-          </div>
+        {/* CO2 Emission Card */}
+        <SummaryCard
+          title="Total CO₂ Emission"
+          description="Est. total CO₂ Emission month to date"
+          value={formatNumberIndonesian(
+            optionalValue(
+              usageSummary?.singlePhase?.totalCO2Emission
+            ).orZero() +
+              optionalValue(
+                usageSummary?.threePhase?.totalCO2Emission
+              ).orZero(),
+            3
+          )}
+          unit="kg CO₂e/kWh"
+        />
 
-          {/* Device Status Card */}
-          <div className="flex-shrink-0 w-80 md:w-auto md:flex">
-            <SummaryCard
-              title="Check Device Status"
-              description="Quickly check the status of a devices"
-              value=""
-              className="md:flex-1"
-            >
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 flex-1 justify-between">
-                  <span className="text-sm text-typography-headline">
-                    Active
-                  </span>
-                  <span className="inline-flex items-center justify-center w-6 h-6 bg-background-brand-positive-subtle text-leastric-primary text-xs font-medium rounded-full">
-                    {optionalValue(
-                      usageSummary?.singlePhase?.deviceStatus?.activeDevices
-                    ).orZero()}
-                  </span>
-                </div>
-                <div className="h-8 w-px bg-default-border" />
-                <div className="flex items-center gap-2 flex-1 justify-between">
-                  <span className="text-sm text-typography-headline">
-                    Inactive
-                  </span>
-                  <span className="inline-flex items-center justify-center w-6 h-6 bg-background-critical-subtle text-typography-negative text-xs font-medium rounded-full">
-                    {optionalValue(
-                      usageSummary?.singlePhase?.deviceStatus?.inactiveDevices
-                    ).orZero()}
-                  </span>
-                </div>
-              </div>
-            </SummaryCard>
+        {/* Device Status Card */}
+        <SummaryCard
+          title="Check Device Status"
+          description="Quickly check the status of a devices"
+          value=""
+        >
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 flex-1 justify-between">
+              <span className="text-sm text-typography-headline">Active</span>
+              <span className="inline-flex items-center justify-center w-6 h-6 bg-background-brand-positive-subtle text-leastric-primary text-xs font-medium rounded-full">
+                {optionalValue(
+                  usageSummary?.singlePhase?.deviceStatus?.activeDevices
+                ).orZero()}
+              </span>
+            </div>
+            <div className="h-8 w-px bg-default-border" />
+            <div className="flex items-center gap-2 flex-1 justify-between">
+              <span className="text-sm text-typography-headline">Inactive</span>
+              <span className="inline-flex items-center justify-center w-6 h-6 bg-background-critical-subtle text-typography-negative text-xs font-medium rounded-full">
+                {optionalValue(
+                  usageSummary?.singlePhase?.deviceStatus?.inactiveDevices
+                ).orZero()}
+              </span>
+            </div>
           </div>
-        </div>
+        </SummaryCard>
       </div>
 
       {/* Usage Chart */}
@@ -285,11 +267,11 @@ export default function SummaryPage() {
       </div>
 
       {/* Real-Time Monitoring and Usage History */}
-      <div className="grid grid-cols-1 lg:flex lg:flex-row gap-[16px]">
-        <RealTimeMonitoringChart className="lg:flex-1" />
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-[16px]">
+        <RealTimeMonitoringChart className="" />
         <ElectricUsageHistoryTable
           data={aggregateElectricityUsageByPeriod(electricityUsageHistory)}
-          className="lg:flex-1"
+          className=""
           loading={electricityUsageHistoryLoading}
         />
       </div>

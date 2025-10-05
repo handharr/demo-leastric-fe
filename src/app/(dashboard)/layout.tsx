@@ -151,6 +151,14 @@ export default function DashboardLayout({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth", // Optional: adds smooth scrolling animation
+    });
+  }, [pathname]);
+
   // Memoized handlers to prevent unnecessary re-renders
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((prev) => !prev);
@@ -169,7 +177,7 @@ export default function DashboardLayout({
     () => `
     ${
       sidebarOpen
-        ? "translate-x-0 w-20 lg:w-60"
+        ? "translate-x-0 w-60" // Changed: consistent width on both mobile and desktop when open
         : "-translate-x-full lg:translate-x-0 w-20"
     } 
     fixed lg:static 
@@ -190,7 +198,7 @@ export default function DashboardLayout({
     ${
       !sidebarOpen
         ? "opacity-100 translate-x-0 scale-100"
-        : "opacity-0 -translate-x-4 scale-95 pointer-events-none"
+        : "opacity-0 -translate-x-full scale-95 pointer-events-none"
     }
   `,
     [sidebarOpen]
@@ -264,15 +272,7 @@ export default function DashboardLayout({
             {/* Logo Section */}
             <header className="h-16 bg-white border-b border-color-default-border flex items-center p-2 lg:p-3 shrink-0">
               <div className="flex items-center justify-between w-full">
-                <Image
-                  src="/resources/images/logo/leastric-logo-small.svg"
-                  alt="Leastric Logo"
-                  width={20}
-                  height={30}
-                  className="lg:hidden w-[20px] h-[30px]"
-                  priority
-                />
-                <Logo sidebarOpen={sidebarOpen} className="hidden lg:block" />
+                <Logo sidebarOpen={sidebarOpen} />
                 <button
                   onClick={toggleSidebar}
                   className="p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer"
@@ -326,7 +326,7 @@ export default function DashboardLayout({
             )}
 
             {/* Top Navigation Bar */}
-            <header className="h-16 bg-white border-b border-[#dedede] flex items-center justify-between px-4 lg:px-6 shrink-0 relative z-30">
+            <header className="h-[64px] bg-white border-b border-[#dedede] flex items-center justify-between px-4 lg:px-6 shrink-0 relative z-30">
               <div className="flex items-center gap-4">
                 <button
                   className={mobileMenuButtonClasses}

@@ -17,7 +17,7 @@ export function TilePrimary({
 }: TilePrimaryProps) {
   return (
     <div
-      className={`bg-white rounded-lg border border-gray-200 p-[24px] ${className}`}
+      className={`flex flex-col bg-white rounded-lg border border-gray-200 p-[24px] ${className}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
@@ -30,7 +30,7 @@ export function TilePrimary({
         {topRightContent}
       </div>
 
-      {children}
+      <div className="flex-1">{children}</div>
     </div>
   );
 }

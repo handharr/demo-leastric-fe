@@ -4,33 +4,33 @@ import {
   DetailLocationResponse,
 } from "@/features/device/infrastructure/models/locations-response";
 import { LocationModel } from "@/features/device/domain/entities/locations-models";
-import { optional } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
 export const mapLocationResponseToModel = (
   response: LocationResponse
 ): LocationModel => {
   return {
-    location: optional(response.location).orEmpty(),
-    deviceCount: optional(response.deviceCount).orZero(),
-    subLocations: optional(response.subLocations)
-      .orEmpty()
+    location: optionalValue(response.location).orEmpty(),
+    deviceCount: optionalValue(response.deviceCount).orZero(),
+    subLocations: optionalValue(response.subLocations)
+      .orEmptyArray()
       .map(mapSubLocationResponseToModel),
   };
 };
 
 const mapSubLocationResponseToModel = (response: SubLocationResponse) => {
   return {
-    subLocation: optional(response.subLocation).orEmpty(),
-    deviceCount: optional(response.deviceCount).orZero(),
-    detailLocations: optional(response.detailLocations)
-      .orEmpty()
+    subLocation: optionalValue(response.subLocation).orEmpty(),
+    deviceCount: optionalValue(response.deviceCount).orZero(),
+    detailLocations: optionalValue(response.detailLocations)
+      .orEmptyArray()
       .map(mapDetailLocationResponseToModel),
   };
 };
 
 const mapDetailLocationResponseToModel = (response: DetailLocationResponse) => {
   return {
-    detailLocation: optional(response.detailLocation).orEmpty(),
-    deviceCount: optional(response.deviceCount).orZero(),
+    detailLocation: optionalValue(response.detailLocation).orEmpty(),
+    deviceCount: optionalValue(response.deviceCount).orZero(),
   };
 };

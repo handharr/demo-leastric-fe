@@ -184,7 +184,7 @@ export default function ReportPage() {
       startDate: dateRangeFromYear.startDate,
       endDate: dateRangeFromYear.endDate,
       period: TimePeriod.Monthly,
-      size: 12,
+      size: 10,
     });
   }, [fetchUsageHistory, activeFilters]);
 
@@ -240,7 +240,7 @@ export default function ReportPage() {
   );
 
   return (
-    <div className="flex min-h-screen space-y-[16px] flex-col">
+    <div className="flex space-y-[16px] flex-col">
       {/* Header */}
       <div className="space-y-[4px]">
         <h1 className="text-2xl font-bold text-typography-headline">Report</h1>
@@ -318,7 +318,7 @@ export default function ReportPage() {
             startDate: dateRangeFromYear.startDate,
             endDate: dateRangeFromYear.endDate,
             period: TimePeriod.Monthly,
-            size: 12,
+            size: 10,
           });
         }}
         previousPage={() => {
@@ -334,7 +334,7 @@ export default function ReportPage() {
             startDate: dateRangeFromYear.startDate,
             endDate: dateRangeFromYear.endDate,
             period: TimePeriod.Monthly,
-            size: 12,
+            size: 10,
           });
         }}
         nextPage={() => {
@@ -350,7 +350,7 @@ export default function ReportPage() {
             startDate: dateRangeFromYear.startDate,
             endDate: dateRangeFromYear.endDate,
             period: TimePeriod.Monthly,
-            size: 12,
+            size: 10,
           });
         }}
         onDownloadSingle={handleDownloadSingle}

@@ -203,7 +203,10 @@ export function UsageChart({
               strokeWidth={2}
               dot={(props: DotProps) => {
                 // Only render dot if comparedValue is not undefined
-                if (props.payload?.comparedValue === undefined) {
+                if (
+                  props.payload?.comparedValue === undefined ||
+                  props.payload?.comparedValue < 0
+                ) {
                   return <g key={`dot-compared-${props.cx}-${props.cy}`} />; // Return empty SVG group instead of null
                 }
                 return (
@@ -232,7 +235,10 @@ export function UsageChart({
             strokeWidth={2}
             dot={(props: DotProps) => {
               // Only render dot if value is not undefined
-              if (props.payload?.value === undefined) {
+              if (
+                props.payload?.value === undefined ||
+                props.payload?.value < 0
+              ) {
                 return <g key={`dot-${props.cx}-${props.cy}`} />; // Return empty SVG group instead of null
               }
               return (

@@ -223,7 +223,7 @@ export function parseDateString(dateString: string): Date | null {
   return null;
 }
 
-// Get date end of date with locale
+// Get date end of date
 export function getDateEndOfDate(date: Date): Date {
   const endDate = new Date(date);
   endDate.setHours(23, 59, 59, 999);

@@ -7,6 +7,7 @@ import {
   formatDateToStringUTCWithoutMs,
   getStartAndEndDateOfYear,
   getTimeStringFromDate,
+  parseDateString,
   substractDateBySeconds,
 } from "@/shared/utils/helpers/date-helpers";
 import { RealTimeDataPoint } from "../presentation/types/ui";
@@ -169,10 +170,18 @@ export function mergeCurrentAndLastPeriodData({
   comparedValue: number | undefined;
 }[] {
   if (!currentData) return [];
+  const _currentData = currentData.filter((item) => item.totalKwh >= 0);
+  const _lastData = optionalValue(lastData)
+    .orEmptyArray()
+    .filter((item) => item.totalKwh >= 0);
 
   // For daily period, we need special handling to align months with different day counts
   if (period === TimePeriod.Daily) {
-    return mergeDailyDataWithAlignment(currentData, lastData || []);
+    return mergeDailyDataWithAlignment(_currentData, _lastData);
+  }
+
+  if (period === TimePeriod.Monthly) {
+    return mergeMonthlyDataWithAlignment(_currentData, _lastData);
   }
 
   // For non-daily periods, use the original logic
@@ -180,7 +189,7 @@ export function mergeCurrentAndLastPeriodData({
     period: string;
     value: number | undefined;
     comparedValue: number | undefined;
-  }[] = currentData.map((currentItem) => {
+  }[] = _currentData.map((currentItem) => {
     return {
       period: getXAxisLabelForPeriod({ period, value: currentItem.period }),
       value: currentItem.totalKwh,
@@ -188,8 +197,8 @@ export function mergeCurrentAndLastPeriodData({
     };
   });
 
-  if (lastData && lastData.length > 0) {
-    lastData.forEach((lastItem) => {
+  if (_lastData && _lastData.length > 0) {
+    _lastData.forEach((lastItem) => {
       const periodLabel = getXAxisLabelForPeriod({
         period,
         value: lastItem.period,
@@ -214,11 +223,94 @@ export function mergeCurrentAndLastPeriodData({
 }
 
 /*
+  Helper function to merge monthly data with
+  Shows all months, with appropriate undefined values
+  Filters out future dates from current data (only shows dates <= today)
+  Always shows full months X-axis (1-12) even when comparison is disabled
+  Period format: "2023-01", "2023-02", etc.
+*/
+function mergeMonthlyDataWithAlignment(
+  currentData: PeriodValueModel[],
+  lastData: PeriodValueModel[]
+): {
+  period: string;
+  value: number | undefined;
+  comparedValue: number | undefined;
+}[] {
+  // Get today's date for filtering
+  const today = new Date();
+  today.setHours(23, 59, 59, 999); // Set to end of today to include today
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0-based (0 = January, 11 = December)
+  // Create maps for both current and last data by month number for quick lookup
+  const currentDataMap = new Map<string, number>();
+  const lastDataMap = new Map<string, number>();
+  // Collect all unique month labels from both datasets
+  const allMonthLabels = new Set<string>();
+  // Filter current data to only include dates from current year and <= today
+  const filteredCurrentData = currentData.filter((item) => {
+    const itemDate = optionalValue(parseDateString(item.period)).orToday(); // Append day to create valid date
+    const itemYear = itemDate.getFullYear();
+    const itemMonth = itemDate.getMonth();
+    // Must be same year as today, and not in the future
+    return itemYear === currentYear && itemMonth <= currentMonth;
+  });
+  filteredCurrentData.forEach((item) => {
+    const monthLabel = getXAxisLabelForPeriod({
+      period: TimePeriod.Monthly,
+      value: item.period,
+    });
+    currentDataMap.set(monthLabel, item.totalKwh);
+    allMonthLabels.add(monthLabel);
+  });
+  // Process last data (comparison data)
+  lastData.forEach((item) => {
+    const monthLabel = getXAxisLabelForPeriod({
+      period: TimePeriod.Monthly,
+      value: item.period,
+    });
+    lastDataMap.set(monthLabel, item.totalKwh);
+    allMonthLabels.add(monthLabel);
+  });
+  // Always include all months of the year (1-12) on X-axis for better UX
+  // This ensures the X-axis shows the full year even when comparison is disabled
+  for (let month = 0; month < 12; month++) {
+    const date = new Date(currentYear, month, 1);
+    const monthLabel = date.toLocaleString("default", { month: "short" }); // e.g., "Jan"
+    allMonthLabels.add(monthLabel);
+  }
+  // Convert to array and sort by month order
+  const monthOrder = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const sortedMonthLabels = Array.from(allMonthLabels).sort((a, b) => {
+    return monthOrder.indexOf(a) - monthOrder.indexOf(b);
+  });
+  // Create merged data for all months from both periods
+  return sortedMonthLabels.map((monthLabel) => {
+    return {
+      period: monthLabel,
+      value: currentDataMap.get(monthLabel), // Will be undefined if month doesn't exist in current year or is in the future
+      comparedValue: lastDataMap.get(monthLabel), // Will be undefined if month doesn't exist in last year
+    };
+  });
+}
+
+/*
   Helper function to merge daily data with proper alignment for months with different day counts
   This ensures that day 1 of current month aligns with day 1 of last month, etc.
   Shows all days from both current and comparison months, with appropriate undefined values
-  Filters out future dates from current data (only shows dates <= today)
-  Always shows full month X-axis (1-31) even when comparison is disabled
 */
 function mergeDailyDataWithAlignment(
   currentData: PeriodValueModel[],

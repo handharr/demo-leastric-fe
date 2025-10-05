@@ -25,7 +25,6 @@ export function CustomTooltip({
   timeUnit,
 }: CustomTooltipProps) {
   if (active && payload && payload.length) {
-    console.log("[debugTest] CustomTooltip payload:", payload);
     return (
       <div className="bg-white p-3 shadow-lg rounded-lg border border-default-border">
         {timeUnit && (

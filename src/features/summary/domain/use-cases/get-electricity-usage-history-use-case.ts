@@ -39,7 +39,7 @@ export class GetElectricityUsageHistoryUseCase {
             optionalValue(parseDateString(item.period)).orToday()
           );
           const now = getDateStartOfDate(new Date());
-          return itemDate <= now;
+          return itemDate <= now && item.totalKwh >= 0;
         }),
       },
     };

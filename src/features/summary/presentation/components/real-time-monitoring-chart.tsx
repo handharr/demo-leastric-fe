@@ -26,6 +26,7 @@ import {
   usePopup,
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
+import { useSubscribeRealTimeUsage } from "../hooks/use-subscribe-real-time-usage";
 
 const availableIntervals = [
   getLabelFromRealTimeInterval(RealTimeInterval.Ten),
@@ -51,7 +52,26 @@ export function RealTimeMonitoringChart({
     fetchElectricityUsage,
     reset: resetElectricityUsageRealTime,
   } = useGetElectricityUsageRealTime();
+  const {
+    data: realTimeData,
+    error: usageRealTimeError,
+    loading: isRealTimeLoading,
+    subscribe: subscribeToRealTime,
+    unsubscribe: unsubscribeFromRealTime,
+  } = useSubscribeRealTimeUsage();
   const fetchRealTimeRef = useRef(fetchElectricityUsage);
+
+  useEffect(() => {
+    // Subscribe to real-time updates when component mounts
+    subscribeToRealTime();
+  }, [subscribeToRealTime]);
+
+  // - Unsubscribe from real-time updates when component unmounts
+  useEffect(() => {
+    return () => {
+      unsubscribeFromRealTime();
+    };
+  }, [unsubscribeFromRealTime]);
 
   const isEmpty = useMemo(
     () => !periodicData || periodicData.length === 0,

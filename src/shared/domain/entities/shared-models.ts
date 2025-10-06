@@ -19,3 +19,8 @@ export interface MqttUsageModel {
   "1phases"?: MqttLog1PhaseModel[];
   "3phases"?: MqttLog3PhaseModel[];
 }
+
+export interface MqttUsageAggregatedModel {
+  deviceId: string;
+  totalWatt: number;
+}

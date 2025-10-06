@@ -7,6 +7,7 @@ import {
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { Observable, Subject, BehaviorSubject } from "rxjs";
 import { filter, share, map } from "rxjs/operators";
+import { createMqttCertConfig } from "@/shared/utils/helpers/mqtt-service-helper";
 
 export type MqttMessage<T = unknown> = {
   topic: string;
@@ -29,6 +30,11 @@ export interface MqttDataSourceConfig {
   onConnectionLost?: () => void;
   onReconnect?: () => void;
   enableLogging?: boolean;
+  // Add certificate options
+  ca?: string | Buffer | Array<string | Buffer>;
+  cert?: string | Buffer;
+  key?: string | Buffer;
+  rejectUnauthorized?: boolean;
 }
 
 export class MqttDataSource {
@@ -83,6 +89,13 @@ export class MqttDataSource {
         this.defaultReconnectHandler()
       ),
       enableLogging: config.enableLogging,
+      // Add certificate configuration
+      ca: config.ca,
+      cert: config.cert,
+      key: config.key,
+      rejectUnauthorized: optionalValue(config.rejectUnauthorized).orDefault(
+        true
+      ),
     };
   }
 
@@ -156,7 +169,19 @@ export class MqttDataSource {
           connectTimeout: this.config.connectTimeout,
           keepalive: this.config.keepAlive,
           clean: true,
-          rejectUnauthorized: false,
+          // Add certificate configuration
+          ca: Array.isArray(this.config.ca)
+            ? this.config.ca.every((item) => typeof item === "string")
+              ? (this.config.ca as string[])
+              : this.config.ca.every((item) => Buffer.isBuffer(item))
+              ? (this.config.ca as Buffer[])
+              : undefined
+            : this.config.ca,
+          cert: this.config.cert,
+          key: this.config.key,
+          rejectUnauthorized: optionalValue(
+            this.config.rejectUnauthorized
+          ).orDefault(true),
         });
 
         this.setupEventHandlers(resolve, reject);
@@ -675,6 +700,72 @@ export function createTypedMqttDataSource<T = unknown>(
   };
 }
 
+// Enhanced factory function with certificate loading
+export async function createMqttDataSourceWithCerts(
+  config: MqttDataSourceConfig & {
+    certificateConfig?: {
+      caCertName?: string;
+      clientCertName?: string;
+      clientKeyName?: string;
+      rejectUnauthorized?: boolean;
+    };
+  }
+): Promise<MqttDataSource> {
+  let finalConfig = { ...config };
+
+  // Load certificates if configuration is provided
+  if (config.certificateConfig) {
+    try {
+      const certConfig = await createMqttCertConfig(config.certificateConfig);
+      finalConfig = {
+        ...finalConfig,
+        ca: certConfig.ca,
+        cert: certConfig.cert,
+        key: certConfig.key,
+        rejectUnauthorized: certConfig.rejectUnauthorized,
+      };
+    } catch (error) {
+      Logger.error(
+        "MqttDataSource",
+        "Failed to load certificates, falling back to insecure connection:",
+        error
+      );
+      finalConfig.rejectUnauthorized = false;
+    }
+  }
+
+  return new MqttDataSource(finalConfig);
+}
+
+// Enhanced typed factory with certificate loading
+export async function createTypedMqttDataSourceWithCerts<T = unknown>(
+  config: MqttDataSourceConfig & {
+    certificateConfig?: {
+      caCertName?: string;
+      clientCertName?: string;
+      clientKeyName?: string;
+      rejectUnauthorized?: boolean;
+    };
+  }
+): Promise<{
+  dataSource: MqttDataSource;
+  subscribeToTopic: (
+    topic: string,
+    options?: { qos?: 0 | 1 | 2; autoConnect?: boolean }
+  ) => Observable<MqttMessage<T>>;
+  getMessagesByTopic: (topicPattern: string) => Observable<MqttMessage<T>>;
+}> {
+  const dataSource = await createMqttDataSourceWithCerts(config);
+
+  return {
+    dataSource,
+    subscribeToTopic: (topic: string, options?) =>
+      dataSource.subscribeToTopic<T>({ topic, options }),
+    getMessagesByTopic: (topicPattern: string) =>
+      dataSource.getMessagesByTopic$<T>(topicPattern),
+  };
+}
+
 // Define specific types for your use cases
 export interface MqttUsageResponse {
   "1phases": Array<{ devid: string; p: number }>;
@@ -689,47 +780,277 @@ export interface DeviceDataPayload {
   timestamp?: string;
 }
 
-// Create typed instances for specific use cases
-export const usageMqttDataSource = createTypedMqttDataSource<MqttUsageResponse>(
-  {
-    brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
-      "ws://localhost:9001"
-    ),
-    username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-    password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
-    enableRetry: true,
-    enableLogging: true,
+// Update your typed instances to use certificates by default
+export const usageMqttDataSource = (async () => {
+  try {
+    return await createTypedMqttDataSourceWithCerts<MqttUsageResponse>({
+      brokerUrl: optionalValue(
+        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+      ).orDefault(
+        "wss://localhost:9001" // Use wss for secure WebSocket
+      ),
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      enableRetry: true,
+      enableLogging: true,
+      certificateConfig: {
+        caCertName: "ca-mosquitto.pem",
+        rejectUnauthorized: true,
+      },
+    });
+  } catch (error) {
+    Logger.warn(
+      "UsageMqttDataSource",
+      "Failed to create secure instance, falling back to insecure:",
+      error
+    );
+    return createTypedMqttDataSource<MqttUsageResponse>({
+      brokerUrl: optionalValue(
+        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+      ).orDefault("ws://localhost:9001"),
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      enableRetry: true,
+      enableLogging: true,
+      rejectUnauthorized: false,
+    });
   }
-);
+})();
 
-export const deviceMqttDataSource =
-  createTypedMqttDataSource<DeviceDataPayload>({
+export const deviceMqttDataSource = (async () => {
+  try {
+    return await createTypedMqttDataSourceWithCerts<DeviceDataPayload>({
+      brokerUrl: optionalValue(
+        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+      ).orDefault("wss://localhost:9001"),
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      enableRetry: true,
+      enableLogging: true,
+      certificateConfig: {
+        caCertName: "ca-mosquitto.pem",
+        rejectUnauthorized: true,
+      },
+    });
+  } catch (error) {
+    Logger.warn(
+      "DeviceMqttDataSource",
+      "Failed to create secure instance, falling back to insecure:",
+      error
+    );
+    return createTypedMqttDataSource<DeviceDataPayload>({
+      brokerUrl: optionalValue(
+        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+      ).orDefault("ws://localhost:9001"),
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      enableRetry: true,
+      enableLogging: true,
+      rejectUnauthorized: false,
+    });
+  }
+})();
+
+// Update existing instances to use certificates
+export const mqttDataSource = (async () => {
+  try {
+    return await createMqttDataSourceWithCerts({
+      brokerUrl: optionalValue(
+        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+      ).orDefault("wss://localhost:9001"),
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      enableRetry: true,
+      enableLogging: true,
+      certificateConfig: {
+        caCertName: "ca-mosquitto.pem",
+        rejectUnauthorized: true,
+      },
+    });
+  } catch (error) {
+    Logger.warn(
+      "MqttDataSource",
+      "Failed to create secure instance, falling back to insecure:",
+      error
+    );
+    return createMqttDataSource({
+      brokerUrl: optionalValue(
+        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+      ).orDefault("ws://localhost:9001"),
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      enableRetry: true,
+      enableLogging: true,
+      rejectUnauthorized: false,
+    });
+  }
+})();
+
+export const generalMqttDataSource = (async () => {
+  try {
+    return await createMqttDataSourceWithCerts({
+      brokerUrl: optionalValue(
+        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+      ).orDefault("wss://localhost:9001"),
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      enableRetry: true,
+      enableLogging: true,
+      certificateConfig: {
+        caCertName: "ca-mosquitto.pem",
+        rejectUnauthorized: true,
+      },
+    });
+  } catch (error) {
+    Logger.warn(
+      "GeneralMqttDataSource",
+      "Failed to create secure instance, falling back to insecure:",
+      error
+    );
+    return createMqttDataSource({
+      brokerUrl: optionalValue(
+        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+      ).orDefault("ws://localhost:9001"),
+      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      enableRetry: true,
+      enableLogging: true,
+      rejectUnauthorized: false,
+    });
+  }
+})();
+
+// Create a simplified function for creating secure instances
+export const createSecureMqttInstance = async <T = unknown>(
+  config?: Partial<MqttDataSourceConfig>
+): Promise<{
+  dataSource: MqttDataSource;
+  subscribeToTopic: (
+    topic: string,
+    options?: { qos?: 0 | 1 | 2; autoConnect?: boolean }
+  ) => Observable<MqttMessage<T>>;
+  getMessagesByTopic: (topicPattern: string) => Observable<MqttMessage<T>>;
+}> => {
+  const defaultConfig = {
     brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
-      "ws://localhost:9001"
+      "wss://localhost:9001"
     ),
     username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
     password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
     enableRetry: true,
     enableLogging: true,
-  });
+    certificateConfig: {
+      caCertName: "ca-mosquitto.pem",
+      rejectUnauthorized: true,
+    },
+    ...config,
+  };
 
-// Keep existing instances for backward compatibility
-export const mqttDataSource = createMqttDataSource({
-  brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
-    "ws://localhost:9001"
-  ),
-  username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-  password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
-  enableRetry: true,
-  enableLogging: true,
-});
+  try {
+    return await createTypedMqttDataSourceWithCerts<T>(defaultConfig);
+  } catch (error) {
+    Logger.warn(
+      "SecureMqttInstance",
+      "Failed to create secure instance, falling back to insecure:",
+      error
+    );
+    const fallbackConfig = { ...defaultConfig };
+    return createTypedMqttDataSource<T>({
+      ...fallbackConfig,
+      brokerUrl: fallbackConfig.brokerUrl.replace("wss://", "ws://"),
+      rejectUnauthorized: false,
+    });
+  }
+};
 
-export const generalMqttDataSource = createMqttDataSource({
-  brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
-    "ws://localhost:9001"
-  ),
-  username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-  password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
-  enableRetry: true,
-  enableLogging: true,
-});
+// Simplified factory for common use cases
+export const createSecureUsageMqttInstance = () =>
+  createSecureMqttInstance<MqttUsageResponse>();
+
+export const createSecureDeviceMqttInstance = () =>
+  createSecureMqttInstance<DeviceDataPayload>();
+
+// Keep the existing createSecureMqttInstances function but update it
+export const createSecureMqttInstances = async () => {
+  try {
+    const [usageInstance, deviceInstance, generalInstance] = await Promise.all([
+      usageMqttDataSource,
+      deviceMqttDataSource,
+      mqttDataSource,
+    ]);
+
+    return {
+      usageMqttDataSource: usageInstance,
+      deviceMqttDataSource: deviceInstance,
+      mqttDataSource: generalInstance,
+      generalMqttDataSource: generalInstance,
+    };
+  } catch (error) {
+    Logger.error(
+      "MqttInstances",
+      "Failed to create secure MQTT instances:",
+      error
+    );
+    throw error; // Let the caller handle the fallback
+  }
+};
+
+// Export a promise that resolves to the instances - this will now use secure by default
+export const mqttInstancesPromise = createSecureMqttInstances();
+
+// Helper function to get instances with fallback
+export const getMqttInstances = async () => {
+  try {
+    return await mqttInstancesPromise;
+  } catch (error) {
+    Logger.warn(
+      "MqttInstances",
+      "Secure instances failed, creating fallback instances:",
+      error
+    );
+
+    // Return insecure fallback instances
+    return {
+      usageMqttDataSource: createTypedMqttDataSource<MqttUsageResponse>({
+        brokerUrl: optionalValue(
+          process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+        ).orDefault("ws://localhost:9001"),
+        username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        enableRetry: true,
+        enableLogging: true,
+        rejectUnauthorized: false,
+      }),
+      deviceMqttDataSource: createTypedMqttDataSource<DeviceDataPayload>({
+        brokerUrl: optionalValue(
+          process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+        ).orDefault("ws://localhost:9001"),
+        username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        enableRetry: true,
+        enableLogging: true,
+        rejectUnauthorized: false,
+      }),
+      mqttDataSource: createMqttDataSource({
+        brokerUrl: optionalValue(
+          process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+        ).orDefault("ws://localhost:9001"),
+        username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        enableRetry: true,
+        enableLogging: true,
+        rejectUnauthorized: false,
+      }),
+      generalMqttDataSource: createMqttDataSource({
+        brokerUrl: optionalValue(
+          process.env.NEXT_PUBLIC_MQTT_BROKER_URL
+        ).orDefault("ws://localhost:9001"),
+        username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
+        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        enableRetry: true,
+        enableLogging: true,
+        rejectUnauthorized: false,
+      }),
+    };
+  }
+};

@@ -313,7 +313,7 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     );
 
     return usageMqttDataSource
-      .subscribeToTopic("device/+/usage", {
+      .subscribeToTopic("logdevice/multipledata", {
         qos: 0,
         autoConnect: true,
       })

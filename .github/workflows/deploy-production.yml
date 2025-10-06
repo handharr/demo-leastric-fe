@@ -78,6 +78,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          dockerfile: Dockerfile
           push: true
           target: runner
           tags: ${{ steps.meta-fe.outputs.tags }}
@@ -92,5 +93,6 @@ jobs:
       - name: Update Frontend deployment status
         run: |
           echo "Frontend image pushed successfully!"
+          echo "Using backend url: ${{ secrets.PRODUCTION_NEXT_PUBLIC_API_BASE_URL }}"
           echo "Image URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_FE_REPOSITORY }}:production-latest"
           echo "Image Digest: ${{ steps.build-fe.outputs.digest }}"

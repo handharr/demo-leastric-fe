@@ -7,7 +7,13 @@ export const loadCertificate = async (
   certName: string
 ): Promise<Buffer | undefined> => {
   try {
-    const certUrl = `/certs/${certName}`;
+    // Get the base URL for the current environment
+    const baseUrl =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001";
+
+    const certUrl = `${baseUrl}/certs/${certName}`;
     const response = await fetch(certUrl);
 
     if (!response.ok) {

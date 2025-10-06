@@ -88,7 +88,7 @@ jobs:
           platforms: linux/amd64
           build-args: |
             NEXT_TELEMETRY_DISABLED=1
-            NEXT_PUBLIC_API_BASE_URL=${{ secrets.PRODUCTION_NEXT_PUBLIC_API_BASE_URL }}
+            PRODUCTION_NEXT_PUBLIC_API_BASE_URL=${{ secrets.PRODUCTION_NEXT_PUBLIC_API_BASE_URL }}
 
       - name: Update Frontend deployment status
         run: |

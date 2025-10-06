@@ -21,16 +21,7 @@ export default function SidebarMenuItem({
   const content = (
     <>
       {/* Active indicator bars */}
-      {isActive && (
-        <>
-          {!isSidebarOpen && (
-            <div className="w-0.5 h-5 bg-leastric-primary rounded-r hidden lg:block" />
-          )}
-          {isSidebarOpen && (
-            <div className="w-0.5 h-5 bg-leastric-primary rounded-r lg:hidden" />
-          )}
-        </>
-      )}
+      {isActive && <div className="w-0.5 h-5 bg-leastric-primary rounded-r" />}
 
       {/* Icon */}
       {iconSource && (

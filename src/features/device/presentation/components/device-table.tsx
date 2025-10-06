@@ -22,11 +22,31 @@ export function DeviceTable({
   loading,
   onEditSuccess,
 }: DeviceTableProps) {
-  const devicesArray = Array.isArray(devices) ? devices : [];
+  const devicesArray: DeviceModel[] = Array.isArray(devices) ? devices : [];
+  const isEmptyData = devicesArray.length === 0 && !loading;
 
-  if (devicesArray.length === 0 && !loading) {
-    return <EmptyData />;
-  }
+  const tableContent = loading ? (
+    <TableSkeletonLoading />
+  ) : (
+    devicesArray.map((d, i) => {
+      const status = devicesStatus?.find((s) => s.device.id === d.id);
+      const isOnline = optionalValue(status?.isOnline).orFalse();
+      return (
+        <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+          <td className="px-4 py-3">{d.deviceName}</td>
+          <td className="px-4 py-3">
+            <StatusBadge status={isOnline} />
+          </td>
+          <td className="px-4 py-3">{d.tariffGroup}</td>
+          <td className="px-4 py-3">{getDeviceTypeLabel(d.deviceType)}</td>
+          <td className="px-4 py-3">{d.location}</td>
+          <td className="px-4 py-3">
+            <EditDeviceModal device={d} onSuccessUpdate={onEditSuccess} />
+          </td>
+        </tr>
+      );
+    })
+  );
 
   return (
     <div className="overflow-x-auto bg-white rounded-xl shadow border">
@@ -44,31 +64,19 @@ export function DeviceTable({
         </thead>
         <tbody>
           {loading ? (
-            <TableSkeletonLoading />
+            <tr>
+              <td colSpan={6} className="p-0">
+                <TableSkeletonLoading />
+              </td>
+            </tr>
+          ) : isEmptyData ? (
+            <tr>
+              <td colSpan={6} className="p-4 text-center">
+                <EmptyData />
+              </td>
+            </tr>
           ) : (
-            devicesArray.map((d, i) => {
-              const status = devicesStatus?.find((s) => s.device.id === d.id);
-              const isOnline = optionalValue(status?.isOnline).orFalse();
-              return (
-                <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                  <td className="px-4 py-3">{d.deviceName}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={isOnline} />
-                  </td>
-                  <td className="px-4 py-3">{d.tariffGroup}</td>
-                  <td className="px-4 py-3">
-                    {getDeviceTypeLabel(d.deviceType)}
-                  </td>
-                  <td className="px-4 py-3">{d.location}</td>
-                  <td className="px-4 py-3">
-                    <EditDeviceModal
-                      device={d}
-                      onSuccessUpdate={onEditSuccess}
-                    />
-                  </td>
-                </tr>
-              );
-            })
+            tableContent
           )}
         </tbody>
       </table>

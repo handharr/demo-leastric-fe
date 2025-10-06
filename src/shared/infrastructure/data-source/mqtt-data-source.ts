@@ -112,7 +112,7 @@ export class MqttDataSource {
       this.log("Connection already in progress");
       return;
     }
-
+    console.log("[debugTest] MqttDataSource - this config:", this.config);
     this.connectionPromise = this.config.enableRetry
       ? this.connectWithRetry()
       : this.performConnection();
@@ -166,7 +166,10 @@ export class MqttDataSource {
           password: optionalValue(this.config.password).isNotNullOrEmpty()
             ? this.config.password
             : undefined,
-          reconnectPeriod: this.config.reconnectPeriod,
+          // Disable built-in reconnection when enableRetry is false
+          reconnectPeriod: this.config.enableRetry
+            ? this.config.reconnectPeriod
+            : 0,
           connectTimeout: this.config.connectTimeout,
           keepalive: this.config.keepAlive,
           clean: true,
@@ -240,7 +243,13 @@ export class MqttDataSource {
     });
 
     client.on("reconnect", () => {
+      if (!this.config.enableRetry) {
+        // Prevent reconnection if retry is disabled
+        this.client?.end(true);
+        return;
+      }
       this.log("Reconnecting to MQTT broker");
+      console.log("[debugTest] MqttDataSource - on reconnect");
       this.config.onReconnect?.();
     });
 
@@ -790,7 +799,7 @@ export const usageMqttDataSource = (async () => {
       brokerUrl: configHelper.brokerUrl,
       username: configHelper.username,
       password: configHelper.password,
-      enableRetry: true,
+      enableRetry: false,
       enableLogging: true,
       certificateConfig: {
         caCertName: "ca-mosquitto.pem",

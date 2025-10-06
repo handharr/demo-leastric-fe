@@ -11,6 +11,7 @@ export async function GET() {
   try {
     const response = await fetch(healthUrl);
     backendHealth = {
+      url: healthUrl,
       status: response.ok ? 'ok' : 'error',
       statusCode: response.status,
     };
@@ -22,6 +23,7 @@ export async function GET() {
   } catch (error) {
     console.error('Failed to reach backend:', error);
     backendHealth = {
+      url: healthUrl,
       status: 'error',
       error: 'Failed to reach backend',
     };

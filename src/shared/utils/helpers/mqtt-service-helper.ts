@@ -1,8 +1,6 @@
 "use client";
 
 import { Logger } from "@/shared/utils/logger/logger";
-import fs from "fs";
-import path from "path";
 
 // Load certificate from public folder (works in both client and server)
 export const loadCertificate = async (
@@ -22,42 +20,6 @@ export const loadCertificate = async (
 
     Logger.info("CertLoader", `Successfully loaded certificate: ${certName}`);
     return certBuffer;
-  } catch (error) {
-    Logger.error(
-      "CertLoader",
-      `Failed to load certificate ${certName}:`,
-      error
-    );
-    return undefined;
-  }
-};
-
-// Synchronous version for server-side (fallback to file system)
-export const loadCertificateSync = (certName: string): Buffer | undefined => {
-  // Check if we're on the server side
-  if (typeof window !== "undefined") {
-    Logger.warn(
-      "CertLoader",
-      "Sync certificate loading is only available on server-side"
-    );
-    return undefined;
-  }
-
-  try {
-    // Try public folder first
-    let certPath = path.join(process.cwd(), "public", "certs", certName);
-    if (fs.existsSync(certPath)) {
-      return fs.readFileSync(certPath);
-    }
-
-    // Fallback to root certs folder
-    certPath = path.join(process.cwd(), "certs", certName);
-    if (fs.existsSync(certPath)) {
-      return fs.readFileSync(certPath);
-    }
-
-    Logger.warn("CertLoader", `Certificate file not found: ${certName}`);
-    return undefined;
   } catch (error) {
     Logger.error(
       "CertLoader",

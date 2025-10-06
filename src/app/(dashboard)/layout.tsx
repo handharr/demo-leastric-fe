@@ -110,8 +110,6 @@ export default function DashboardLayout({
       const isSettingRoute = settingRoutes.some((route) =>
         pathname.startsWith(route)
       );
-      console.log("[debugTest] Found setting route:", isSettingRoute);
-      console.log("[debugTest] Current pathname:", pathname);
       const settingMenu = MENU_ITEMS.find((item) => item.label === "Setting");
       if (isSettingRoute && settingMenu) {
         setActiveMenu(settingMenu);

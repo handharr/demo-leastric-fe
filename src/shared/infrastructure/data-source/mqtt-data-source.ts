@@ -109,10 +109,9 @@ export class MqttDataSource {
     }
 
     if (this.isConnecting) {
-      this.log("Connection already in progress");
       return;
     }
-    console.log("[debugTest] MqttDataSource - this config:", this.config);
+
     this.connectionPromise = this.config.enableRetry
       ? this.connectWithRetry()
       : this.performConnection();
@@ -249,7 +248,6 @@ export class MqttDataSource {
         return;
       }
       this.log("Reconnecting to MQTT broker");
-      console.log("[debugTest] MqttDataSource - on reconnect");
       this.config.onReconnect?.();
     });
 
@@ -793,7 +791,6 @@ export interface DeviceDataPayload {
 // Update your typed instances to use certificates by default
 export const usageMqttDataSource = (async () => {
   const configHelper = getMqttConfig();
-  console.log("[debugTest] MQTT Config:", configHelper);
   try {
     return await createTypedMqttDataSourceWithCerts<MqttUsageResponse>({
       brokerUrl: configHelper.brokerUrl,

@@ -599,7 +599,7 @@ export function createAuthApiClient(
     retryOptions: {
       maxRetries: 2,
       onRetry: (attempt, error) => {
-        console.log(`Auth API retry attempt ${attempt}:`, error);
+        Logger.info("Auth API", `Retry attempt ${attempt}:`, error);
       },
     },
     ...config,

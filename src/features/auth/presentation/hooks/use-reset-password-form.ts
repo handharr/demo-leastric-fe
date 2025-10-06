@@ -7,6 +7,7 @@ import { AuthRepositoryImpl } from "@/features/auth/infrastructure/repositories-
 import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export interface UseResetPasswordFormReturn {
   formData: ResetPasswordPageModel;
@@ -110,10 +111,13 @@ export function useResetPasswordForm(): UseResetPasswordFormReturn {
           }
         } else {
           setIsSuccess(true);
-          console.log("Password reset successful:", result);
         }
       } catch (error) {
-        console.error("Reset password error:", error);
+        Logger.error(
+          "useResetPasswordForm",
+          "Unexpected error during password reset:",
+          error
+        );
         setErrors({
           newPassword: "An unexpected error occurred",
         });

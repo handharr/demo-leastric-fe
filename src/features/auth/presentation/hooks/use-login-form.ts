@@ -4,6 +4,7 @@ import { LoginValidationErrors } from "@/features/auth/domain/entities/login-val
 import { LoginUseCase } from "@/features/auth/domain/use-cases/login-use-case";
 import { isErrorModel } from "@/shared/domain/entities/base-error-model";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { Logger } from "@/shared/utils/logger/logger";
 
 export interface UseLoginFormReturn {
   formData: LoginFormData;
@@ -83,12 +84,11 @@ export function useLoginForm(
           }
         } else {
           // Handle successful login (redirect, etc.)
-          console.log("Login successful:", result);
           // Call the callback instead of router.push
           onLoginSuccess?.();
         }
       } catch (error) {
-        console.error("Login error:", error);
+        Logger.error("useLoginForm", "Unexpected error during login:", error);
         setErrors({
           other: "An unexpected error occurred. Please try again later.",
         });

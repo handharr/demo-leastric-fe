@@ -78,12 +78,10 @@ export default function SummaryPage() {
 
   const handleFilterApply = (filters: SummaryFilterState) => {
     setActiveFilters(filters);
-    console.log("Applied filters:", filters);
   };
 
   const handleFilterReset = (resetValue: SummaryFilterState) => {
     setActiveFilters(resetValue);
-    console.log("Filters reset");
   };
 
   useEffect(() => {

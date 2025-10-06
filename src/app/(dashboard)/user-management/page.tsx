@@ -8,6 +8,7 @@ import { GenericFilterModal } from "@/shared/presentation/components/filter/gene
 import { FilterMetas, FilterType } from "@/shared/presentation/types/filter-ui";
 import { getDefaultFilters } from "@/shared/utils/helpers/filter-helper";
 import { UserManagementTable } from "@/features/admin-management/presentation/components/user-management-table";
+import { Logger } from "@/shared/utils/logger/logger";
 
 interface UserManagementFilterState {
   singleSelection: {
@@ -76,10 +77,10 @@ export default function UserManagementPage() {
         <Pagination
           model={pagination}
           onPageChange={(page) => {
-            console.log(page);
+            Logger.info("UserManagementPage", `Page changed to ${page}`);
           }}
           onPreviousPage={() => {
-            console.log("previous");
+            Logger.info("UserManagementPage", "Previous page clicked");
           }}
           onNextPage={() => {}}
         />

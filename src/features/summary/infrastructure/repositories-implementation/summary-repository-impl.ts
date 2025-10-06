@@ -312,8 +312,6 @@ export class SummaryRepositoryImpl implements SummaryRepository {
       "subscribeRealTimeUsage - starting subscription"
     );
 
-    console.log("[debugTest] subscribeRealTimeUsage - starting subscription");
-
     // Use the helper function that includes fallback logic
     return from(getMqttInstances()).pipe(
       switchMap((instances) => {

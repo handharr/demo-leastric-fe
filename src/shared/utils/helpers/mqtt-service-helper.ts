@@ -2,6 +2,14 @@
 
 import { Logger } from "@/shared/utils/logger/logger";
 
+export const getMqttConfig = () => ({
+  brokerUrl:
+    process.env.NEXT_PUBLIC_MQTT_BROKER_URL ||
+    "mqtts://staging-api.leastric.com:8883",
+  username: process.env.NEXT_PUBLIC_MQTT_USERNAME || "admin",
+  password: process.env.NEXT_PUBLIC_MQTT_PASSWORD || "admin123",
+});
+
 // Load certificate from public folder (works in both client and server)
 export const loadCertificate = async (
   certName: string

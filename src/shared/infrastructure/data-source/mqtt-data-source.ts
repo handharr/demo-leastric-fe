@@ -8,6 +8,7 @@ import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 import { Observable, Subject, BehaviorSubject } from "rxjs";
 import { filter, share, map } from "rxjs/operators";
 import { createMqttCertConfig } from "@/shared/utils/helpers/mqtt-service-helper";
+import { getMqttConfig } from "@/shared/utils/helpers/mqtt-service-helper";
 
 export type MqttMessage<T = unknown> = {
   topic: string;
@@ -155,7 +156,7 @@ export class MqttDataSource {
         this.isConnecting = true;
         this.connectionAttempts++;
 
-        this.log("Connecting to MQTT broker:", this.config.brokerUrl);
+        this.log("Connecting to MQTT broker:", this.config);
 
         this.client = mqtt.connect(this.config.brokerUrl, {
           clientId: this.config.clientId,
@@ -782,15 +783,13 @@ export interface DeviceDataPayload {
 
 // Update your typed instances to use certificates by default
 export const usageMqttDataSource = (async () => {
+  const configHelper = getMqttConfig();
+  console.log("[debugTest] MQTT Config:", configHelper);
   try {
     return await createTypedMqttDataSourceWithCerts<MqttUsageResponse>({
-      brokerUrl: optionalValue(
-        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-      ).orDefault(
-        "wss://localhost:9001" // Use wss for secure WebSocket
-      ),
-      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      brokerUrl: configHelper.brokerUrl,
+      username: configHelper.username,
+      password: configHelper.password,
       enableRetry: true,
       enableLogging: true,
       certificateConfig: {
@@ -805,11 +804,9 @@ export const usageMqttDataSource = (async () => {
       error
     );
     return createTypedMqttDataSource<MqttUsageResponse>({
-      brokerUrl: optionalValue(
-        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-      ).orDefault("ws://localhost:9001"),
-      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      brokerUrl: configHelper.brokerUrl,
+      username: configHelper.username,
+      password: configHelper.password,
       enableRetry: true,
       enableLogging: true,
       rejectUnauthorized: false,
@@ -819,12 +816,11 @@ export const usageMqttDataSource = (async () => {
 
 export const deviceMqttDataSource = (async () => {
   try {
+    const configHelper = getMqttConfig();
     return await createTypedMqttDataSourceWithCerts<DeviceDataPayload>({
-      brokerUrl: optionalValue(
-        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-      ).orDefault("wss://localhost:9001"),
-      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      brokerUrl: configHelper.brokerUrl,
+      username: configHelper.username,
+      password: configHelper.password,
       enableRetry: true,
       enableLogging: true,
       certificateConfig: {
@@ -838,12 +834,11 @@ export const deviceMqttDataSource = (async () => {
       "Failed to create secure instance, falling back to insecure:",
       error
     );
+    const configHelper = getMqttConfig();
     return createTypedMqttDataSource<DeviceDataPayload>({
-      brokerUrl: optionalValue(
-        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-      ).orDefault("ws://localhost:9001"),
-      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      brokerUrl: configHelper.brokerUrl,
+      username: configHelper.username,
+      password: configHelper.password,
       enableRetry: true,
       enableLogging: true,
       rejectUnauthorized: false,
@@ -854,12 +849,11 @@ export const deviceMqttDataSource = (async () => {
 // Update existing instances to use certificates
 export const mqttDataSource = (async () => {
   try {
+    const configHelper = getMqttConfig();
     return await createMqttDataSourceWithCerts({
-      brokerUrl: optionalValue(
-        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-      ).orDefault("wss://localhost:9001"),
-      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      brokerUrl: configHelper.brokerUrl,
+      username: configHelper.username,
+      password: configHelper.password,
       enableRetry: true,
       enableLogging: true,
       certificateConfig: {
@@ -873,12 +867,11 @@ export const mqttDataSource = (async () => {
       "Failed to create secure instance, falling back to insecure:",
       error
     );
+    const configHelper = getMqttConfig();
     return createMqttDataSource({
-      brokerUrl: optionalValue(
-        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-      ).orDefault("ws://localhost:9001"),
-      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      brokerUrl: configHelper.brokerUrl,
+      username: configHelper.username,
+      password: configHelper.password,
       enableRetry: true,
       enableLogging: true,
       rejectUnauthorized: false,
@@ -888,12 +881,11 @@ export const mqttDataSource = (async () => {
 
 export const generalMqttDataSource = (async () => {
   try {
+    const configHelper = getMqttConfig();
     return await createMqttDataSourceWithCerts({
-      brokerUrl: optionalValue(
-        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-      ).orDefault("wss://localhost:9001"),
-      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      brokerUrl: configHelper.brokerUrl,
+      username: configHelper.username,
+      password: configHelper.password,
       enableRetry: true,
       enableLogging: true,
       certificateConfig: {
@@ -907,12 +899,11 @@ export const generalMqttDataSource = (async () => {
       "Failed to create secure instance, falling back to insecure:",
       error
     );
+    const configHelper = getMqttConfig();
     return createMqttDataSource({
-      brokerUrl: optionalValue(
-        process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-      ).orDefault("ws://localhost:9001"),
-      username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-      password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+      brokerUrl: configHelper.brokerUrl,
+      username: configHelper.username,
+      password: configHelper.password,
       enableRetry: true,
       enableLogging: true,
       rejectUnauthorized: false,
@@ -931,12 +922,11 @@ export const createSecureMqttInstance = async <T = unknown>(
   ) => Observable<MqttMessage<T>>;
   getMessagesByTopic: (topicPattern: string) => Observable<MqttMessage<T>>;
 }> => {
+  const configHelper = getMqttConfig();
   const defaultConfig = {
-    brokerUrl: optionalValue(process.env.NEXT_PUBLIC_MQTT_BROKER_URL).orDefault(
-      "wss://localhost:9001"
-    ),
-    username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-    password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+    brokerUrl: configHelper.brokerUrl,
+    username: configHelper.username,
+    password: configHelper.password,
     enableRetry: true,
     enableLogging: true,
     certificateConfig: {
@@ -957,7 +947,6 @@ export const createSecureMqttInstance = async <T = unknown>(
     const fallbackConfig = { ...defaultConfig };
     return createTypedMqttDataSource<T>({
       ...fallbackConfig,
-      brokerUrl: fallbackConfig.brokerUrl.replace("wss://", "ws://"),
       rejectUnauthorized: false,
     });
   }
@@ -1008,45 +997,37 @@ export const getMqttInstances = async () => {
       "Secure instances failed, creating fallback instances:",
       error
     );
-
+    const configHelper = getMqttConfig();
     // Return insecure fallback instances
     return {
       usageMqttDataSource: createTypedMqttDataSource<MqttUsageResponse>({
-        brokerUrl: optionalValue(
-          process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-        ).orDefault("ws://localhost:9001"),
-        username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        brokerUrl: configHelper.brokerUrl,
+        username: configHelper.username,
+        password: configHelper.password,
         enableRetry: true,
         enableLogging: true,
         rejectUnauthorized: false,
       }),
       deviceMqttDataSource: createTypedMqttDataSource<DeviceDataPayload>({
-        brokerUrl: optionalValue(
-          process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-        ).orDefault("ws://localhost:9001"),
-        username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        brokerUrl: configHelper.brokerUrl,
+        username: configHelper.username,
+        password: configHelper.password,
         enableRetry: true,
         enableLogging: true,
         rejectUnauthorized: false,
       }),
       mqttDataSource: createMqttDataSource({
-        brokerUrl: optionalValue(
-          process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-        ).orDefault("ws://localhost:9001"),
-        username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        brokerUrl: configHelper.brokerUrl,
+        username: configHelper.username,
+        password: configHelper.password,
         enableRetry: true,
         enableLogging: true,
         rejectUnauthorized: false,
       }),
       generalMqttDataSource: createMqttDataSource({
-        brokerUrl: optionalValue(
-          process.env.NEXT_PUBLIC_MQTT_BROKER_URL
-        ).orDefault("ws://localhost:9001"),
-        username: process.env.NEXT_PUBLIC_MQTT_USERNAME,
-        password: process.env.NEXT_PUBLIC_MQTT_PASSWORD,
+        brokerUrl: configHelper.brokerUrl,
+        username: configHelper.username,
+        password: configHelper.password,
         enableRetry: true,
         enableLogging: true,
         rejectUnauthorized: false,

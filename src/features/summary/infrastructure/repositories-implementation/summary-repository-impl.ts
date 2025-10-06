@@ -27,9 +27,9 @@ import {
 } from "@/shared/utils/helpers/enum-helpers";
 import { RemoteSummaryDataSource } from "@/features/summary/infrastructure/data-source/remote-summary-data-source";
 import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
-import { usageMqttDataSource } from "@/shared/infrastructure/data-source/mqtt-data-source";
-import { Observable, of } from "rxjs";
-import { map, catchError } from "rxjs/operators";
+import { getMqttInstances } from "@/shared/infrastructure/data-source/mqtt-data-source";
+import { Observable, of, from } from "rxjs";
+import { map, catchError, switchMap } from "rxjs/operators";
 
 export class SummaryRepositoryImpl implements SummaryRepository {
   constructor(
@@ -312,108 +312,148 @@ export class SummaryRepositoryImpl implements SummaryRepository {
       "subscribeRealTimeUsage - starting subscription"
     );
 
-    return usageMqttDataSource
-      .subscribeToTopic("logdevice/multipledata", {
-        qos: 0,
-        autoConnect: true,
-      })
-      .pipe(
-        map((message): MqttUsageModel | BaseErrorModel => {
-          try {
-            Logger.info(
-              "SummaryRepositoryImpl",
-              "subscribeRealTimeUsage - message received",
-              {
-                topic: message.topic,
-                timestamp: message.timestamp,
-                qos: message.qos,
-                payload: message.payload,
-              }
-            );
+    // Use the helper function that includes fallback logic
+    return from(getMqttInstances()).pipe(
+      switchMap((instances) => {
+        Logger.info(
+          "SummaryRepositoryImpl",
+          "subscribeRealTimeUsage - MQTT instances loaded successfully"
+        );
 
-            const payload = message.payload;
-
-            // Validate payload structure
-            if (!payload || typeof payload !== "object") {
-              Logger.error(
-                "SummaryRepositoryImpl",
-                "subscribeRealTimeUsage - invalid payload structure",
-                payload
-              );
-              return createErrorModel({
-                type: ErrorType.UNEXPECTED,
-                message: "Invalid MQTT message payload structure.",
-              });
+        return instances.usageMqttDataSource.subscribeToTopic(
+          "logdevice/multipledata",
+          {
+            qos: 0,
+            autoConnect: true,
+          }
+        );
+      }),
+      map((message): MqttUsageModel | BaseErrorModel => {
+        try {
+          Logger.info(
+            "SummaryRepositoryImpl",
+            "subscribeRealTimeUsage - message received",
+            {
+              topic: message.topic,
+              timestamp: message.timestamp,
+              qos: message.qos,
+              payload: message.payload,
             }
+          );
 
-            // Check for error in payload
-            if ("error" in payload && typeof payload.error === "string") {
-              Logger.error(
-                "SummaryRepositoryImpl",
-                "subscribeRealTimeUsage - error in payload",
-                payload.error
-              );
-              return createErrorModel({
-                type: ErrorType.UNEXPECTED,
-                message: payload.error,
-              });
-            }
+          const payload = message.payload;
 
-            // Map to MqttUsageModel with proper validation
-            const mappedUsage: MqttUsageModel = {
-              "1phases": optionalValue(payload["1phases"])
-                .orEmptyArray()
-                .map((log) => ({
-                  devid: optionalValue(log?.devid).orEmpty(),
-                  p: optionalValue(log?.p).orZero(),
-                })),
-              "3phases": optionalValue(payload["3phases"])
-                .orEmptyArray()
-                .map((log) => ({
-                  devid: optionalValue(log?.devid).orEmpty(),
-                  pR: optionalValue(log?.pR).orZero(),
-                  pS: optionalValue(log?.pS).orZero(),
-                  pT: optionalValue(log?.pT).orZero(),
-                })),
-            };
-
-            Logger.info(
-              "SummaryRepositoryImpl",
-              "subscribeRealTimeUsage - successfully mapped usage",
-              mappedUsage
-            );
-
-            return mappedUsage;
-          } catch (error) {
+          // Validate payload structure
+          if (!payload || typeof payload !== "object") {
             Logger.error(
               "SummaryRepositoryImpl",
-              "subscribeRealTimeUsage - parsing error",
-              error
+              "subscribeRealTimeUsage - invalid payload structure",
+              payload
             );
             return createErrorModel({
               type: ErrorType.UNEXPECTED,
-              message: "Failed to parse MQTT usage data.",
+              message: "Invalid MQTT message payload structure.",
             });
           }
-        }),
-        catchError((error) => {
-          Logger.error(
+
+          // Check for error in payload
+          if ("error" in payload && typeof payload.error === "string") {
+            Logger.error(
+              "SummaryRepositoryImpl",
+              "subscribeRealTimeUsage - error in payload",
+              payload.error
+            );
+            return createErrorModel({
+              type: ErrorType.UNEXPECTED,
+              message: payload.error,
+            });
+          }
+
+          // Map to MqttUsageModel with proper validation
+          const mappedUsage: MqttUsageModel = {
+            "1phases": optionalValue(payload["1phases"])
+              .orEmptyArray()
+              .map((log) => ({
+                devid: optionalValue(log?.devid).orEmpty(),
+                p: optionalValue(log?.p).orZero(),
+              })),
+            "3phases": optionalValue(payload["3phases"])
+              .orEmptyArray()
+              .map((log) => ({
+                devid: optionalValue(log?.devid).orEmpty(),
+                pR: optionalValue(log?.pR).orZero(),
+                pS: optionalValue(log?.pS).orZero(),
+                pT: optionalValue(log?.pT).orZero(),
+              })),
+          };
+
+          Logger.info(
             "SummaryRepositoryImpl",
-            "subscribeRealTimeUsage - MQTT connection error",
-            error
+            "subscribeRealTimeUsage - successfully mapped usage",
+            mappedUsage
           );
 
-          // Return an observable with error model instead of throwing
-          return of(
-            createErrorModel({
-              type: ErrorType.NETWORK,
-              message:
-                error instanceof Error
-                  ? `MQTT connection error: ${error.message}`
-                  : "MQTT connection error occurred.",
-            })
+          return mappedUsage;
+        } catch (error) {
+          Logger.error(
+            "SummaryRepositoryImpl",
+            "subscribeRealTimeUsage - parsing error",
+            error
           );
-        })
-      );
+          return createErrorModel({
+            type: ErrorType.UNEXPECTED,
+            message: "Failed to parse MQTT usage data.",
+          });
+        }
+      }),
+      catchError((error) => {
+        Logger.error(
+          "SummaryRepositoryImpl",
+          "subscribeRealTimeUsage - MQTT connection error",
+          error
+        );
+
+        // Enhanced error categorization
+        let errorType = ErrorType.UNEXPECTED;
+        let errorMessage = "MQTT connection error occurred.";
+
+        if (error instanceof Error) {
+          const message = error.message.toLowerCase();
+
+          if (
+            message.includes("certificate") ||
+            message.includes("tls") ||
+            message.includes("ssl") ||
+            message.includes("cert")
+          ) {
+            errorType = ErrorType.NETWORK;
+            errorMessage = `Certificate/TLS error: ${error.message}`;
+          } else if (
+            message.includes("connection") ||
+            message.includes("timeout") ||
+            message.includes("refused")
+          ) {
+            errorType = ErrorType.NETWORK;
+            errorMessage = `Network connection error: ${error.message}`;
+          } else if (
+            message.includes("auth") ||
+            message.includes("credential")
+          ) {
+            errorType = ErrorType.UNEXPECTED;
+            errorMessage = `Authentication error: ${error.message}`;
+          } else {
+            errorMessage = `MQTT error: ${error.message}`;
+          }
+        }
+
+        // Return an observable with error model instead of throwing
+        return of(
+          createErrorModel({
+            type: errorType,
+            message: errorMessage,
+          })
+        );
+      })
+    );
   }
 }

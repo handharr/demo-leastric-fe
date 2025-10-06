@@ -15,38 +15,50 @@ import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 
 // Constants - moved outside component to prevent recreation
-const MENU_ITEMS: SidebarMenuItemProps[] = [
-  {
-    label: "Summary",
-    iconSource: "/resources/icons/analytic/dashboard.svg",
-    route: "/summary",
-  },
-  {
-    label: "Report",
-    iconSource: "/resources/icons/analytic/chart-bar-vertical.svg",
-    route: "/report",
-  },
-  {
-    label: "Mqtt Log",
-    iconSource: "/resources/icons/document/list-2.svg",
-    route: "/mqtt-log",
-  },
-  {
-    label: "User Management",
-    iconSource: "/resources/icons/user/account-square.svg",
-    route: "/user-management",
-  },
-  {
-    label: "Device",
-    iconSource: "/resources/icons/device/device.svg",
-    route: "/device",
-  },
-  {
-    label: "Setting",
-    iconSource: "/resources/icons/system/setting.svg",
-    route: "/profile",
-  },
-];
+const MENU_ITEMS = (): SidebarMenuItemProps[] => {
+  const items: SidebarMenuItemProps[] = [
+    {
+      label: "Summary",
+      iconSource: "/resources/icons/analytic/dashboard.svg",
+      route: "/summary",
+    },
+    {
+      label: "Report",
+      iconSource: "/resources/icons/analytic/chart-bar-vertical.svg",
+      route: "/report",
+    },
+    {
+      label: "Mqtt Log",
+      iconSource: "/resources/icons/document/list-2.svg",
+      route: "/mqtt-log",
+    },
+    {
+      label: "User Management",
+      iconSource: "/resources/icons/user/account-square.svg",
+      route: "/user-management",
+    },
+    {
+      label: "Device",
+      iconSource: "/resources/icons/device/device.svg",
+      route: "/device",
+    },
+    {
+      label: "Setting",
+      iconSource: "/resources/icons/system/setting.svg",
+      route: "/profile",
+    },
+  ];
+
+  const isAdmin = process.env.NEXT_PUBLIC_IS_ADMIN === "TRUE";
+  if (!isAdmin) {
+    // Filter out "User Management" for non-admin users
+    return items.filter(
+      (item) => item.label !== "User Management" && item.label !== "Mqtt Log"
+    );
+  }
+
+  return items;
+};
 
 // Extracted components for better readability
 const Logo = ({
@@ -102,7 +114,7 @@ export default function DashboardLayout({
 
   // Sync activeMenu with current path
   useEffect(() => {
-    const found = MENU_ITEMS.find((item) => pathname.startsWith(item.route));
+    const found = MENU_ITEMS().find((item) => pathname.startsWith(item.route));
     if (found) {
       setActiveMenu(found);
     } else {
@@ -110,7 +122,7 @@ export default function DashboardLayout({
       const isSettingRoute = settingRoutes.some((route) =>
         pathname.startsWith(route)
       );
-      const settingMenu = MENU_ITEMS.find((item) => item.label === "Setting");
+      const settingMenu = MENU_ITEMS().find((item) => item.label === "Setting");
       if (isSettingRoute && settingMenu) {
         setActiveMenu(settingMenu);
       }
@@ -292,7 +304,7 @@ export default function DashboardLayout({
 
             {/* Navigation Menu */}
             <nav className="flex-1 overflow-y-auto p-3">
-              {MENU_ITEMS.map((item) => (
+              {MENU_ITEMS().map((item) => (
                 <SidebarMenuItem
                   key={item.label}
                   label={item.label}

@@ -60,6 +60,10 @@
   --color-neutral-disabled: #909090;
   --color-neutral-shadow-base: #909090;
   --color-neutral-negative: #db1919;
+  --color-system-warning-dark: #d19800;
+  --color-system-warning-lighter: #ffe399;
+  --color-system-danger-lighter: #fce9e9;
+  --color-system-danger-base: #db1919;
   --color-form-disabled: #e6e6e6;
   --color-cta-disabled: #dedede;
   --color-typography-disabled: #a6a6a6;

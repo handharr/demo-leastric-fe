@@ -24,11 +24,11 @@ export const TopPopup: React.FC<TopPopupProps> = ({
       case PopupType.INFO:
         return "bg-blue-500 text-white";
       case PopupType.WARNING:
-        return "bg-yellow-500 text-black";
+        return "bg-system-warning-dark border border-system-warning-lighter text-typography-headline";
       case PopupType.ERROR:
-        return "bg-red-500 text-white";
+        return "bg-system-danger-base border border-system-danger-lighter text-typography-headline";
       case PopupType.SUCCESS:
-        return "bg-green-500 text-white";
+        return "bg-brand-primary border border-brand-subtle text-typography-headline";
       default:
         return "";
     }

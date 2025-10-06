@@ -27,9 +27,9 @@ import {
 } from "@/shared/utils/helpers/enum-helpers";
 import { RemoteSummaryDataSource } from "@/features/summary/infrastructure/data-source/remote-summary-data-source";
 import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
-import { getMqttInstances } from "@/shared/infrastructure/data-source/mqtt-data-source";
-import { Observable, of, from } from "rxjs";
-import { map, catchError, switchMap } from "rxjs/operators";
+import { Observable, of } from "rxjs";
+import { map, catchError } from "rxjs/operators";
+import { WebSocketDataSource } from "@/shared/infrastructure/data-source/web-socket-data-source";
 
 export class SummaryRepositoryImpl implements SummaryRepository {
   constructor(
@@ -309,34 +309,54 @@ export class SummaryRepositoryImpl implements SummaryRepository {
   subscribeRealTimeUsage(): Observable<MqttUsageModel | BaseErrorModel> {
     Logger.info(
       "SummaryRepositoryImpl",
-      "subscribeRealTimeUsage - starting subscription"
+      "subscribeRealTimeUsage - starting WebSocket subscription"
     );
 
-    // Use the helper function that includes fallback logic
-    return from(getMqttInstances()).pipe(
-      switchMap((instances) => {
+    // Create WebSocket data source for real-time usage
+    const webSocketDataSource = new WebSocketDataSource<MqttUsageModel>({
+      url: process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080/usage",
+      enableRetry: true,
+      enableLogging: true,
+      enableHeartbeat: true,
+      heartbeatInterval: 30000,
+      retryOptions: {
+        maxRetries: 5,
+        initialDelay: 1000,
+        maxDelay: 10000,
+        backoffFactor: 2,
+      },
+      connectTimeout: 30000,
+      reconnectInterval: 5000,
+      maxReconnectAttempts: 10,
+      onConnectionLost: () => {
+        Logger.warn(
+          "SummaryRepositoryImpl",
+          "WebSocket connection lost for real-time usage"
+        );
+      },
+      onReconnect: () => {
         Logger.info(
           "SummaryRepositoryImpl",
-          "subscribeRealTimeUsage - MQTT instances loaded successfully"
+          "WebSocket reconnected for real-time usage"
         );
+      },
+      onHeartbeatFailed: () => {
+        Logger.warn(
+          "SummaryRepositoryImpl",
+          "WebSocket heartbeat failed for real-time usage"
+        );
+      },
+    });
 
-        return instances.usageMqttDataSource.subscribeToTopic(
-          "logdevice/multipledata",
-          {
-            qos: 0,
-            autoConnect: true,
-          }
-        );
-      }),
+    return webSocketDataSource.getMessages$().pipe(
       map((message): MqttUsageModel | BaseErrorModel => {
         try {
           Logger.info(
             "SummaryRepositoryImpl",
-            "subscribeRealTimeUsage - message received",
+            "subscribeRealTimeUsage - WebSocket message received",
             {
-              topic: message.topic,
+              type: message.type,
               timestamp: message.timestamp,
-              qos: message.qos,
               payload: message.payload,
             }
           );
@@ -352,7 +372,7 @@ export class SummaryRepositoryImpl implements SummaryRepository {
             );
             return createErrorModel({
               type: ErrorType.UNEXPECTED,
-              message: "Invalid MQTT message payload structure.",
+              message: "Invalid WebSocket message payload structure.",
             });
           }
 
@@ -389,7 +409,7 @@ export class SummaryRepositoryImpl implements SummaryRepository {
 
           Logger.info(
             "SummaryRepositoryImpl",
-            "subscribeRealTimeUsage - successfully mapped usage",
+            "subscribeRealTimeUsage - successfully mapped WebSocket usage",
             mappedUsage
           );
 
@@ -402,20 +422,20 @@ export class SummaryRepositoryImpl implements SummaryRepository {
           );
           return createErrorModel({
             type: ErrorType.UNEXPECTED,
-            message: "Failed to parse MQTT usage data.",
+            message: "Failed to parse WebSocket usage data.",
           });
         }
       }),
       catchError((error) => {
         Logger.error(
           "SummaryRepositoryImpl",
-          "subscribeRealTimeUsage - MQTT connection error",
+          "subscribeRealTimeUsage - WebSocket connection error",
           error
         );
 
         // Enhanced error categorization
         let errorType = ErrorType.UNEXPECTED;
-        let errorMessage = "MQTT connection error occurred.";
+        let errorMessage = "WebSocket connection error occurred.";
 
         if (error instanceof Error) {
           const message = error.message.toLowerCase();
@@ -442,7 +462,7 @@ export class SummaryRepositoryImpl implements SummaryRepository {
             errorType = ErrorType.UNEXPECTED;
             errorMessage = `Authentication error: ${error.message}`;
           } else {
-            errorMessage = `MQTT error: ${error.message}`;
+            errorMessage = `WebSocket error: ${error.message}`;
           }
         }
 

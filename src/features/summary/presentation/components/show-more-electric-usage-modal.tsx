@@ -82,7 +82,6 @@ export function ShowMoreElectricUsageModalButton() {
               dateRange={dateRange}
               onApply={(range) => {
                 setDateRange(range);
-                console.log("[debugTest] range applied", range);
                 fetchUsageHistory({
                   startDate: formatDateToStringUTCWithoutMs(range.startDate),
                   endDate: formatDateToStringUTCWithoutMs(range.endDate),

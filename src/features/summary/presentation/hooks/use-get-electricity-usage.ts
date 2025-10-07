@@ -10,7 +10,7 @@ import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
 import {
-  formatDateToStringUTCWithoutMs,
+  formatDateToStringLocal,
   getDateRangeByTimePeriod,
 } from "@/shared/utils/helpers/date-helpers";
 
@@ -65,8 +65,8 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
         const { startDate: start, endDate: end } = getDateRangeByTimePeriod(
           period as TimePeriod
         );
-        _startDate = formatDateToStringUTCWithoutMs(start);
-        _endDate = formatDateToStringUTCWithoutMs(end);
+        _startDate = formatDateToStringLocal(start);
+        _endDate = formatDateToStringLocal(end);
       } catch (dateError) {
         Logger.warn(
           "useGetElectricityUsage",
@@ -178,11 +178,17 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
         comparedPeriod === TimePeriod.Daily ||
         comparedPeriod === TimePeriod.Weekly
       ) {
-        _startDate = formatDateToStringUTCWithoutMs(subMonths(start, 1));
-        _endDate = formatDateToStringUTCWithoutMs(subMonths(end, 1));
+        const comparedStart = subMonths(start, 1);
+        // For end date, we want the last day of the previous month at 23:59:59
+        const comparedEnd = new Date(start);
+        comparedEnd.setDate(0); // This sets to last day of previous month
+        comparedEnd.setHours(23, 59, 59, 999); // Set to end of day
+
+        _startDate = formatDateToStringLocal(comparedStart);
+        _endDate = formatDateToStringLocal(comparedEnd);
       } else {
-        _startDate = formatDateToStringUTCWithoutMs(subYears(start, 1));
-        _endDate = formatDateToStringUTCWithoutMs(subYears(end, 1));
+        _startDate = formatDateToStringLocal(subYears(start, 1));
+        _endDate = formatDateToStringLocal(subYears(end, 1));
       }
 
       const comparedParams: GetElectricityUsageQueryParams = {

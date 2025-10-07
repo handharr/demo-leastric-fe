@@ -28,6 +28,33 @@ export function formatDateToStringUTCWithoutMs(date: Date): string {
 }
 
 /**
+ * Formats a Date object to local string without milliseconds in ISO 8601 format.
+ * Uses local time components.
+ *
+ * @param date - The Date object to format
+ * @returns Formatted local string without milliseconds
+ *
+ * @example
+ * ```typescript
+ * const date = new Date("2023-10-15T14:30:25.123Z");
+ * formatDateToStringLocal(date); // "2023-10-15T14:30:25"
+ *
+ * const localDate = new Date(2023, 9, 15, 14, 30, 25); // October 15, 2023 (local time)
+ * formatDateToStringLocal(localDate); // "2023-10-15T14:30:25"
+ * ```
+ */
+export function formatDateToStringLocal(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+}
+
+/**
  * Gets the start and end dates of a given year in UTC.
  * Returns January 1st 00:00:00 to December 31st 23:59:59.
  *

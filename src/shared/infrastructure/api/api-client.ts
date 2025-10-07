@@ -649,7 +649,7 @@ export class ApiClient {
     );
 
     // Clear all tokens
-    // this.clearTokens();
+    this.clearTokens();
 
     // Reset refresh attempts
     this.currentRefreshAttempts = 0;

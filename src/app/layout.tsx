@@ -10,7 +10,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Leastric",
-  description: "Leastric",
+  description: "Leastric - “Your Smart Electricity Solution“",
   icons: {
     icon: "/resources/images/logo/leastric-logo-small.svg",
   },

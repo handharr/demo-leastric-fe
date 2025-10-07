@@ -13,6 +13,7 @@ import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
 import { RealTimeInterval } from "@/shared/domain/enum/enums";
 import {
+  convertKwhToWatt,
   getDateStringAfterSubstractingSeconds,
   getLabelFromRealTimeInterval,
   mapUsageDataToRealTimeDataPoints,
@@ -64,13 +65,30 @@ export function RealTimeMonitoringChart({
   );
 
   const currentUsage = useMemo(
-    () => formatNumberIndonesian(optionalValue(lastData?.totalKwh).orZero(), 2),
+    () =>
+      formatNumberIndonesian(
+        optionalValue(convertKwhToWatt(lastData?.totalKwh)).orZero(),
+        2
+      ),
     [lastData]
   );
 
   useEffect(() => {
     fetchRealTimeRef.current = fetchElectricityUsage;
   }, [fetchElectricityUsage]);
+
+  useEffect(() => {
+    if (!selectedInterval) return;
+
+    // Fetch once immediately
+    fetchRealTimeRef.current();
+
+    const intervalId = setInterval(() => {
+      fetchRealTimeRef.current();
+    }, selectedInterval * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [selectedInterval]);
 
   useEffect(() => {
     if (electricityUsageRealTimeError) {
@@ -103,7 +121,7 @@ export function RealTimeMonitoringChart({
         <div className="text-xl sm:text-2xl font-bold text-typography-headline">
           {currentUsage}
           <span className="text-sm font-normal text-typography-secondary ml-1">
-            Kwh
+            watt
           </span>
         </div>
       </div>

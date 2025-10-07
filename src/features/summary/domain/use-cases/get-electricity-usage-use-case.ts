@@ -1,4 +1,7 @@
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import {
+  BaseErrorModel,
+  isErrorModel,
+} from "@/shared/domain/entities/base-error-model";
 import { GetElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { GetElectricityUsageQueryParams } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";
@@ -12,6 +15,26 @@ export class GetElectricityUsageUseCase {
   async execute(
     queryParam: GetElectricityUsageQueryParams
   ): Promise<GetElectricityUsageModel | BaseErrorModel> {
-    return await this.summaryRepository.getElectricityUsage({ queryParam });
+    const result = await this.summaryRepository.getElectricityUsage({
+      queryParam,
+    });
+
+    // Check if the result is GetElectricityUsageHistoryModel by type
+    if (isErrorModel(result)) {
+      return result;
+    }
+
+    /// Result must be GetElectricityUsageHistoryModel
+    /// filter future dates
+    const newResult: GetElectricityUsageModel = {
+      ...result,
+      usage: {
+        data: result.usage.data.filter((item) => {
+          return item.totalKwh >= 0;
+        }),
+      },
+    };
+
+    return newResult;
   }
 }

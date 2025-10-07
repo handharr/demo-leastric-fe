@@ -530,6 +530,12 @@ export function getLabelFromRealTimeInterval(interval: number): string {
   }
 }
 
+/// Convert kwh to watt
+export function convertKwhToWatt(kwh: number | undefined): number | undefined {
+  if (kwh === undefined) return undefined;
+  return kwh * 1000;
+}
+
 export function mapUsageDataToRealTimeDataPoints(
   usageData: ElectricityUsageModel[],
   interval: RealTimeInterval
@@ -554,7 +560,7 @@ export function mapUsageDataToRealTimeDataPoints(
   /// and so on for 30 and 60 interval
   return usageData.map((usage, index) => ({
     time: (-1 * (interval * (usageData.length - 1 - index))).toString(), // in seconds
-    usage: optionalValue(usage.totalKwh).orZero(),
+    usage: optionalValue(convertKwhToWatt(usage.totalKwh)).orZero(), // in watt (kwh to watt)
   }));
 }
 

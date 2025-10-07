@@ -31,7 +31,9 @@ export function ReportTable({
   onDownloadSingle,
 }: ReportTableProps) {
   const isAllSelected = selectedIds.length === data.length && data.length > 0;
-  const mappedData = aggregateElectricityUsageByPeriod(data);
+  const mappedData = aggregateElectricityUsageByPeriod(data).filter(
+    (item) => item.totalKwh > 0
+  );
 
   return (
     <div className="w-full">

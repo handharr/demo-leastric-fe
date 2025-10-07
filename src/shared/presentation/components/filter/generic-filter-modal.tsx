@@ -153,28 +153,31 @@ export function GenericFilterModal<T extends FilterState>({
       );
     }
     return (
-      <div className="flex-1 min-h-[400px] overflow-hidden overflow-y-auto">
-        {Object.entries(filterMeta).map(([filterKey, meta]) =>
-          activeSection === filterKey && meta.type === FilterType.Multi ? (
-            <MultiSelectSection<T>
-              key={filterKey}
-              filterKey={filterKey}
-              filters={filter}
-              meta={meta}
-              options={meta.options}
-              onUpdateFilters={(newFilters) => setFilter(newFilters)}
-            />
-          ) : activeSection === filterKey && meta.type === FilterType.Single ? (
-            <SingleSelectSection<T>
-              key={filterKey}
-              filterKey={filterKey}
-              filters={filter}
-              meta={meta}
-              options={meta.options}
-              onUpdateFilters={setFilter}
-            />
-          ) : null
-        )}
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 overflow-y-auto">
+          {Object.entries(filterMeta).map(([filterKey, meta]) =>
+            activeSection === filterKey && meta.type === FilterType.Multi ? (
+              <MultiSelectSection<T>
+                key={filterKey}
+                filterKey={filterKey}
+                filters={filter}
+                meta={meta}
+                options={meta.options}
+                onUpdateFilters={(newFilters) => setFilter(newFilters)}
+              />
+            ) : activeSection === filterKey &&
+              meta.type === FilterType.Single ? (
+              <SingleSelectSection<T>
+                key={filterKey}
+                filterKey={filterKey}
+                filters={filter}
+                meta={meta}
+                options={meta.options}
+                onUpdateFilters={setFilter}
+              />
+            ) : null
+          )}
+        </div>
       </div>
     );
   };

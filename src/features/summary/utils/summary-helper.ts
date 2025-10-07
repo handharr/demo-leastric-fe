@@ -545,19 +545,11 @@ export function mapUsageDataToRealTimeDataPoints(
   }
 
   /// For time, the latest is 0, and the oldest is
-  /// e.g., for 10 interval:
   /// when the length is 0 the time is 0
   /// when the length is 1 the time is -10, 0
   /// when the length is 2 the time is -20, -10, 0
   /// the max usageData length is 10, so when the length is 10 the time from right to left will be:
   /// -100, -90, -80, -70, -60, -50, -40, -30, -20, -10, 0
-  /// for 15 interval:
-  /// when the length is 0 the time is 0
-  /// when the length is 1 the time is -15, 0
-  /// when the length is 2 the time is -30, -15, 0
-  /// the max usageData length is 15, so when the length is 15 the time from right to left will be:
-  /// -225, -210, -195, -180, -165, -150, -135, -120, -105, -90, -75, -60, -45, -30, -15, 0
-  /// and so on for 30 and 60 interval
   return usageData.map((usage, index) => ({
     time: (-1 * (interval * (usageData.length - 1 - index))).toString(), // in seconds
     usage: optionalValue(convertKwhToWatt(usage.totalKwh)).orZero(), // in watt (kwh to watt)

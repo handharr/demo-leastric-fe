@@ -95,3 +95,9 @@ jobs:
           build-args: |
             NEXT_TELEMETRY_DISABLED=1
             NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+            NEXT_PUBLIC_NODE_ENV=${{ secrets.NEXT_PUBLIC_NODE_ENV }}
+            NEXT_PUBLIC_MQTT_USERNAME=${{ secrets.NEXT_PUBLIC_MQTT_USERNAME }}
+            NEXT_PUBLIC_MQTT_PASSWORD=${{ secrets.NEXT_PUBLIC_MQTT_PASSWORD }}
+            NEXT_PUBLIC_MQTT_BROKER_URL=${{ secrets.NEXT_PUBLIC_MQTT_BROKER_URL }}
+            NEXT_PUBLIC_IS_ADMIN=${{ secrets.NEXT_PUBLIC_IS_ADMIN }}
+            NEXT_PUBLIC_WS_URL=${{ secrets.NEXT_PUBLIC_WS_URL }}

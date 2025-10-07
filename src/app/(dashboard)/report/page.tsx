@@ -30,6 +30,8 @@ import {
   formatDateToStringUTCWithoutMs,
   getStartAndEndDateOfMonthFromDate,
 } from "@/shared/utils/helpers/date-helpers";
+import { useGetHundredDevices } from "@/features/summary/presentation/hooks/use-get-hundred-devices";
+import { FilterOption } from "@/shared/presentation/types/filter-ui";
 
 const downloadCsv = (fileUrl: string, fileName: string): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -73,6 +75,11 @@ export default function ReportPage() {
   const [activeFilters, setActiveFilters] = useState<ReportFilterState>(
     reportFilterDefaultValue()
   );
+  const {
+    devices,
+    error: useGetHundredDevicesError,
+    reset: resetHundredDevices,
+  } = useGetHundredDevices();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [exporting, setExporting] = useState(false);
   const {
@@ -116,12 +123,24 @@ export default function ReportPage() {
       );
       resetExportToCsv();
     }
+
+    if (useGetHundredDevicesError) {
+      showPopup(
+        optionalValue(useGetHundredDevicesError?.message).orDefault(
+          "Failed to fetch devices"
+        ),
+        PopupType.ERROR
+      );
+      resetHundredDevices();
+    }
   }, [
     useGetElectricityUsageHistoryError,
+    useGetHundredDevicesError,
     showPopup,
     resetUsageHistory,
     resetExportToCsv,
     useGetExportToCsvError,
+    resetHundredDevices,
   ]);
 
   useEffect(() => {
@@ -239,6 +258,24 @@ export default function ReportPage() {
     [exporting, fetchExportToCsv, showPopup]
   );
 
+  const devicesOptions: FilterOption[] = devices
+    ? [
+        { id: "all", label: "All devices" },
+        ...devices.map((device) => ({
+          id: device.id.toString(),
+          label: device.deviceName,
+        })),
+      ]
+    : [];
+
+  const updatedReportFilterMeta = {
+    ...reportFilterMeta,
+    devices: {
+      ...reportFilterMeta.devices,
+      options: devicesOptions,
+    },
+  };
+
   return (
     <div className="flex space-y-[16px] flex-col">
       {/* Header */}
@@ -256,7 +293,7 @@ export default function ReportPage() {
           currentState={activeFilters}
           onApply={(newFilters) => setActiveFilters(newFilters)}
           onReset={() => setActiveFilters(reportFilterDefaultValue())}
-          filterMeta={reportFilterMeta}
+          filterMeta={updatedReportFilterMeta}
           defaultValue={reportFilterDefaultValue()}
         />
         {/* Export Button */}

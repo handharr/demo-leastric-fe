@@ -9,8 +9,8 @@ import { ActiveFiltersContainer } from "@/shared/presentation/components/filter/
 import { GenericFilterModal } from "@/shared/presentation/components/filter/generic-filter-modal";
 import {
   SummaryFilterState,
+  getSummaryFiltersMeta,
   summaryFilterDefaultValue,
-  summaryFilterMeta,
 } from "@/features/summary/presentation/components/summary-filter-modal";
 import { useGetUsageSummary } from "@/features/summary/presentation/hooks/use-get-usage-summary";
 import {
@@ -30,6 +30,8 @@ import {
   getLegendLabelForPeriod,
 } from "@/features/summary/utils/summary-helper";
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
+import { FilterOption } from "@/shared/presentation/types/filter-ui";
+import { useGetLocations } from "@/features/device/presentation/hooks/locations/use-get-locations";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -75,6 +77,20 @@ export default function SummaryPage() {
     fetchUsageHistory: fetchElectricityUsageHistory,
     reset: resetElectricityUsageHistory,
   } = useGetElectricityUsageHistory();
+  const {
+    data: locations,
+    error: getLocationsError,
+    reset: getLocationsReset,
+  } = useGetLocations();
+
+  const locationOptions: FilterOption[] = locations
+    ? [
+        { id: "all", label: "All locations" },
+        ...locations.map((loc: string) => ({ id: loc, label: loc })),
+      ]
+    : [];
+
+  const summaryFilterMeta = getSummaryFiltersMeta({ options: locationOptions });
 
   const handleFilterApply = (filters: SummaryFilterState) => {
     setActiveFilters(filters);
@@ -108,14 +124,24 @@ export default function SummaryPage() {
       );
       resetElectricityUsageHistory();
     }
+
+    if (getLocationsError) {
+      showPopup(
+        getLocationsError.message || "Failed to fetch device locations",
+        PopupType.ERROR
+      );
+      getLocationsReset();
+    }
   }, [
     errorSummary,
     errorElectricityUsage,
     electricityUsageHistoryError,
+    getLocationsError,
     showPopup,
     resetSummary,
     resetElectricityUsage,
     resetElectricityUsageHistory,
+    getLocationsReset,
   ]);
 
   useEffect(() => {

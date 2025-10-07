@@ -2,6 +2,7 @@ import {
   FilterType,
   FilterState,
   FilterMetas,
+  FilterOption,
 } from "@/shared/presentation/types/filter-ui";
 import { getDefaultFilters } from "@/shared/utils/helpers/filter-helper";
 
@@ -33,4 +34,13 @@ export const summaryFilterMeta: FilterMetas = {
 
 export function summaryFilterDefaultValue(): SummaryFilterState {
   return getDefaultFilters(summaryFilterMeta);
+}
+
+export function getSummaryFiltersMeta({
+  options,
+}: { options?: FilterOption[] } = {}): FilterMetas {
+  if (options) {
+    summaryFilterMeta.location.options = options;
+  }
+  return summaryFilterMeta;
 }

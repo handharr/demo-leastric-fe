@@ -249,7 +249,10 @@ export default function SummaryPage() {
               <span className="inline-flex items-center justify-center w-6 h-6 bg-background-brand-positive-subtle text-leastric-primary text-xs font-medium rounded-full">
                 {optionalValue(
                   usageSummary?.singlePhase?.deviceStatus?.activeDevices
-                ).orZero()}
+                ).orZero() +
+                  optionalValue(
+                    usageSummary?.threePhase?.deviceStatus?.activeDevices
+                  ).orZero()}
               </span>
             </div>
             <div className="h-8 w-px bg-default-border" />
@@ -258,7 +261,10 @@ export default function SummaryPage() {
               <span className="inline-flex items-center justify-center w-6 h-6 bg-background-critical-subtle text-typography-negative text-xs font-medium rounded-full">
                 {optionalValue(
                   usageSummary?.singlePhase?.deviceStatus?.inactiveDevices
-                ).orZero()}
+                ).orZero() +
+                  optionalValue(
+                    usageSummary?.threePhase?.deviceStatus?.inactiveDevices
+                  ).orZero()}
               </span>
             </div>
           </div>

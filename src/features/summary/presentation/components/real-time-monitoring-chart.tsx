@@ -129,8 +129,8 @@ export function RealTimeMonitoringChart({
   );
 
   const chartSection = (
-    <div className="h-48 sm:h-full w-full">
-      <ResponsiveContainer width="100%" height="90%">
+    <div className="h-[300px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={mapUsageDataToRealTimeDataPoints(
             periodicData,
@@ -195,9 +195,13 @@ export function RealTimeMonitoringChart({
     <>
       {controlsSection}
       {isLoading && isEmpty ? (
-        <LoadingSpinner />
-      ) : !isLoading && isEmpty ? (
-        <EmptyData />
+        <div className="h-[400px] flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      ) : isEmpty ? (
+        <div className="h-[400px] flex items-center justify-center">
+          <EmptyData />
+        </div>
       ) : (
         chartSection
       )}

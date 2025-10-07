@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   description: "Leastric - “Your Smart Electricity Solution“",
   icons: {
     icon: "/resources/images/logo/leastric-logo-small.svg",
+    apple: "/resources/images/logo/leastric-logo-small.svg",
   },
 };
 

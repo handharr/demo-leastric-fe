@@ -11,9 +11,31 @@ import {
   parseDateString,
   substractDateBySeconds,
 } from "@/shared/utils/helpers/date-helpers";
-import { RealTimeDataPoint } from "../presentation/types/ui";
+import { RealTimeDataPoint } from "@/features/summary/presentation/types/ui";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
 
+/**
+ * Aggregates electricity usage data by grouping and summing values for the same period.
+ *
+ * @param usageData - Array of electricity usage models to aggregate
+ * @returns Array of aggregated period value models sorted by period
+ *
+ * @example
+ * ```typescript
+ * const input = [
+ *   { period: "2023-10-01", totalKwh: 5.2, totalEstBilling: 1.5, avgVoltage: 220 },
+ *   { period: "2023-10-01", totalKwh: 3.8, totalEstBilling: 1.1, avgVoltage: 225 },
+ *   { period: "2023-10-02", totalKwh: 4.5, totalEstBilling: 1.3, avgVoltage: 222 }
+ * ];
+ *
+ * const result = aggregateElectricityUsageByPeriod(input);
+ * // Output:
+ * // [
+ * //   { period: "2023-10-01", totalKwh: 9.0, totalEstBilling: 2.6, avgVoltage: 222.5 },
+ * //   { period: "2023-10-02", totalKwh: 4.5, totalEstBilling: 1.3, avgVoltage: 222 }
+ * // ]
+ * ```
+ */
 export function aggregateElectricityUsageByPeriod(
   usageData: ElectricityUsageModel[]
 ): PeriodValueModel[] {
@@ -83,6 +105,20 @@ export function aggregateElectricityUsageByPeriod(
   return result.sort((a, b) => a.period.localeCompare(b.period));
 }
 
+/**
+ * Gets the legend label for the current period in chart displays.
+ *
+ * @param period - The time period type
+ * @returns Formatted legend label string
+ *
+ * @example
+ * ```typescript
+ * getLegendLabelForPeriod(TimePeriod.Daily); // "This month"
+ * getLegendLabelForPeriod(TimePeriod.Weekly); // "This month"
+ * getLegendLabelForPeriod(TimePeriod.Monthly); // "This year"
+ * getLegendLabelForPeriod(TimePeriod.Yearly); // "This year"
+ * ```
+ */
 export function getLegendLabelForPeriod(period: TimePeriod): string {
   switch (period) {
     case TimePeriod.Daily:
@@ -93,6 +129,20 @@ export function getLegendLabelForPeriod(period: TimePeriod): string {
   }
 }
 
+/**
+ * Gets the legend label for the comparison period in chart displays.
+ *
+ * @param period - The time period type
+ * @returns Formatted comparison legend label string
+ *
+ * @example
+ * ```typescript
+ * getComparedLegendLabelForPeriod(TimePeriod.Daily); // "Last month"
+ * getComparedLegendLabelForPeriod(TimePeriod.Weekly); // "Last month"
+ * getComparedLegendLabelForPeriod(TimePeriod.Monthly); // "Last year"
+ * getComparedLegendLabelForPeriod(TimePeriod.Yearly); // "Last year"
+ * ```
+ */
 export function getComparedLegendLabelForPeriod(period: TimePeriod): string {
   switch (period) {
     case TimePeriod.Daily:
@@ -103,18 +153,33 @@ export function getComparedLegendLabelForPeriod(period: TimePeriod): string {
   }
 }
 
-/*
-  Generate X-Axis label based on selected period and value
-  Input: 
-  - Daily: Usage "2023-10-01"
-  - Monthly Usage "2023-10"
-  - Weekly Usage "Week 3 - 2025-09"
-  - Yearly (Ignored, as yearly data is not displayed in chart)
-  returns formatted string for chart X-Axis label: 
-  - Daily: "01"
-  - Monthly: "Oct"
-  - Weekly: "Week 3"
-*/
+/**
+ * Generates X-Axis label based on selected period and period value for chart displays.
+ * Formats period strings into short, readable chart labels.
+ *
+ * @param params - Object containing period type and value
+ * @param params.period - The time period type (Daily, Weekly, Monthly, Yearly)
+ * @param params.value - The period value string to format
+ * @returns Formatted string for chart X-Axis label
+ *
+ * @example
+ * ```typescript
+ * // Daily period
+ * getXAxisLabelForPeriod({ period: TimePeriod.Daily, value: "2023-10-01" }); // "01"
+ * getXAxisLabelForPeriod({ period: TimePeriod.Daily, value: "2023-10-15" }); // "15"
+ *
+ * // Weekly period
+ * getXAxisLabelForPeriod({ period: TimePeriod.Weekly, value: "2025-09-28 - 2025-10-04" }); // "W1"
+ * getXAxisLabelForPeriod({ period: TimePeriod.Weekly, value: "2025-10-05 - 2025-10-11" }); // "W2"
+ *
+ * // Monthly period
+ * getXAxisLabelForPeriod({ period: TimePeriod.Monthly, value: "2023-10" }); // "Oct"
+ * getXAxisLabelForPeriod({ period: TimePeriod.Monthly, value: "2023-01" }); // "Jan"
+ *
+ * // Yearly period (fallback)
+ * getXAxisLabelForPeriod({ period: TimePeriod.Yearly, value: "2023" }); // "2023"
+ * ```
+ */
 export function getXAxisLabelForPeriod({
   period,
   value,
@@ -148,27 +213,63 @@ export function getXAxisLabelForPeriod({
   }
 }
 
-// Helper to get week number in month (1-4)
+/**
+ * Helper function to get week number within a month (1-5).
+ * Calculates which week of the month a given date falls into.
+ *
+ * @param date - The date to calculate week number for
+ * @returns Week number within the month (1-5)
+ *
+ * @example
+ * ```typescript
+ * getWeekNumber(new Date("2023-10-01")); // 1 (first week)
+ * getWeekNumber(new Date("2023-10-08")); // 2 (second week)
+ * getWeekNumber(new Date("2023-10-15")); // 3 (third week)
+ * getWeekNumber(new Date("2023-10-31")); // 5 (fifth week)
+ * ```
+ */
 function getWeekNumber(date: Date): number {
   const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
   const weekNumber = Math.ceil((date.getDate() + startOfMonth.getDay()) / 7);
   return weekNumber;
 }
 
-/*
-  Function to merge current and last period data for comparison
-  Input:
-  - currentData: PeriodValueData[] for current period
-  - lastData: PeriodValueData[] for last period
-  - period: TimePeriod
-  Output:
-  - Merged array of objects with structure:
-    {
-      period: string; // x-axis label from getXAxisLabelForPeriod
-      value: number | null; // current period value
-      comparedValue: number | null; // last period value
-    }[]
-*/
+/**
+ * Merges current and last period data for comparison charts.
+ * Aligns data points by period labels and handles missing data with undefined values.
+ * Filters out future dates from current data and provides full period coverage on X-axis.
+ *
+ * @param params - Object containing current data, last data, and period type
+ * @param params.currentData - Array of current period values
+ * @param params.lastData - Array of last period values (nullable)
+ * @param params.period - The time period type for proper alignment
+ * @returns Array of merged data objects with current and comparison values
+ *
+ * @example
+ * ```typescript
+ * const currentData = [
+ *   { period: "2023-10-01", totalKwh: 5.2 },
+ *   { period: "2023-10-02", totalKwh: 4.8 }
+ * ];
+ * const lastData = [
+ *   { period: "2023-09-01", totalKwh: 4.5 },
+ *   { period: "2023-09-03", totalKwh: 3.9 }
+ * ];
+ *
+ * const result = mergeCurrentAndLastPeriodData({
+ *   currentData,
+ *   lastData,
+ *   period: TimePeriod.Daily
+ * });
+ * // Output:
+ * // [
+ * //   { period: "01", value: 5.2, comparedValue: 4.5 },
+ * //   { period: "02", value: 4.8, comparedValue: undefined },
+ * //   { period: "03", value: undefined, comparedValue: 3.9 },
+ * //   ... // continues for all days in month
+ * // ]
+ * ```
+ */
 export function mergeCurrentAndLastPeriodData({
   currentData,
   lastData,
@@ -239,18 +340,37 @@ export function mergeCurrentAndLastPeriodData({
   return mergedData;
 }
 
-/*
-  Helper function to merge weekly data in a month with proper alignment
-  Shows all weeks, with appropriate undefined values
-  Filters out future dates from current data (only shows dates <= today)
-  Always shows full weeks possibility X-axis (1-5) even when comparison is disabled
-  input Period format: "2025-09-28 - 2025-10-04".
-  Filter to any date range that has current month's weeks
-  e.g., if today is 2025-10-15, then only show weeks of October 2025:
-  Expected output:
-  let's say current month is October 2025, which has 5 weeks (1-5) and last month September 2025 has 4 weeks (1-4)
-  xAxis or period: ["W1", "W2", "W3", "W4", "W5"]
-*/
+/**
+ * Helper function to merge weekly data with proper alignment for chart display.
+ * Filters data to show only current month's weeks and excludes future dates.
+ * Always shows all possible weeks (W1-W5) on X-axis for consistent UX.
+ *
+ * @param currentData - Array of current period weekly data
+ * @param lastData - Array of comparison period weekly data
+ * @returns Array of merged weekly data with proper alignment
+ *
+ * @example
+ * ```typescript
+ * const currentData = [
+ *   { period: "2025-10-01 - 2025-10-07", totalKwh: 15.2 }, // W1
+ *   { period: "2025-10-08 - 2025-10-14", totalKwh: 18.5 }  // W2
+ * ];
+ * const lastData = [
+ *   { period: "2025-09-02 - 2025-09-08", totalKwh: 14.1 }, // W1
+ *   { period: "2025-09-23 - 2025-09-29", totalKwh: 16.8 }  // W4
+ * ];
+ *
+ * const result = mergeWeeklyDataWithAlignment(currentData, lastData);
+ * // Output (assuming today is 2025-10-15):
+ * // [
+ * //   { period: "W1", value: 15.2, comparedValue: 14.1 },
+ * //   { period: "W2", value: 18.5, comparedValue: undefined },
+ * //   { period: "W3", value: undefined, comparedValue: undefined },
+ * //   { period: "W4", value: undefined, comparedValue: 16.8 },
+ * //   { period: "W5", value: undefined, comparedValue: undefined }
+ * // ]
+ * ```
+ */
 function mergeWeeklyDataWithAlignment(
   currentData: PeriodValueModel[],
   lastData: PeriodValueModel[]
@@ -333,13 +453,37 @@ function mergeWeeklyDataWithAlignment(
   return mergedData;
 }
 
-/*
-  Helper function to merge monthly data with
-  Shows all months, with appropriate undefined values
-  Filters out future dates from current data (only shows dates <= today)
-  Always shows full months X-axis (1-12) even when comparison is disabled
-  Period format: "2023-01", "2023-02", etc.
-*/
+/**
+ * Helper function to merge monthly data with proper alignment for chart display.
+ * Filters data to show only current year's months and excludes future dates.
+ * Always shows all months (Jan-Dec) on X-axis for consistent UX.
+ *
+ * @param currentData - Array of current year monthly data
+ * @param lastData - Array of comparison year monthly data
+ * @returns Array of merged monthly data with proper alignment
+ *
+ * @example
+ * ```typescript
+ * const currentData = [
+ *   { period: "2023-01", totalKwh: 150.2 },
+ *   { period: "2023-03", totalKwh: 180.5 }
+ * ];
+ * const lastData = [
+ *   { period: "2022-01", totalKwh: 140.1 },
+ *   { period: "2022-02", totalKwh: 165.8 }
+ * ];
+ *
+ * const result = mergeMonthlyDataWithAlignment(currentData, lastData);
+ * // Output (assuming today is 2023-03-15):
+ * // [
+ * //   { period: "Jan", value: 150.2, comparedValue: 140.1 },
+ * //   { period: "Feb", value: undefined, comparedValue: 165.8 },
+ * //   { period: "Mar", value: 180.5, comparedValue: undefined },
+ * //   { period: "Apr", value: undefined, comparedValue: undefined },
+ * //   ... // continues for all months
+ * // ]
+ * ```
+ */
 function mergeMonthlyDataWithAlignment(
   currentData: PeriodValueModel[],
   lastData: PeriodValueModel[]
@@ -418,11 +562,41 @@ function mergeMonthlyDataWithAlignment(
   });
 }
 
-/*
-  Helper function to merge daily data with proper alignment for months with different day counts
-  This ensures that day 1 of current month aligns with day 1 of last month, etc.
-  Shows all days from both current and comparison months, with appropriate undefined values
-*/
+/**
+ * Helper function to merge daily data with proper alignment for chart display.
+ * Ensures day 1 of current month aligns with day 1 of comparison month.
+ * Filters data to show only current month's days and excludes future dates.
+ * Always shows all days of current month on X-axis for consistent UX.
+ *
+ * @param currentData - Array of current month daily data
+ * @param lastData - Array of comparison month daily data
+ * @returns Array of merged daily data with proper day alignment
+ *
+ * @example
+ * ```typescript
+ * const currentData = [
+ *   { period: "2023-10-01", totalKwh: 5.2 },
+ *   { period: "2023-10-02", totalKwh: 4.8 },
+ *   { period: "2023-10-04", totalKwh: 6.1 }
+ * ];
+ * const lastData = [
+ *   { period: "2023-09-01", totalKwh: 4.5 },
+ *   { period: "2023-09-02", totalKwh: 5.1 },
+ *   { period: "2023-09-03", totalKwh: 3.9 }
+ * ];
+ *
+ * const result = mergeDailyDataWithAlignment(currentData, lastData);
+ * // Output (assuming today is 2023-10-05):
+ * // [
+ * //   { period: "01", value: 5.2, comparedValue: 4.5 },
+ * //   { period: "02", value: 4.8, comparedValue: 5.1 },
+ * //   { period: "03", value: undefined, comparedValue: 3.9 },
+ * //   { period: "04", value: 6.1, comparedValue: undefined },
+ * //   { period: "05", value: undefined, comparedValue: undefined },
+ * //   ... // continues for all days in current month
+ * // ]
+ * ```
+ */
 function mergeDailyDataWithAlignment(
   currentData: PeriodValueModel[],
   lastData: PeriodValueModel[]
@@ -506,6 +680,22 @@ function mergeDailyDataWithAlignment(
   });
 }
 
+/**
+ * Gets formatted start and end dates for a given year in UTC format without milliseconds.
+ *
+ * @param year - The year to get date range for
+ * @returns Object containing formatted start and end date strings
+ *
+ * @example
+ * ```typescript
+ * const result = getStartAndEndDateFormattedUTCWithoutMsFromYear(2023);
+ * // Output:
+ * // {
+ * //   startDate: "2023-01-01T00:00:00Z",
+ * //   endDate: "2023-12-31T23:59:59Z"
+ * // }
+ * ```
+ */
 export function getStartAndEndDateFormattedUTCWithoutMsFromYear(year: number) {
   const dateRange = getStartAndEndDateOfYear(year);
 
@@ -515,6 +705,21 @@ export function getStartAndEndDateFormattedUTCWithoutMsFromYear(year: number) {
   };
 }
 
+/**
+ * Gets a human-readable label for real-time data intervals.
+ *
+ * @param interval - The interval in seconds
+ * @returns Formatted string describing the interval
+ *
+ * @example
+ * ```typescript
+ * getLabelFromRealTimeInterval(10); // "10 seconds"
+ * getLabelFromRealTimeInterval(15); // "15 seconds"
+ * getLabelFromRealTimeInterval(30); // "30 seconds"
+ * getLabelFromRealTimeInterval(60); // "60 seconds"
+ * getLabelFromRealTimeInterval(45); // "45 seconds"
+ * ```
+ */
 export function getLabelFromRealTimeInterval(interval: number): string {
   switch (interval) {
     case 10:
@@ -530,12 +735,51 @@ export function getLabelFromRealTimeInterval(interval: number): string {
   }
 }
 
-/// Convert kwh to watt
+/**
+ * Converts kilowatt-hours (kWh) to watts (W).
+ *
+ * @param kwh - The energy value in kilowatt-hours
+ * @returns The power value in watts, or undefined if input is undefined
+ *
+ * @example
+ * ```typescript
+ * convertKwhToWatt(1.5); // 1500
+ * convertKwhToWatt(0.5); // 500
+ * convertKwhToWatt(2.25); // 2250
+ * convertKwhToWatt(undefined); // undefined
+ * ```
+ */
 export function convertKwhToWatt(kwh: number | undefined): number | undefined {
   if (kwh === undefined) return undefined;
   return kwh * 1000;
 }
 
+/**
+ * Maps electricity usage data to real-time data points for chart visualization.
+ * Creates time series data with negative time offsets from the latest point (time 0).
+ * Converts kWh values to watts for real-time display.
+ *
+ * @param usageData - Array of electricity usage models
+ * @param interval - The time interval between data points in seconds
+ * @returns Array of real-time data points with time and usage values
+ *
+ * @example
+ * ```typescript
+ * const usageData = [
+ *   { totalKwh: 1.2 }, // oldest
+ *   { totalKwh: 1.5 },
+ *   { totalKwh: 1.8 }  // newest
+ * ];
+ *
+ * const result = mapUsageDataToRealTimeDataPoints(usageData, 10);
+ * // Output:
+ * // [
+ * //   { time: "-20", usage: 1200 }, // oldest (20 seconds ago)
+ * //   { time: "-10", usage: 1500 }, // middle (10 seconds ago)
+ * //   { time: "0", usage: 1800 }    // newest (now)
+ * // ]
+ * ```
+ */
 export function mapUsageDataToRealTimeDataPoints(
   usageData: ElectricityUsageModel[],
   interval: RealTimeInterval
@@ -556,6 +800,25 @@ export function mapUsageDataToRealTimeDataPoints(
   }));
 }
 
+/**
+ * Gets a formatted time string from a date after subtracting specified seconds.
+ * If seconds is 0, returns the time string from the original date.
+ * Handles negative seconds by taking absolute value.
+ *
+ * @param date - The base date to subtract from
+ * @param seconds - Number of seconds to subtract (negative values become positive)
+ * @returns Formatted time string
+ *
+ * @example
+ * ```typescript
+ * const baseDate = new Date("2023-10-15T14:30:00");
+ *
+ * getDateStringAfterSubstractingSeconds(baseDate, 0); // "14:30:00"
+ * getDateStringAfterSubstractingSeconds(baseDate, 60); // "14:29:00"
+ * getDateStringAfterSubstractingSeconds(baseDate, 3600); // "13:30:00"
+ * getDateStringAfterSubstractingSeconds(baseDate, -60); // "14:29:00" (negative becomes positive)
+ * ```
+ */
 export function getDateStringAfterSubstractingSeconds(
   date: Date,
   seconds: number

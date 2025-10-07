@@ -148,15 +148,13 @@ export default function SummaryPage() {
     if (compareEnabled) {
       fetchComparedElectricityUsage({
         period: selectedPeriod,
-        unit: selectedUnit,
       });
     } else {
-      fetchElectricityUsage({ period: selectedPeriod, unit: selectedUnit });
+      fetchElectricityUsage({ period: selectedPeriod });
     }
   }, [
     compareEnabled,
     selectedPeriod,
-    selectedUnit,
     fetchComparedElectricityUsage,
     fetchElectricityUsage,
   ]);

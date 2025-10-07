@@ -581,3 +581,59 @@ export function getDateStartOfDate(date: Date): Date {
   startDate.setHours(0, 0, 0, 0);
   return startDate;
 }
+
+/**
+ * Converts a Date object to a Date in Asia/Jakarta timezone.
+ * Returns a new Date object adjusted to Jakarta time.
+ *
+ * @param date - The original Date object (in UTC or local time)
+ * @returns New Date object adjusted to Asia/Jakarta timezone
+ *
+ * @example
+ * ```typescript
+ * const utcDate = new Date("2023-10-15T14:30:00Z"); // UTC time
+ * const jakartaDate = convertDateToJakartaTimezone(utcDate);
+ * // Output: Date representing "2023-10-15T21:30:00+07:00" in Jakarta time
+ *
+ * const localDate = new Date(2023, 9, 15, 14, 30); // Local time (e.g. UTC+2)
+ * const jakartaLocalDate = convertDateToJakartaTimezone(localDate);
+ * // Output: Date representing "2023-10-15T21:30:00+07:00" in Jakarta time
+ * ```
+ */
+export function convertDateToJakartaTimezone(date?: Date): Date {
+  // Get asia/jakarta timezone date helpers
+  // Note: This is a simplified approach and may not handle all edge cases like DST changes
+  const jakartaTimeZone = "Asia/Jakarta";
+
+  if (!date) {
+    date = new Date();
+  }
+
+  return new Date(date.toLocaleString("en-US", { timeZone: jakartaTimeZone }));
+}
+
+/**
+ * Converts a Date object to a Date in UTC timezone.
+ * Returns a new Date object adjusted to UTC time.
+ * @param date
+ * @returns New Date object adjusted to UTC timezone
+ *
+ * @example
+ * ```typescript
+ * const localDate = new Date(2023, 9, 15, 14, 30); // Local time (e.g. UTC+7)
+ * const utcDate = convertDateToUTC(localDate);
+ * // Output: Date representing "2023-10-15T07:30:00Z" in UTC time
+ *
+ * const utcDate2 = new Date("2023-10-15T14:30:00Z"); // Already in UTC
+ * const utcDateConverted = convertDateToUTC(utcDate2);
+ * // Output: Date representing "2023-10-15T14:30:00Z" in UTC time (unchanged)
+ * ```
+ */
+export function convertDateToUTC(date?: Date): Date {
+  // Get UTC date helpers
+  if (!date) {
+    date = new Date();
+  }
+
+  return new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
+}

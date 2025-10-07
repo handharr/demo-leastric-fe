@@ -117,8 +117,8 @@ export function MultiSelectSection<T extends FilterState>({
                 <Image
                   src={
                     isSelected
-                      ? "/resources/icons/checkbox/checkbox-default-selected"
-                      : "/resources/icons/checkbox/checkbox-default"
+                      ? "/resources/icons/checkbox/checkbox-default-selected.svg"
+                      : "/resources/icons/checkbox/checkbox-default.svg"
                   }
                   alt={isSelected ? "Selected" : "Not selected"}
                   width={20}

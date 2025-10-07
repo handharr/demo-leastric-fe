@@ -62,7 +62,6 @@ export function DateRangeModal({
                 mode="range"
                 navLayout="around"
                 numberOfMonths={2}
-                timeZone="Asia/Jakarta"
                 disabled={{ after: new Date() }}
                 selected={{
                   from: selectedRange?.startDate,
@@ -70,9 +69,17 @@ export function DateRangeModal({
                 }}
                 onSelect={(range) => {
                   if (range && range.from && range.to) {
+                    // Create start of day for range.from (00:00:00 local time)
+                    const startDateRange = new Date(range.from);
+                    startDateRange.setHours(0, 0, 0, 0);
+
+                    // Create end of day for range.to (23:59:59.999 local time)
+                    const endDateRange = new Date(range.to);
+                    endDateRange.setHours(23, 59, 59, 999);
+
                     setSelectedRange({
-                      startDate: range.from,
-                      endDate: range.to,
+                      startDate: startDateRange,
+                      endDate: endDateRange,
                     });
                   } else {
                     setSelectedRange(undefined);

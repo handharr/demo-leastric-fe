@@ -24,11 +24,11 @@ export const TopPopup: React.FC<TopPopupProps> = ({
       case PopupType.INFO:
         return "bg-blue-500 text-white";
       case PopupType.WARNING:
-        return "bg-system-warning-dark border border-system-warning-lighter text-typography-headline";
+        return "bg-system-warning-lighter border border-system-warning-dark text-typography-headline";
       case PopupType.ERROR:
-        return "bg-system-danger-base border border-system-danger-lighter text-typography-headline";
+        return "bg-system-danger-lighter border border-system-danger-base text-typography-headline";
       case PopupType.SUCCESS:
-        return "bg-brand-primary border border-brand-subtle text-typography-headline";
+        return "bg-brand-subtle border border-system-success-base text-typography-headline";
       default:
         return "";
     }
@@ -36,7 +36,7 @@ export const TopPopup: React.FC<TopPopupProps> = ({
 
   return (
     <div
-      className={`fixed top-5 left-1/2 transform -translate-x-1/2 p-4 rounded shadow-lg transition-transform duration-300 ${getPopupStyle()}`}
+      className={`fixed top-5 left-1/2 transform -translate-x-1/2 p-4 rounded-md shadow-lg transition-transform duration-300 ${getPopupStyle()}`}
       style={{ zIndex: 1000 }}
     >
       <div className="flex justify-between items-center">

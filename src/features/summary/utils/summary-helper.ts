@@ -2,7 +2,11 @@ import {
   ElectricityUsageModel,
   PeriodValueModel,
 } from "@/features/summary/domain/entities/summary-models";
-import { RealTimeInterval, TimePeriod } from "@/shared/domain/enum/enums";
+import {
+  EnergyUnit,
+  RealTimeInterval,
+  TimePeriod,
+} from "@/shared/domain/enum/enums";
 import {
   formatDateToStringUTCWithoutMs,
   getDateRangeFromString,
@@ -239,27 +243,30 @@ function getWeekNumber(date: Date): number {
  * Aligns data points by period labels and handles missing data with undefined values.
  * Filters out future dates from current data and provides full period coverage on X-axis.
  *
- * @param params - Object containing current data, last data, and period type
+ * @param params - Object containing current data, last data, period type, and electricity unit
  * @param params.currentData - Array of current period values
  * @param params.lastData - Array of last period values (nullable)
  * @param params.period - The time period type for proper alignment
+ * @param params.electricityUnit - The unit of electricity measurement (default: KWH)
  * @returns Array of merged data objects with current and comparison values
  *
  * @example
  * ```typescript
  * const currentData = [
- *   { period: "2023-10-01", totalKwh: 5.2 },
- *   { period: "2023-10-02", totalKwh: 4.8 }
+ *   { period: "2023-10-01", totalKwh: 5.2, avgVoltage: 220, avgCurrent: 2.5, avgRealPower: 550 },
+ *   { period: "2023-10-02", totalKwh: 4.8, avgVoltage: 225, avgCurrent: 2.3, avgRealPower: 517 }
  * ];
  * const lastData = [
- *   { period: "2023-09-01", totalKwh: 4.5 },
- *   { period: "2023-09-03", totalKwh: 3.9 }
+ *   { period: "2023-09-01", totalKwh: 4.5, avgVoltage: 218, avgCurrent: 2.1, avgRealPower: 458 },
+ *   { period: "2023-09-03", totalKwh: 3.9, avgVoltage: 222, avgCurrent: 1.9, avgRealPower: 422 }
  * ];
  *
- * const result = mergeCurrentAndLastPeriodData({
+ * // Using KWH (default)
+ * const resultKwh = mergeCurrentAndLastPeriodData({
  *   currentData,
  *   lastData,
- *   period: TimePeriod.Daily
+ *   period: TimePeriod.Daily,
+ *   electricityUnit: EnergyUnit.KWH
  * });
  * // Output:
  * // [
@@ -268,16 +275,63 @@ function getWeekNumber(date: Date): number {
  * //   { period: "03", value: undefined, comparedValue: 3.9 },
  * //   ... // continues for all days in month
  * // ]
+ *
+ * // Using Voltage
+ * const resultVolt = mergeCurrentAndLastPeriodData({
+ *   currentData,
+ *   lastData,
+ *   period: TimePeriod.Daily,
+ *   electricityUnit: EnergyUnit.Volt
+ * });
+ * // Output:
+ * // [
+ * //   { period: "01", value: 220, comparedValue: 218 },
+ * //   { period: "02", value: 225, comparedValue: undefined },
+ * //   { period: "03", value: undefined, comparedValue: 222 },
+ * //   ... // continues for all days in month
+ * // ]
+ *
+ * // Using Current
+ * const resultAmpere = mergeCurrentAndLastPeriodData({
+ *   currentData,
+ *   lastData,
+ *   period: TimePeriod.Daily,
+ *   electricityUnit: EnergyUnit.Ampere
+ * });
+ * // Output:
+ * // [
+ * //   { period: "01", value: 2.5, comparedValue: 2.1 },
+ * //   { period: "02", value: 2.3, comparedValue: undefined },
+ * //   { period: "03", value: undefined, comparedValue: 1.9 },
+ * //   ... // continues for all days in month
+ * // ]
+ *
+ * // Using Power
+ * const resultWatt = mergeCurrentAndLastPeriodData({
+ *   currentData,
+ *   lastData,
+ *   period: TimePeriod.Daily,
+ *   electricityUnit: EnergyUnit.Watt
+ * });
+ * // Output:
+ * // [
+ * //   { period: "01", value: 550, comparedValue: 458 },
+ * //   { period: "02", value: 517, comparedValue: undefined },
+ * //   { period: "03", value: undefined, comparedValue: 422 },
+ * //   ... // continues for all days in month
+ * // ]
  * ```
  */
 export function mergeCurrentAndLastPeriodData({
   currentData,
   lastData,
   period,
+  electricityUnit = EnergyUnit.KWH,
 }: {
   currentData: PeriodValueModel[];
   lastData: PeriodValueModel[] | null;
   period: TimePeriod;
+  electricityUnit: EnergyUnit;
 }): {
   period: string;
   value: number | undefined;
@@ -291,15 +345,27 @@ export function mergeCurrentAndLastPeriodData({
 
   // For daily period, we need special handling to align months with different day counts
   if (period === TimePeriod.Daily) {
-    return mergeDailyDataWithAlignment(_currentData, _lastData);
+    return mergeDailyDataWithAlignment(
+      _currentData,
+      _lastData,
+      electricityUnit
+    );
   }
 
   if (period === TimePeriod.Monthly) {
-    return mergeMonthlyDataWithAlignment(_currentData, _lastData);
+    return mergeMonthlyDataWithAlignment(
+      _currentData,
+      _lastData,
+      electricityUnit
+    );
   }
 
   if (period === TimePeriod.Weekly) {
-    return mergeWeeklyDataWithAlignment(_currentData, _lastData);
+    return mergeWeeklyDataWithAlignment(
+      _currentData,
+      _lastData,
+      electricityUnit
+    );
   }
 
   // For non-daily periods, use the original logic
@@ -347,20 +413,22 @@ export function mergeCurrentAndLastPeriodData({
  *
  * @param currentData - Array of current period weekly data
  * @param lastData - Array of comparison period weekly data
+ * @param electricityUnit - The unit of electricity measurement (default: KWH)
  * @returns Array of merged weekly data with proper alignment
  *
  * @example
  * ```typescript
  * const currentData = [
- *   { period: "2025-10-01 - 2025-10-07", totalKwh: 15.2 }, // W1
- *   { period: "2025-10-08 - 2025-10-14", totalKwh: 18.5 }  // W2
+ *   { period: "2025-10-01 - 2025-10-07", totalKwh: 15.2, avgVoltage: 220, avgCurrent: 10.5, avgRealPower: 2310 }, // W1
+ *   { period: "2025-10-08 - 2025-10-14", totalKwh: 18.5, avgVoltage: 225, avgCurrent: 12.1, avgRealPower: 2722 }  // W2
  * ];
  * const lastData = [
- *   { period: "2025-09-02 - 2025-09-08", totalKwh: 14.1 }, // W1
- *   { period: "2025-09-23 - 2025-09-29", totalKwh: 16.8 }  // W4
+ *   { period: "2025-09-02 - 2025-09-08", totalKwh: 14.1, avgVoltage: 218, avgCurrent: 9.8, avgRealPower: 2136 }, // W1
+ *   { period: "2025-09-23 - 2025-09-29", totalKwh: 16.8, avgVoltage: 222, avgCurrent: 11.2, avgRealPower: 2486 }  // W4
  * ];
  *
- * const result = mergeWeeklyDataWithAlignment(currentData, lastData);
+ * // Using KWH (default)
+ * const resultKwh = mergeWeeklyDataWithAlignment(currentData, lastData, EnergyUnit.KWH);
  * // Output (assuming today is 2025-10-15):
  * // [
  * //   { period: "W1", value: 15.2, comparedValue: 14.1 },
@@ -369,11 +437,45 @@ export function mergeCurrentAndLastPeriodData({
  * //   { period: "W4", value: undefined, comparedValue: 16.8 },
  * //   { period: "W5", value: undefined, comparedValue: undefined }
  * // ]
+ *
+ * // Using Voltage
+ * const resultVolt = mergeWeeklyDataWithAlignment(currentData, lastData, EnergyUnit.Volt);
+ * // Output (assuming today is 2025-10-15):
+ * // [
+ * //   { period: "W1", value: 220, comparedValue: 218 },
+ * //   { period: "W2", value: 225, comparedValue: undefined },
+ * //   { period: "W3", value: undefined, comparedValue: undefined },
+ * //   { period: "W4", value: undefined, comparedValue: 222 },
+ * //   { period: "W5", value: undefined, comparedValue: undefined }
+ * // ]
+ *
+ * // Using Current
+ * const resultAmpere = mergeWeeklyDataWithAlignment(currentData, lastData, EnergyUnit.Ampere);
+ * // Output (assuming today is 2025-10-15):
+ * // [
+ * //   { period: "W1", value: 10.5, comparedValue: 9.8 },
+ * //   { period: "W2", value: 12.1, comparedValue: undefined },
+ * //   { period: "W3", value: undefined, comparedValue: undefined },
+ * //   { period: "W4", value: undefined, comparedValue: 11.2 },
+ * //   { period: "W5", value: undefined, comparedValue: undefined }
+ * // ]
+ *
+ * // Using Power
+ * const resultWatt = mergeWeeklyDataWithAlignment(currentData, lastData, EnergyUnit.Watt);
+ * // Output (assuming today is 2025-10-15):
+ * // [
+ * //   { period: "W1", value: 2310, comparedValue: 2136 },
+ * //   { period: "W2", value: 2722, comparedValue: undefined },
+ * //   { period: "W3", value: undefined, comparedValue: undefined },
+ * //   { period: "W4", value: undefined, comparedValue: 2486 },
+ * //   { period: "W5", value: undefined, comparedValue: undefined }
+ * // ]
  * ```
  */
 function mergeWeeklyDataWithAlignment(
   currentData: PeriodValueModel[],
-  lastData: PeriodValueModel[]
+  lastData: PeriodValueModel[],
+  electricityUnit: EnergyUnit = EnergyUnit.KWH
 ): {
   period: string;
   value: number | undefined;
@@ -411,7 +513,20 @@ function mergeWeeklyDataWithAlignment(
     if (dateRange) {
       const weekNumber = getWeekNumber(dateRange.startDate);
       const weekLabel = `W${weekNumber}`;
-      currentDataMap.set(weekLabel, item.totalKwh);
+      switch (electricityUnit) {
+        case EnergyUnit.KWH:
+          currentDataMap.set(weekLabel, item.totalKwh);
+          break;
+        case EnergyUnit.Ampere:
+          currentDataMap.set(weekLabel, item.avgCurrent);
+          break;
+        case EnergyUnit.Volt:
+          currentDataMap.set(weekLabel, item.avgVoltage);
+          break;
+        case EnergyUnit.Watt:
+          currentDataMap.set(weekLabel, item.avgRealPower);
+          break;
+      }
       allWeekLabels.add(weekLabel);
     }
   });
@@ -422,7 +537,20 @@ function mergeWeeklyDataWithAlignment(
     if (dateRange) {
       const weekNumber = getWeekNumber(dateRange.startDate);
       const weekLabel = `W${weekNumber}`;
-      lastDataMap.set(weekLabel, item.totalKwh);
+      switch (electricityUnit) {
+        case EnergyUnit.KWH:
+          lastDataMap.set(weekLabel, item.totalKwh);
+          break;
+        case EnergyUnit.Ampere:
+          lastDataMap.set(weekLabel, item.avgCurrent);
+          break;
+        case EnergyUnit.Volt:
+          lastDataMap.set(weekLabel, item.avgVoltage);
+          break;
+        case EnergyUnit.Watt:
+          lastDataMap.set(weekLabel, item.avgRealPower);
+          break;
+      }
       allWeekLabels.add(weekLabel);
     }
   });
@@ -460,20 +588,22 @@ function mergeWeeklyDataWithAlignment(
  *
  * @param currentData - Array of current year monthly data
  * @param lastData - Array of comparison year monthly data
+ * @param electricityUnit - The unit of electricity measurement (default: KWH)
  * @returns Array of merged monthly data with proper alignment
  *
  * @example
  * ```typescript
  * const currentData = [
- *   { period: "2023-01", totalKwh: 150.2 },
- *   { period: "2023-03", totalKwh: 180.5 }
+ *   { period: "2023-01", totalKwh: 150.2, avgVoltage: 220, avgCurrent: 45.5, avgRealPower: 10010 },
+ *   { period: "2023-03", totalKwh: 180.5, avgVoltage: 225, avgCurrent: 52.1, avgRealPower: 11722 }
  * ];
  * const lastData = [
- *   { period: "2022-01", totalKwh: 140.1 },
- *   { period: "2022-02", totalKwh: 165.8 }
+ *   { period: "2022-01", totalKwh: 140.1, avgVoltage: 218, avgCurrent: 42.8, avgRealPower: 9330 },
+ *   { period: "2022-02", totalKwh: 165.8, avgVoltage: 222, avgCurrent: 48.9, avgRealPower: 10856 }
  * ];
  *
- * const result = mergeMonthlyDataWithAlignment(currentData, lastData);
+ * // Using KWH (default)
+ * const resultKwh = mergeMonthlyDataWithAlignment(currentData, lastData, EnergyUnit.KWH);
  * // Output (assuming today is 2023-03-15):
  * // [
  * //   { period: "Jan", value: 150.2, comparedValue: 140.1 },
@@ -482,11 +612,45 @@ function mergeWeeklyDataWithAlignment(
  * //   { period: "Apr", value: undefined, comparedValue: undefined },
  * //   ... // continues for all months
  * // ]
+ *
+ * // Using Voltage
+ * const resultVolt = mergeMonthlyDataWithAlignment(currentData, lastData, EnergyUnit.Volt);
+ * // Output (assuming today is 2023-03-15):
+ * // [
+ * //   { period: "Jan", value: 220, comparedValue: 218 },
+ * //   { period: "Feb", value: undefined, comparedValue: 222 },
+ * //   { period: "Mar", value: 225, comparedValue: undefined },
+ * //   { period: "Apr", value: undefined, comparedValue: undefined },
+ * //   ... // continues for all months
+ * // ]
+ *
+ * // Using Current
+ * const resultAmpere = mergeMonthlyDataWithAlignment(currentData, lastData, EnergyUnit.Ampere);
+ * // Output (assuming today is 2023-03-15):
+ * // [
+ * //   { period: "Jan", value: 45.5, comparedValue: 42.8 },
+ * //   { period: "Feb", value: undefined, comparedValue: 48.9 },
+ * //   { period: "Mar", value: 52.1, comparedValue: undefined },
+ * //   { period: "Apr", value: undefined, comparedValue: undefined },
+ * //   ... // continues for all months
+ * // ]
+ *
+ * // Using Power
+ * const resultWatt = mergeMonthlyDataWithAlignment(currentData, lastData, EnergyUnit.Watt);
+ * // Output (assuming today is 2023-03-15):
+ * // [
+ * //   { period: "Jan", value: 10010, comparedValue: 9330 },
+ * //   { period: "Feb", value: undefined, comparedValue: 10856 },
+ * //   { period: "Mar", value: 11722, comparedValue: undefined },
+ * //   { period: "Apr", value: undefined, comparedValue: undefined },
+ * //   ... // continues for all months
+ * // ]
  * ```
  */
 function mergeMonthlyDataWithAlignment(
   currentData: PeriodValueModel[],
-  lastData: PeriodValueModel[]
+  lastData: PeriodValueModel[],
+  electricityUnit: EnergyUnit = EnergyUnit.KWH
 ): {
   period: string;
   value: number | undefined;
@@ -515,7 +679,20 @@ function mergeMonthlyDataWithAlignment(
       period: TimePeriod.Monthly,
       value: item.period,
     });
-    currentDataMap.set(monthLabel, item.totalKwh);
+    switch (electricityUnit) {
+      case EnergyUnit.KWH:
+        currentDataMap.set(monthLabel, item.totalKwh);
+        break;
+      case EnergyUnit.Ampere:
+        currentDataMap.set(monthLabel, item.avgCurrent);
+        break;
+      case EnergyUnit.Volt:
+        currentDataMap.set(monthLabel, item.avgVoltage);
+        break;
+      case EnergyUnit.Watt:
+        currentDataMap.set(monthLabel, item.avgRealPower);
+        break;
+    }
     allMonthLabels.add(monthLabel);
   });
   // Process last data (comparison data)
@@ -524,7 +701,20 @@ function mergeMonthlyDataWithAlignment(
       period: TimePeriod.Monthly,
       value: item.period,
     });
-    lastDataMap.set(monthLabel, item.totalKwh);
+    switch (electricityUnit) {
+      case EnergyUnit.KWH:
+        lastDataMap.set(monthLabel, item.totalKwh);
+        break;
+      case EnergyUnit.Ampere:
+        lastDataMap.set(monthLabel, item.avgCurrent);
+        break;
+      case EnergyUnit.Volt:
+        lastDataMap.set(monthLabel, item.avgVoltage);
+        break;
+      case EnergyUnit.Watt:
+        lastDataMap.set(monthLabel, item.avgRealPower);
+        break;
+    }
     allMonthLabels.add(monthLabel);
   });
   // Always include all months of the year (1-12) on X-axis for better UX
@@ -570,22 +760,24 @@ function mergeMonthlyDataWithAlignment(
  *
  * @param currentData - Array of current month daily data
  * @param lastData - Array of comparison month daily data
+ * @param electricityUnit - The unit of electricity measurement (default: KWH)
  * @returns Array of merged daily data with proper day alignment
  *
  * @example
  * ```typescript
  * const currentData = [
- *   { period: "2023-10-01", totalKwh: 5.2 },
- *   { period: "2023-10-02", totalKwh: 4.8 },
- *   { period: "2023-10-04", totalKwh: 6.1 }
+ *   { period: "2023-10-01", totalKwh: 5.2, avgVoltage: 220, avgCurrent: 2.5, avgRealPower: 550 },
+ *   { period: "2023-10-02", totalKwh: 4.8, avgVoltage: 225, avgCurrent: 2.3, avgRealPower: 517 },
+ *   { period: "2023-10-04", totalKwh: 6.1, avgVoltage: 218, avgCurrent: 2.8, avgRealPower: 610 }
  * ];
  * const lastData = [
- *   { period: "2023-09-01", totalKwh: 4.5 },
- *   { period: "2023-09-02", totalKwh: 5.1 },
- *   { period: "2023-09-03", totalKwh: 3.9 }
+ *   { period: "2023-09-01", totalKwh: 4.5, avgVoltage: 222, avgCurrent: 2.1, avgRealPower: 466 },
+ *   { period: "2023-09-02", totalKwh: 5.1, avgVoltage: 219, avgCurrent: 2.4, avgRealPower: 525 },
+ *   { period: "2023-09-03", totalKwh: 3.9, avgVoltage: 223, avgCurrent: 1.9, avgRealPower: 423 }
  * ];
  *
- * const result = mergeDailyDataWithAlignment(currentData, lastData);
+ * // Using KWH (default)
+ * const resultKwh = mergeDailyDataWithAlignment(currentData, lastData, EnergyUnit.KWH);
  * // Output (assuming today is 2023-10-05):
  * // [
  * //   { period: "01", value: 5.2, comparedValue: 4.5 },
@@ -595,11 +787,48 @@ function mergeMonthlyDataWithAlignment(
  * //   { period: "05", value: undefined, comparedValue: undefined },
  * //   ... // continues for all days in current month
  * // ]
+ *
+ * // Using Voltage
+ * const resultVolt = mergeDailyDataWithAlignment(currentData, lastData, EnergyUnit.Volt);
+ * // Output (assuming today is 2023-10-05):
+ * // [
+ * //   { period: "01", value: 220, comparedValue: 222 },
+ * //   { period: "02", value: 225, comparedValue: 219 },
+ * //   { period: "03", value: undefined, comparedValue: 223 },
+ * //   { period: "04", value: 218, comparedValue: undefined },
+ * //   { period: "05", value: undefined, comparedValue: undefined },
+ * //   ... // continues for all days in current month
+ * // ]
+ *
+ * // Using Current
+ * const resultAmpere = mergeDailyDataWithAlignment(currentData, lastData, EnergyUnit.Ampere);
+ * // Output (assuming today is 2023-10-05):
+ * // [
+ * //   { period: "01", value: 2.5, comparedValue: 2.1 },
+ * //   { period: "02", value: 2.3, comparedValue: 2.4 },
+ * //   { period: "03", value: undefined, comparedValue: 1.9 },
+ * //   { period: "04", value: 2.8, comparedValue: undefined },
+ * //   { period: "05", value: undefined, comparedValue: undefined },
+ * //   ... // continues for all days in current month
+ * // ]
+ *
+ * // Using Power
+ * const resultWatt = mergeDailyDataWithAlignment(currentData, lastData, EnergyUnit.Watt);
+ * // Output (assuming today is 2023-10-05):
+ * // [
+ * //   { period: "01", value: 550, comparedValue: 466 },
+ * //   { period: "02", value: 517, comparedValue: 525 },
+ * //   { period: "03", value: undefined, comparedValue: 423 },
+ * //   { period: "04", value: 610, comparedValue: undefined },
+ * //   { period: "05", value: undefined, comparedValue: undefined },
+ * //   ... // continues for all days in current month
+ * // ]
  * ```
  */
 function mergeDailyDataWithAlignment(
   currentData: PeriodValueModel[],
-  lastData: PeriodValueModel[]
+  lastData: PeriodValueModel[],
+  electricityUnit: EnergyUnit = EnergyUnit.KWH
 ): {
   period: string;
   value: number | undefined;
@@ -639,7 +868,20 @@ function mergeDailyDataWithAlignment(
       period: TimePeriod.Daily,
       value: item.period,
     });
-    currentDataMap.set(dayLabel, item.totalKwh);
+    switch (electricityUnit) {
+      case EnergyUnit.KWH:
+        currentDataMap.set(dayLabel, item.totalKwh);
+        break;
+      case EnergyUnit.Ampere:
+        currentDataMap.set(dayLabel, item.avgCurrent);
+        break;
+      case EnergyUnit.Volt:
+        currentDataMap.set(dayLabel, item.avgVoltage);
+        break;
+      case EnergyUnit.Watt:
+        currentDataMap.set(dayLabel, item.avgRealPower);
+        break;
+    }
     allDayLabels.add(dayLabel);
   });
 
@@ -649,7 +891,20 @@ function mergeDailyDataWithAlignment(
       period: TimePeriod.Daily,
       value: item.period,
     });
-    lastDataMap.set(dayLabel, item.totalKwh);
+    switch (electricityUnit) {
+      case EnergyUnit.KWH:
+        lastDataMap.set(dayLabel, item.totalKwh);
+        break;
+      case EnergyUnit.Ampere:
+        lastDataMap.set(dayLabel, item.avgCurrent);
+        break;
+      case EnergyUnit.Volt:
+        lastDataMap.set(dayLabel, item.avgVoltage);
+        break;
+      case EnergyUnit.Watt:
+        lastDataMap.set(dayLabel, item.avgRealPower);
+        break;
+    }
     allDayLabels.add(dayLabel);
   });
 

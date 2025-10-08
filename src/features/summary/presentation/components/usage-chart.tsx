@@ -82,6 +82,7 @@ export function UsageChart({
     currentData: usageData || [],
     lastData: compareEnabled ? usageComparedData || null : null,
     period: selectedPeriod,
+    electricityUnit: selectedUnit,
   });
 
   const controlsSection = (

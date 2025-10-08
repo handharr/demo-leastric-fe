@@ -23,7 +23,7 @@ export const useGetUsageSummary = (): UseGetUsageSummaryReturn => {
 
   const fetchUsageSummary = useCallback(
     async (
-      month: number = new Date().getMonth(),
+      month: number = new Date().getMonth() + 1,
       year: number = new Date().getFullYear()
     ) => {
       try {

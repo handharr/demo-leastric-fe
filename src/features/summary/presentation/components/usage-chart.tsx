@@ -161,7 +161,12 @@ export function UsageChart({
               fontSize: 12,
               fill: "#6b7280",
             }}
-            tickFormatter={(value) => formatNumberIndonesian(Number(value), 0)}
+            tickFormatter={(value) =>
+              formatNumberIndonesian(
+                Number(value),
+                selectedUnit === EnergyUnit.Ampere ? 2 : 0
+              )
+            }
             tickCount={4}
             domain={["dataMin", "dataMax"]}
           />

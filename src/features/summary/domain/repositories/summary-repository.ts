@@ -1,5 +1,6 @@
 import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
 import {
+  GetDevicesCurrentMqttLogModel,
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
   GetExportToCsvModel,
@@ -10,6 +11,7 @@ import {
   GetElectricityUsageQueryParams,
   GetElectricityUsageHistoryQueryParams,
   GetExportToCsvQueryParams,
+  GetDevicesCurrentMqttLogQueryParams,
 } from "@/features/summary/domain/params/query-params";
 import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
 import { Observable } from "rxjs";
@@ -36,4 +38,9 @@ export interface SummaryRepository {
     queryParam: GetExportToCsvQueryParams;
   }): Promise<GetExportToCsvModel | BaseErrorModel>;
   subscribeRealTimeUsage(): Observable<MqttUsageModel | BaseErrorModel>;
+  getDevicesCurrentMqttLog({
+    queryParam,
+  }: {
+    queryParam: GetDevicesCurrentMqttLogQueryParams;
+  }): Promise<GetDevicesCurrentMqttLogModel | BaseErrorModel>;
 }

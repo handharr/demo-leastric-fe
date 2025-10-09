@@ -8,6 +8,8 @@ import { isErrorResponse } from "@/shared/infrastructure/models/base-error-respo
 import { Logger } from "@/shared/utils/logger/logger";
 import { ErrorType } from "@/shared/domain/enum/base-enum";
 import {
+  DeviceCurrentMqttLogModel,
+  GetDevicesCurrentMqttLogModel,
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
   GetExportToCsvModel,
@@ -18,6 +20,7 @@ import {
   GetElectricityUsageQueryParams,
   GetElectricityUsageHistoryQueryParams,
   GetExportToCsvQueryParams,
+  GetDevicesCurrentMqttLogQueryParams,
 } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
@@ -475,5 +478,99 @@ export class SummaryRepositoryImpl implements SummaryRepository {
         );
       })
     );
+  }
+
+  async getDevicesCurrentMqttLog({
+    queryParam,
+  }: {
+    queryParam: GetDevicesCurrentMqttLogQueryParams;
+  }): Promise<GetDevicesCurrentMqttLogModel | BaseErrorModel> {
+    Logger.info(
+      "SummaryRepositoryImpl",
+      "getDevicesCurrentMqttLog",
+      queryParam
+    );
+    const result = await this.dataSource.getDevicesCurrentMqttLog({
+      params: { ...queryParam },
+    });
+
+    if (isErrorResponse(result)) {
+      Logger.error("SummaryRepositoryImpl", "getDevicesCurrentMqttLog", result);
+      return mapErrorResponseToModel({ response: result });
+    }
+    Logger.info(
+      "SummaryRepositoryImpl",
+      "getDevicesCurrentMqttLog result",
+      result
+    );
+    const logs = optionalValue(result.data?.devices).orEmptyArray();
+    Logger.info("SummaryRepositoryImpl", "Parsed logs", logs);
+    if (result.flash?.type === "success") {
+      try {
+        Logger.info(
+          "SummaryRepositoryImpl",
+          "Success getDevicesCurrentMqttLog - mapping logs"
+        );
+        const mappedDevices: DeviceCurrentMqttLogModel[] = logs.map((log) => ({
+          deviceId: optionalValue(log.deviceId).orEmpty(),
+          deviceName: optionalValue(log.deviceName).orEmpty(),
+          deviceType: parseDeviceType(optionalValue(log.deviceType).orEmpty()),
+          location: optionalValue(log.location).orEmpty(),
+          subLocation: optionalValue(log.subLocation).orNull(),
+          detailLocation: optionalValue(log.detailLocation).orNull(),
+          lastReading: optionalValue(log.lastReading).orEmpty(),
+          totalKwh: optionalValue(log.totalKwh).orDefault(-1),
+          latestReadingData: {
+            voltage: optionalValue(log.latestReadingData?.voltage).orDefault(
+              -1
+            ),
+            current: optionalValue(log.latestReadingData?.current).orDefault(
+              -1
+            ),
+            activePower: optionalValue(
+              log.latestReadingData?.activePower
+            ).orDefault(-1),
+            apparentPower: optionalValue(
+              log.latestReadingData?.apparentPower
+            ).orDefault(-1),
+            powerFactor: optionalValue(
+              log.latestReadingData?.powerFactor
+            ).orDefault(-1),
+            totalKwh: optionalValue(log.latestReadingData?.totalKwh).orDefault(
+              -1
+            ),
+            currentKwh: optionalValue(
+              log.latestReadingData?.currentKwh
+            ).orDefault(-1),
+          },
+        }));
+        Logger.info("SummaryRepositoryImpl", "Mapped logs", mappedDevices);
+        return {
+          devices: mappedDevices,
+        };
+      } catch (error) {
+        Logger.error(
+          "SummaryRepositoryImpl",
+          "getDevicesCurrentMqttLog - parsing error",
+          error
+        );
+        return createErrorModel({
+          type: ErrorType.UNEXPECTED,
+          message: "Failed to parse devices current MQTT log data.",
+        });
+      }
+    } else {
+      Logger.error(
+        "SummaryRepositoryImpl",
+        "getDevicesCurrentMqttLog - unexpected flash type",
+        result
+      );
+      return createErrorModel({
+        type: ErrorType.UNEXPECTED,
+        message:
+          result.flash?.message ||
+          "Failed to retrieve devices current MQTT log. Please try again.",
+      });
+    }
   }
 }

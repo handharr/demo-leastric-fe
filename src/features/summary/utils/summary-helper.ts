@@ -1089,3 +1089,11 @@ export function getDateStringAfterSubstractingSeconds(
   const substractedDate = substractDateBySeconds(date, seconds);
   return getTimeStringFromDate(substractedDate);
 }
+
+// Substract date and return how many seconds substracted from now
+// e.g. if date is 10 seconds ago, return -10
+export function getSecondsSubstractedFromNow(date: Date): number {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  return -diffInSeconds;
+}

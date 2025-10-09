@@ -23,3 +23,7 @@ export interface GetExportToCsvQueryParams {
   startDate?: string; // ISO 8601 format
   endDate?: string; // ISO 8601 format
 }
+
+export interface GetDevicesCurrentMqttLogQueryParams {
+  location?: string; // e.g., "Building A"
+}

@@ -296,7 +296,15 @@ export default function SummaryPage() {
 
       {/* Real-Time Monitoring and Usage History */}
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-[16px]">
-        <RealTimeMonitoringChart className="" />
+        <RealTimeMonitoringChart
+          className=""
+          location={
+            activeFilters.singleSelection.location &&
+            activeFilters.singleSelection.location.toLowerCase() !== "all"
+              ? activeFilters.singleSelection.location
+              : undefined
+          }
+        />
         <ElectricUsageHistoryTable
           data={aggregateElectricityUsageByPeriod(electricityUsageHistory)}
           className=""

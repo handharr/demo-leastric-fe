@@ -4,6 +4,7 @@ import {
   GetUsageSummaryResponse,
   GetElectricityUsageResponse,
   GetExportToCsvResponse,
+  GetDevicesCurrentMqttLogResponse,
 } from "@/features/summary/infrastructure/models/summary-responses";
 
 export interface SummaryDataSource {
@@ -27,4 +28,11 @@ export interface SummaryDataSource {
   }: {
     params: Record<string, unknown>;
   }): Promise<BaseResponse<GetExportToCsvResponse> | BaseErrorResponse>;
+  getDevicesCurrentMqttLog({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<
+    BaseResponse<GetDevicesCurrentMqttLogResponse> | BaseErrorResponse
+  >;
 }

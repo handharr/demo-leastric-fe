@@ -41,3 +41,27 @@ export interface GetExportToCsvResponse {
   fileName?: string;
   recordCount?: number;
 }
+
+export interface DeviceCurrentMqttLogResponse {
+  deviceId?: string;
+  deviceName?: string;
+  deviceType?: string;
+  location?: string;
+  subLocation?: string | null;
+  detailLocation?: string | null;
+  lastReading?: string;
+  totalKwh?: number;
+  latestReadingData?: {
+    voltage?: number;
+    current?: number;
+    activePower?: number;
+    apparentPower?: number;
+    powerFactor?: number;
+    totalKwh?: number;
+    currentKwh?: number;
+  };
+}
+
+export interface GetDevicesCurrentMqttLogResponse {
+  devices?: DeviceCurrentMqttLogResponse[];
+}

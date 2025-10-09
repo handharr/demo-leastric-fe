@@ -9,6 +9,7 @@ import {
   GetUsageSummaryResponse,
   GetElectricityUsageResponse,
   GetExportToCsvResponse,
+  GetDevicesCurrentMqttLogResponse,
 } from "@/features/summary/infrastructure/models/summary-responses";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
 import { AxiosError } from "axios";
@@ -118,6 +119,31 @@ export class RemoteSummaryDataSource implements SummaryDataSource {
       return this.apiClient.handleError(
         error as AxiosError<BaseErrorResponse>,
         "Failed to export to CSV. Please try again."
+      );
+    }
+  }
+
+  async getDevicesCurrentMqttLog({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<
+    BaseResponse<GetDevicesCurrentMqttLogResponse> | BaseErrorResponse
+  > {
+    try {
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
+      return await this.apiClient.get(`v1/mqtt/latest-readings`, params, {
+        headers,
+      });
+    } catch (error) {
+      Logger.error("Error fetching devices current MQTT log", error);
+      return this.apiClient.handleError(
+        error as AxiosError<BaseErrorResponse>,
+        "Failed to fetch devices current MQTT log. Please try again."
       );
     }
   }

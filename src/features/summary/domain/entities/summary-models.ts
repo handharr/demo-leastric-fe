@@ -73,3 +73,27 @@ export interface GetExportToCsvModel {
 export interface ExportToCsvDownloadModel {
   count: number;
 }
+
+export interface DeviceCurrentMqttLogModel {
+  deviceId: string;
+  deviceName: string;
+  deviceType: string;
+  location: string;
+  subLocation: string | null;
+  detailLocation: string | null;
+  lastReading: string;
+  totalKwh: number;
+  latestReadingData: {
+    voltage: number;
+    current: number;
+    activePower: number;
+    apparentPower: number;
+    powerFactor: number;
+    totalKwh: number;
+    currentKwh: number;
+  };
+}
+
+export interface GetDevicesCurrentMqttLogModel {
+  devices: DeviceCurrentMqttLogModel[];
+}

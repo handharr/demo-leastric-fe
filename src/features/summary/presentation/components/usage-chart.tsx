@@ -168,7 +168,7 @@ export function UsageChart({
               )
             }
             tickCount={4}
-            domain={["dataMin", "dataMax"]}
+            domain={[0, "dataMax"]}
           />
           <Tooltip
             content={(props) => {

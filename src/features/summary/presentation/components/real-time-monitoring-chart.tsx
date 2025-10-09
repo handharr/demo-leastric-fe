@@ -1,4 +1,8 @@
-import { CustomTooltip } from "@/features/summary/presentation/components/custom-tooltip";
+import {
+  CustomTooltip,
+  CustomToolTipPayload,
+  CustomToolTipTextColor,
+} from "@/features/summary/presentation/components/custom-tooltip";
 import {
   LineChart,
   Line,
@@ -13,20 +17,17 @@ import { TilePrimary } from "@/shared/presentation/components/tile-primary";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
 import { RealTimeInterval } from "@/shared/domain/enum/enums";
 import {
-  convertKwhToWatt,
-  getDateStringAfterSubstractingSeconds,
   getLabelFromRealTimeInterval,
-  mapUsageDataToRealTimeDataPoints,
+  getSecondsSubstractedFromNow,
 } from "@/features/summary/utils/summary-helper";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
 import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
-import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
-import { useGetElectricityUsageRealTime } from "@/features/summary/presentation/hooks/use-get-electricity-usage-real-time";
 import { useRef, useEffect, useMemo } from "react";
 import {
   usePopup,
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
+import { useGetDevicesCurrentMqttLog } from "../hooks/use-get-devices-current-mqtt-log";
 
 const availableIntervals = [
   getLabelFromRealTimeInterval(RealTimeInterval.Ten),
@@ -37,68 +38,70 @@ const availableIntervals = [
 
 interface RealTimeMonitoringChartProps {
   className?: string;
+  location?: string;
 }
 
 export function RealTimeMonitoringChart({
   className = "",
+  location,
 }: RealTimeMonitoringChartProps) {
   const { showPopup } = usePopup();
   const {
-    periodicData,
+    error: mqttLogError,
     selectedInterval,
-    error: electricityUsageRealTimeError,
-    loading: isLoading,
+    periodicData: mqttPeriodicData,
+    fetch: fetchDevicesCurrentMqttLog,
     setSelectedInterval,
-    fetchElectricityUsage,
-    reset: resetElectricityUsageRealTime,
-  } = useGetElectricityUsageRealTime();
-  const fetchRealTimeRef = useRef(fetchElectricityUsage);
+    reset: resetMqttLog,
+    resetPeriodicData,
+  } = useGetDevicesCurrentMqttLog();
+  const fetchRealTimeRef = useRef(fetchDevicesCurrentMqttLog);
 
   const isEmpty = useMemo(
-    () => !periodicData || periodicData.length === 0,
-    [periodicData]
+    () => !mqttPeriodicData || mqttPeriodicData.length === 0,
+    [mqttPeriodicData]
   );
 
   const lastData = useMemo(
-    () => periodicData.findLast((d) => d.totalKwh !== undefined),
-    [periodicData]
+    () => mqttPeriodicData.findLast((d) => d.value !== undefined),
+    [mqttPeriodicData]
   );
 
   const currentUsage = useMemo(
-    () =>
-      formatNumberIndonesian(
-        optionalValue(convertKwhToWatt(lastData?.totalKwh)).orZero(),
-        2
-      ),
+    () => formatNumberIndonesian(optionalValue(lastData?.value).orZero(), 2),
     [lastData]
   );
 
   useEffect(() => {
-    fetchRealTimeRef.current = fetchElectricityUsage;
-  }, [fetchElectricityUsage]);
+    fetchRealTimeRef.current = fetchDevicesCurrentMqttLog;
+  }, [fetchDevicesCurrentMqttLog]);
 
   useEffect(() => {
     if (!selectedInterval) return;
 
+    if (resetPeriodicData) {
+      resetPeriodicData();
+    }
+
     // Fetch once immediately
-    fetchRealTimeRef.current();
+    fetchRealTimeRef.current(location || "");
 
     const intervalId = setInterval(() => {
-      fetchRealTimeRef.current();
+      fetchRealTimeRef.current(location || "");
     }, selectedInterval * 1000);
 
     return () => clearInterval(intervalId);
-  }, [selectedInterval]);
+  }, [selectedInterval, location, resetPeriodicData]);
 
   useEffect(() => {
-    if (electricityUsageRealTimeError) {
+    if (mqttLogError) {
       showPopup(
-        `Error fetching real-time electricity usage: ${electricityUsageRealTimeError.message}`,
+        `Error fetching real-time MQTT log: ${mqttLogError.message}`,
         PopupType.ERROR
       );
-      resetElectricityUsageRealTime();
+      resetMqttLog();
     }
-  }, [electricityUsageRealTimeError, showPopup, resetElectricityUsageRealTime]);
+  }, [mqttLogError, showPopup, resetMqttLog]);
 
   const controlsSection = (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 mb-4 sm:mb-6">
@@ -132,10 +135,7 @@ export function RealTimeMonitoringChart({
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={mapUsageDataToRealTimeDataPoints(
-            periodicData,
-            selectedInterval || RealTimeInterval.Sixty
-          )}
+          data={mqttPeriodicData}
           margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#dedede" />
@@ -145,15 +145,21 @@ export function RealTimeMonitoringChart({
             tickLine={false}
             tick={{ fontSize: 10, fill: "#6B7280" }}
             className="text-xs"
+            tickFormatter={(time) => {
+              const secondsAgo = getSecondsSubstractedFromNow(time);
+              if (secondsAgo === 0) return "Now";
+              return `${secondsAgo.toString()}s`;
+            }}
           />
           <YAxis
-            dataKey={"usage"}
+            dataKey="value"
             axisLine={false}
             tickLine={false}
             tick={{ fontSize: 10, fill: "#6B7280" }}
             tickFormatter={(value) => {
               return formatNumberIndonesian(value, 0);
             }}
+            domain={[0, "dataMax + 100"]} // Add some padding on top
           />
           <Tooltip
             content={(props) => {
@@ -164,16 +170,28 @@ export function RealTimeMonitoringChart({
               ) {
                 return null;
               }
-              const item = props.payload[0].payload.time;
+              const _payload: CustomToolTipPayload[] = props.payload.map(
+                (entry) => {
+                  return {
+                    value: `${formatNumberIndonesian(
+                      Number(entry.value),
+                      2
+                    )} watt`,
+                    textColor: CustomToolTipTextColor.primary,
+                  };
+                }
+              );
+              const time = new Date(props.label || "");
+              // Convert to HH:MM:SS
+              const hours = time.getHours().toString().padStart(2, "0");
+              const minutes = time.getMinutes().toString().padStart(2, "0");
+              const seconds = time.getSeconds().toString().padStart(2, "0");
+              const formattedTime = `${hours}:${minutes}:${seconds}`;
               return (
                 <CustomTooltip
-                  titles={["Usage"]}
                   active={props.active}
-                  payload={props.payload}
-                  label={getDateStringAfterSubstractingSeconds(
-                    new Date(),
-                    item
-                  )}
+                  payload={_payload}
+                  label={formattedTime}
                   timeUnit="Time:"
                 />
               );
@@ -181,7 +199,7 @@ export function RealTimeMonitoringChart({
           />
           <Line
             type="linear"
-            dataKey="usage"
+            dataKey="value"
             stroke="#2a6335"
             strokeWidth={2}
             activeDot={{ r: 4, fill: "#2a6335" }}
@@ -194,11 +212,7 @@ export function RealTimeMonitoringChart({
   const contents = (
     <>
       {controlsSection}
-      {isLoading && isEmpty ? (
-        <div className="h-[400px] flex items-center justify-center">
-          <LoadingSpinner />
-        </div>
-      ) : isEmpty ? (
+      {isEmpty ? (
         <div className="h-[400px] flex items-center justify-center">
           <EmptyData />
         </div>

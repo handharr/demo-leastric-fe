@@ -77,7 +77,7 @@ export interface ExportToCsvDownloadModel {
 export interface DeviceCurrentMqttLogModel {
   deviceId: string;
   deviceName: string;
-  deviceType: string;
+  deviceType: DeviceType;
   location: string;
   subLocation: string | null;
   detailLocation: string | null;
@@ -91,6 +91,55 @@ export interface DeviceCurrentMqttLogModel {
     powerFactor: number;
     totalKwh: number;
     currentKwh: number;
+    voltageData: {
+      vR: number;
+      vS: number;
+      vT: number;
+      vRS: number;
+      vST: number;
+      vRT: number;
+    };
+    currentData: {
+      iR: number;
+      iS: number;
+      iT: number;
+    };
+    activePowerData: {
+      pR: number;
+      pS: number;
+      pT: number;
+    };
+    apparentPowerData: {
+      sR: number;
+      sS: number;
+      sT: number;
+    };
+    reactivePowerData: {
+      qR: number;
+      qS: number;
+      qT: number;
+    };
+    powerFactorData: {
+      pfR: number;
+      pfS: number;
+      pfT: number;
+    };
+    totalEnergyData: {
+      tkWhR: number;
+      tkWhS: number;
+      tkWhT: number;
+      tkVAhR: number;
+      tkVAhS: number;
+      tkVAhT: number;
+      tkVArhR: number;
+      tkVArhS: number;
+      tkVArhT: number;
+    };
+    currentKwhData: {
+      curkWhR: number;
+      curkWhS: number;
+      curkWhT: number;
+    };
   };
 }
 

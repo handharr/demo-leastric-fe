@@ -33,6 +33,7 @@ import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
 import { Observable, of } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 import { WebSocketDataSource } from "@/shared/infrastructure/data-source/web-socket-data-source";
+import { mapDeviceCurrentMqttLogResponsesToModel } from "../../domain/mapper/summary-mapper";
 
 export class SummaryRepositoryImpl implements SummaryRepository {
   constructor(
@@ -511,39 +512,8 @@ export class SummaryRepositoryImpl implements SummaryRepository {
           "SummaryRepositoryImpl",
           "Success getDevicesCurrentMqttLog - mapping logs"
         );
-        const mappedDevices: DeviceCurrentMqttLogModel[] = logs.map((log) => ({
-          deviceId: optionalValue(log.deviceId).orEmpty(),
-          deviceName: optionalValue(log.deviceName).orEmpty(),
-          deviceType: parseDeviceType(optionalValue(log.deviceType).orEmpty()),
-          location: optionalValue(log.location).orEmpty(),
-          subLocation: optionalValue(log.subLocation).orNull(),
-          detailLocation: optionalValue(log.detailLocation).orNull(),
-          lastReading: optionalValue(log.lastReading).orEmpty(),
-          totalKwh: optionalValue(log.totalKwh).orDefault(-1),
-          latestReadingData: {
-            voltage: optionalValue(log.latestReadingData?.voltage).orDefault(
-              -1
-            ),
-            current: optionalValue(log.latestReadingData?.current).orDefault(
-              -1
-            ),
-            activePower: optionalValue(
-              log.latestReadingData?.activePower
-            ).orDefault(-1),
-            apparentPower: optionalValue(
-              log.latestReadingData?.apparentPower
-            ).orDefault(-1),
-            powerFactor: optionalValue(
-              log.latestReadingData?.powerFactor
-            ).orDefault(-1),
-            totalKwh: optionalValue(log.latestReadingData?.totalKwh).orDefault(
-              -1
-            ),
-            currentKwh: optionalValue(
-              log.latestReadingData?.currentKwh
-            ).orDefault(-1),
-          },
-        }));
+        const mappedDevices: DeviceCurrentMqttLogModel[] =
+          mapDeviceCurrentMqttLogResponsesToModel(logs);
         Logger.info("SummaryRepositoryImpl", "Mapped logs", mappedDevices);
         return {
           devices: mappedDevices,

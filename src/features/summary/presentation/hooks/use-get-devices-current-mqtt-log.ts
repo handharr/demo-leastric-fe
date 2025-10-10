@@ -5,7 +5,7 @@ import { ErrorType } from "@/shared/domain/enum/base-enum";
 import { useCallback, useState } from "react";
 import { GetDevicesCurrentMqttLogQueryParams } from "@/features/summary/domain/params/query-params";
 import { GetDevicesCurrentMqttLogUseCase } from "@/features/summary/domain/use-cases/get-devices-current-mqtt-log";
-import { RealTimeInterval } from "@/shared/domain/enum/enums";
+import { DeviceType, RealTimeInterval } from "@/shared/domain/enum/enums";
 import { PeriodicMqttLogUIData } from "@/features/summary/presentation/data/summary-ui-data";
 
 interface UseGetDevicesCurrentMqttLogReturn {
@@ -57,10 +57,18 @@ export const useGetDevicesCurrentMqttLog =
           setError(result);
           setData(null);
         } else {
-          const activePowerInWattSum = result.devices.reduce(
-            (sum, log) => sum + log.latestReadingData.activePower,
-            0
-          );
+          const activePowerInWattSum = result.devices.reduce((sum, log) => {
+            let watt = 0;
+            if (log.deviceType === DeviceType.SinglePhase) {
+              watt = log.latestReadingData.activePower;
+            } else {
+              watt =
+                log.latestReadingData.activePowerData.pR +
+                log.latestReadingData.activePowerData.pS +
+                log.latestReadingData.activePowerData.pT;
+            }
+            return sum + watt;
+          }, 0);
           const periodicData: PeriodicMqttLogUIData = {
             time: new Date(),
             value: activePowerInWattSum,

@@ -72,6 +72,31 @@ export function RealTimeMonitoringChart({
     [lastData]
   );
 
+  const yAxisDomain = useMemo(() => {
+    if (!mqttPeriodicData || mqttPeriodicData.length === 0) {
+      return [0, 100]; // Default domain when no data
+    }
+
+    const values = mqttPeriodicData
+      .map((d) => d.value)
+      .filter((v) => v !== undefined && v !== null)
+      .sort((a, b) => a - b);
+
+    if (values.length === 0) {
+      return [0, 100];
+    }
+
+    const median =
+      values.length % 2 === 0
+        ? (values[values.length / 2 - 1] + values[values.length / 2]) / 2
+        : values[Math.floor(values.length / 2)];
+
+    // Make the median the center, so max should be 2 * median
+    const maxValue = Math.max(median * 2, Math.max(...values) + 50);
+
+    return [0, maxValue];
+  }, [mqttPeriodicData]);
+
   useEffect(() => {
     fetchRealTimeRef.current = fetchDevicesCurrentMqttLog;
   }, [fetchDevicesCurrentMqttLog]);
@@ -159,7 +184,7 @@ export function RealTimeMonitoringChart({
             tickFormatter={(value) => {
               return formatNumberIndonesian(value, 0);
             }}
-            domain={[0, "dataMax + 100"]} // Add some padding on top
+            domain={yAxisDomain}
           />
           <Tooltip
             content={(props) => {

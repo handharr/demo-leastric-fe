@@ -5,15 +5,12 @@ import axios, {
   InternalAxiosRequestConfig,
   AxiosRequestConfig,
 } from "axios";
-import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import {
-  RetryHandler,
-  RetryOptions,
-} from "@/shared/utils/helpers/retry-helper";
-import { Logger } from "@/shared/utils/logger/logger";
-import { BaseResponse } from "@/shared/infrastructure/models/base-response";
+import { BaseErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
+import { RetryHandler, RetryOptions } from "@/core/utils/helpers/retry-helper";
+import { Logger } from "@/core/utils/logger/logger";
+import { BaseResponse } from "@/core/insfrastructure/responses/base-response";
 import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 /**
  * Configuration options for the ApiClient.

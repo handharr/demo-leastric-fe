@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal } from "@/shared/presentation/components/modal";
 import { DeviceModel } from "@/features/device/domain/entities/device-model";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useGetDevice } from "@/features/device/presentation/hooks/use-get-device";
 import { useUpdateDevice } from "@/features/device/presentation/hooks/use-update-device";
 import {

@@ -14,7 +14,7 @@ import { useGetLocations } from "@/features/device/presentation/hooks/locations/
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 import { useGetDevicesStatus } from "@/features/device/presentation/hooks/use-get-devices-status";
 import { useEffect } from "react";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import {
   usePopup,
   PopupType,

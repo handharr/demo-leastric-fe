@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { Pagination } from "@/shared/presentation/components/pagination";
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
+import { PaginationModel } from "@/core/domain/entities/base-model";
 import { useState } from "react";
 import { GenericFilterModal } from "@/shared/presentation/components/filter/generic-filter-modal";
 import { FilterMetas, FilterType } from "@/shared/presentation/types/filter-ui";
 import { getDefaultFilters } from "@/shared/utils/helpers/filter-helper";
 import { UserManagementTable } from "@/features/admin-management/presentation/components/user-management-table";
-import { Logger } from "@/shared/utils/logger/logger";
+import { Logger } from "@/core/utils/logger/logger";
 
 interface UserManagementFilterState {
   singleSelection: {

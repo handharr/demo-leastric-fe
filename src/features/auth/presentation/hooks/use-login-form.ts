@@ -2,9 +2,9 @@ import { useState, useCallback, useMemo } from "react";
 import { LoginFormData } from "@/features/auth/domain/params/data/login-form-data";
 import { LoginValidationErrors } from "@/features/auth/domain/entities/login-validation-errors";
 import { LoginUseCase } from "@/features/auth/domain/use-cases/login-use-case";
-import { isErrorModel } from "@/shared/domain/entities/base-error-model";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
-import { Logger } from "@/shared/utils/logger/logger";
+import { isErrorModel } from "@/core/domain/entities/base-error-model";
+import { ErrorType } from "@/core/domain/enums/base-enum";
+import { Logger } from "@/core/utils/logger/logger";
 
 export interface UseLoginFormReturn {
   formData: LoginFormData;

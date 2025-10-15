@@ -2,7 +2,7 @@ import {
   BaseErrorModel,
   createErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { GetExportToCsvModel } from "@/features/summary/domain/entities/summary-models";
 import { GetExportToCsvQueryParams } from "@/features/summary/domain/params/query-params";
 import { useCallback, useState } from "react";

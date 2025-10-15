@@ -3,7 +3,7 @@ import { UpdateDeviceUseCase } from "@/features/device/domain/use-cases/update-d
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
 import { UpdateDeviceFormData } from "@/features/device/domain/params/data-params";
 import { DeviceModel } from "@/features/device/domain/entities/device-model";
-import { isErrorModel } from "@/shared/domain/entities/base-error-model";
+import { isErrorModel } from "@/core/domain/entities/base-error-model";
 
 type UpdateDeviceResult = {
   loading: boolean;

@@ -4,10 +4,10 @@ import {
   deviceFilterDefaultValue,
   DeviceFilterState,
 } from "@/features/device/presentation/components/device-filter-modal";
-import { isErrorModel } from "@/shared/domain/entities/base-error-model";
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
-import { Logger } from "@/shared/utils/logger/logger";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { isErrorModel } from "@/core/domain/entities/base-error-model";
+import { PaginationModel } from "@/core/domain/entities/base-model";
+import { Logger } from "@/core/utils/logger/logger";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useCallback, useEffect, useState } from "react";
 
 export interface UseDevicesReturn {

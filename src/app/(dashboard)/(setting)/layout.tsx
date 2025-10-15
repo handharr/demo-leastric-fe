@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/shared/presentation/hooks/user-context";
-import { Logger } from "@/shared/utils/logger/logger";
+import { Logger } from "@/core/utils/logger/logger";
 import { useLogout } from "@/features/auth/presentation/hooks/use-logout";
 import {
   PopupType,

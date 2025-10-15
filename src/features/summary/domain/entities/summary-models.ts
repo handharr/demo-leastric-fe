@@ -1,4 +1,4 @@
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
+import { PaginationModel } from "@/core/domain/entities/base-model";
 import { DeviceType, EnergyUnit } from "@/shared/domain/enum/enums";
 
 export interface UsageSummaryModel {

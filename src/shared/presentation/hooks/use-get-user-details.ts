@@ -3,8 +3,8 @@ import { GetUserDetailsUseCase } from "@/shared/domain/use-cases/get-user-detail
 import {
   BaseErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+} from "@/core/domain/entities/base-error-model";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import { useUser } from "@/shared/presentation/hooks/user-context";
 import { UserModel } from "@/shared/domain/entities/user-model";
 

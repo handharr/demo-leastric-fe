@@ -1,7 +1,7 @@
 import {
   BaseErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { GetElectricityUsageHistoryModel } from "@/features/summary/domain/entities/summary-models";
 import { GetElectricityUsageHistoryQueryParams } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";
@@ -10,7 +10,7 @@ import {
   getDateStartOfDate,
   parseDateString,
 } from "@/shared/utils/helpers/date-helpers";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 export class GetElectricityUsageHistoryUseCase {
   constructor(

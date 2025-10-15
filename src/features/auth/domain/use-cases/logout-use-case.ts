@@ -1,7 +1,7 @@
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import { AuthRepository } from "@/features/auth/domain/repositories/auth-repository";
 import { AuthRepositoryImpl } from "@/features/auth/infrastructure/repositories-implementation/auth-repository-impl";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 export class LogoutUseCase {
   constructor(

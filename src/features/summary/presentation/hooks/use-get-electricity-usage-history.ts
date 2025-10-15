@@ -1,9 +1,9 @@
 import { GetElectricityUsageHistoryUseCase } from "@/features/summary/domain/use-cases/get-electricity-usage-history-use-case";
 import { GetElectricityUsageHistoryQueryParams } from "@/features/summary/domain/params/query-params";
-import { isErrorModel } from "@/shared/domain/entities/base-error-model";
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
-import { Logger } from "@/shared/utils/logger/logger";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { isErrorModel } from "@/core/domain/entities/base-error-model";
+import { PaginationModel } from "@/core/domain/entities/base-model";
+import { Logger } from "@/core/utils/logger/logger";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useCallback, useState } from "react";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { TimePeriod } from "@/shared/domain/enum/enums";

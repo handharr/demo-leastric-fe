@@ -9,7 +9,7 @@ import {
 import { DateRange } from "@/shared/domain/entities/shared-models";
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
 import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
 import {
   usePopup,

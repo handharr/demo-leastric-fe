@@ -17,7 +17,7 @@ import {
   usePopup,
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
 import { useGetElectricityUsage } from "@/features/summary/presentation/hooks/use-get-electricity-usage";
 import {

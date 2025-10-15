@@ -2,12 +2,12 @@ import { useState, useCallback, useEffect } from "react";
 import {
   BaseErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { GetUsageSummaryModel } from "@/features/summary/domain/entities/summary-models";
 import { GetUsageSummaryQueryParams } from "@/features/summary/domain/params/query-params";
 import { GetUsageSummaryUseCase } from "@/features/summary/domain/use-cases/get-usage-summary-use-case";
-import { Logger } from "@/shared/utils/logger/logger";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { Logger } from "@/core/utils/logger/logger";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 interface UseGetUsageSummaryReturn {
   data: GetUsageSummaryModel | null;

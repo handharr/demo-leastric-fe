@@ -3,14 +3,14 @@ import { AuthDataSource } from "@/features/auth/infrastructure/data-source/inter
 import { LoginResponse } from "@/features/auth/infrastructure/models/login/login-response";
 import { RefreshTokenResponse } from "@/features/auth/infrastructure/models/login/refresh-token-response";
 import { ValidateTokenResponse } from "@/features/auth/infrastructure/models/login/validate-token-response";
-import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
+import { BaseErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
 import { ResetPasswordResponse } from "@/features/auth/infrastructure/models/reset-password/reset-password-response";
 import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-password-data";
-import { BaseResponse } from "@/shared/infrastructure/models/base-response";
+import { BaseResponse } from "@/core/insfrastructure/responses/base-response";
 import {
   ApiClient,
   createAuthApiClient,
-} from "@/shared/infrastructure/api/api-client";
+} from "@/core/insfrastructure/api/api-client";
 import {
   LogoutResponse,
   UpdatePasswordResponse,

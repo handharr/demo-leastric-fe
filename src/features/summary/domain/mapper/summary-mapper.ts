@@ -1,5 +1,5 @@
 import { DeviceCurrentMqttLogModel } from "@/features/summary/domain/entities/summary-models";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { DeviceCurrentMqttLogResponse } from "@/features/summary/infrastructure/models/summary-responses";
 import { parseDeviceType } from "@/shared/utils/helpers/enum-helpers";
 

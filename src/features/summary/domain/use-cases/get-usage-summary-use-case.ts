@@ -1,4 +1,4 @@
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import { GetUsageSummaryModel } from "@/features/summary/domain/entities/summary-models";
 import { GetUsageSummaryQueryParams } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";

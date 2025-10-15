@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { LogoutUseCase } from "@/features/auth/domain/use-cases/logout-use-case";
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
-import { Logger } from "@/shared/utils/logger/logger";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
+import { Logger } from "@/core/utils/logger/logger";
 import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
 
 interface UseLogoutReturn {

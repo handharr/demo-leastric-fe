@@ -1,11 +1,11 @@
 import { AxiosError } from "axios";
-import { BaseResponse } from "@/shared/infrastructure/models/base-response";
+import { BaseResponse } from "@/core/insfrastructure/responses/base-response";
 import {
   ApiClient,
   createAuthApiClient,
-} from "@/shared/infrastructure/api/api-client";
-import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import { Logger } from "@/shared/utils/logger/logger";
+} from "@/core/insfrastructure/api/api-client";
+import { BaseErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
+import { Logger } from "@/core/utils/logger/logger";
 import { AdminManagementDataSource } from "@/features/admin-management/infrastructure/data-source/interface/admin-management-data-source";
 import { GetMqttLogsResponse } from "@/features/admin-management/infrastructure/model/admin-management-response";
 

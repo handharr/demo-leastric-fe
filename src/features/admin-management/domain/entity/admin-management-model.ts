@@ -1,4 +1,4 @@
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
+import { PaginationModel } from "@/core/domain/entities/base-model";
 
 export interface MqttLog1PhaseModel {
   devid: string;

@@ -1,7 +1,7 @@
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import { GetDevicesCurrentMqttLogModel } from "@/features/summary/domain/entities/summary-models";
-import { Logger } from "@/shared/utils/logger/logger";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { Logger } from "@/core/utils/logger/logger";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import { useCallback, useState } from "react";
 import { GetDevicesCurrentMqttLogQueryParams } from "@/features/summary/domain/params/query-params";
 import { GetDevicesCurrentMqttLogUseCase } from "@/features/summary/domain/use-cases/get-devices-current-mqtt-log";

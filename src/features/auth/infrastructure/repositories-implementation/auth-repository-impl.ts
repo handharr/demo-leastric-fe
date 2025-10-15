@@ -8,17 +8,17 @@ import {
   BaseErrorModel,
   createErrorModel,
   mapErrorResponseToModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { UserModel } from "@/shared/domain/entities/user-model";
-import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { isErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import { UpdatePasswordModel } from "@/features/auth/domain/entities/auth-model";
 import { mapUpdatePasswordFormDataToDto } from "@/features/auth/domain/mapper/auth-params-mapper";
 import { UpdatePasswordFormData } from "@/features/auth/domain/params/data/auth-form-data";
 import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
 import { AuthHelper } from "@/features/auth/domain/utils/auth-helper";
-import { Logger } from "@/shared/utils/logger/logger";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { Logger } from "@/core/utils/logger/logger";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 export class AuthRepositoryImpl implements AuthRepository {
   constructor(

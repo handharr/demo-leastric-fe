@@ -2,11 +2,11 @@ import {
   BaseErrorModel,
   createErrorModel,
   mapErrorResponseToModel,
-} from "@/shared/domain/entities/base-error-model";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
-import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
-import { Logger } from "@/shared/utils/logger/logger";
+} from "@/core/domain/entities/base-error-model";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
+import { isErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
+import { ErrorType } from "@/core/domain/enums/base-enum";
+import { Logger } from "@/core/utils/logger/logger";
 import { LocationsRepository } from "@/features/device/domain/repositories/locations-repository";
 import {
   LocationModel,

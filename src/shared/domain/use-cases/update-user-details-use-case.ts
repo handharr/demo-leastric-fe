@@ -3,10 +3,10 @@ import { UpdateUserFormData } from "@/shared/domain/params/data-params";
 import {
   BaseErrorModel,
   createErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { UserRepositoryImpl } from "@/shared/infrastructure/repositories-implementation/user-repository-impl";
-import { Logger } from "@/shared/utils/logger/logger";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { Logger } from "@/core/utils/logger/logger";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 export class UpdateUserDetailsUseCase {
   constructor(

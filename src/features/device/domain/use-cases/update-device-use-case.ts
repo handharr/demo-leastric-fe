@@ -6,9 +6,9 @@ import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositor
 import {
   BaseErrorModel,
   createErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { UpdateDeviceFormData } from "@/features/device/domain/params/data-params";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 export class UpdateDeviceUseCase {
   constructor(

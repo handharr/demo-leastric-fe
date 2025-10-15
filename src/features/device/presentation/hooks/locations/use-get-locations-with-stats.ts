@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import { LocationStatsModel } from "@/features/device/domain/entities/locations-models";
 import { GetLocationsWithStatsUseCase } from "@/features/device/domain/use-cases/locations/get-locations-with-stats-use-case";
-import { Logger } from "@/shared/utils/logger/logger";
+import { Logger } from "@/core/utils/logger/logger";
 
 interface UseGetLocationsWithStatsReturn {
   data: LocationStatsModel[] | null;

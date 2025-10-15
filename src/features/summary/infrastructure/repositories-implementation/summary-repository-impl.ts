@@ -2,11 +2,11 @@ import {
   BaseErrorModel,
   createErrorModel,
   mapErrorResponseToModel,
-} from "@/shared/domain/entities/base-error-model";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
-import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import { Logger } from "@/shared/utils/logger/logger";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+} from "@/core/domain/entities/base-error-model";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
+import { isErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
+import { Logger } from "@/core/utils/logger/logger";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import {
   DeviceCurrentMqttLogModel,
   GetDevicesCurrentMqttLogModel,
@@ -34,7 +34,7 @@ import { RemoteSummaryDataSource } from "@/features/summary/infrastructure/data-
 import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
 import { Observable, of } from "rxjs";
 import { map, catchError } from "rxjs/operators";
-import { WebSocketDataSource } from "@/shared/infrastructure/data-source/web-socket-data-source";
+import { WebSocketDataSource } from "@/core/insfrastructure/data-sources/web-socket-data-source";
 import { mapDeviceCurrentMqttLogResponsesToModel } from "../../domain/mapper/summary-mapper";
 
 export class SummaryRepositoryImpl implements SummaryRepository {

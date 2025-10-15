@@ -2,10 +2,10 @@ import {
   BaseErrorModel,
   createErrorModel,
   mapErrorResponseToModel,
-} from "@/shared/domain/entities/base-error-model";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
-import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+} from "@/core/domain/entities/base-error-model";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
+import { isErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import { GetMqttLogsQueryParams } from "@/features/admin-management/domain/params/admin-management-query-params";
 
 import { AdminManagementRepository } from "@/features/admin-management/domain/repository/admin-management-repository";

@@ -6,9 +6,9 @@ import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositor
 import {
   BaseErrorModel,
   createErrorModel,
-} from "@/shared/domain/entities/base-error-model";
-import { Logger } from "@/shared/utils/logger/logger";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+} from "@/core/domain/entities/base-error-model";
+import { Logger } from "@/core/utils/logger/logger";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 export class GetDeviceUseCase {
   constructor(

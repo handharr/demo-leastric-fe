@@ -4,7 +4,7 @@ import {
   DetailLocationResponse,
 } from "@/features/device/infrastructure/models/locations-response";
 import { LocationModel } from "@/features/device/domain/entities/locations-models";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 export const mapLocationResponseToModel = (
   response: LocationResponse

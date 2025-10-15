@@ -7,14 +7,14 @@ import {
   BaseErrorModel,
   isErrorModel,
   createErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { UserModel } from "@/shared/domain/entities/user-model";
 import { mapValidationErrorsToRecord } from "@/shared/utils/helpers/validation-helpers";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import {
   StorageManager,
   STORAGE_KEYS,
-} from "@/shared/utils/helpers/storage-helper";
+} from "@/core/utils/helpers/storage-helper";
 
 export class LoginUseCase {
   constructor(

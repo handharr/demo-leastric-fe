@@ -1,7 +1,7 @@
 import { Pagination } from "@/shared/presentation/components/pagination";
 import Image from "next/image";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
+import { PaginationModel } from "@/core/domain/entities/base-model";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
 import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
 

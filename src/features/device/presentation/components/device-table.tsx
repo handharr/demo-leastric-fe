@@ -1,5 +1,5 @@
 import { StatusBadge } from "@/shared/presentation/components/status-badge";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { EditDeviceModal } from "@/features/device/presentation/components/edit-device-modal";
 import { getDeviceTypeLabel } from "@/features/device/utils/device-helper";
 import {

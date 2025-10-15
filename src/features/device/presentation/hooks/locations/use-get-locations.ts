@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import { GetLocationsUseCase } from "@/features/device/domain/use-cases/locations/get-locations-use-case";
-import { Logger } from "@/shared/utils/logger/logger";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { Logger } from "@/core/utils/logger/logger";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 interface UseGetLocationsReturn {
   data: string[] | null;

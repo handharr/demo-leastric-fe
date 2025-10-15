@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { DateRange } from "@/shared/domain/entities/shared-models";
 import "react-day-picker/dist/style.css";
 import "@/features/summary/presentation/styles/date-range-modal.css";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 interface DateRangeModalProps {
   onClose?: () => void;

@@ -1,14 +1,11 @@
 import mqtt, { MqttClient } from "mqtt";
-import { Logger } from "@/shared/utils/logger/logger";
-import {
-  RetryHandler,
-  RetryOptions,
-} from "@/shared/utils/helpers/retry-helper";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { Logger } from "@/core/utils/logger/logger";
+import { RetryHandler, RetryOptions } from "@/core/utils/helpers/retry-helper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { Observable, Subject, BehaviorSubject } from "rxjs";
 import { filter, share, map } from "rxjs/operators";
-import { createMqttCertConfig } from "@/shared/utils/helpers/mqtt-service-helper";
-import { getMqttConfig } from "@/shared/utils/helpers/mqtt-service-helper";
+import { createMqttCertConfig } from "@/core/utils/helpers/mqtt-service-helper";
+import { getMqttConfig } from "@/core/utils/helpers/mqtt-service-helper";
 
 export type MqttMessage<T = unknown> = {
   topic: string;

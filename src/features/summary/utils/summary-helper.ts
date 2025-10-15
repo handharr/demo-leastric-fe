@@ -16,7 +16,7 @@ import {
   substractDateBySeconds,
 } from "@/shared/utils/helpers/date-helpers";
 import { RealTimeDataPoint } from "@/features/summary/presentation/types/ui";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 /**
  * Aggregates electricity usage data by grouping and summing values for the same period.

@@ -1,7 +1,7 @@
 import {
   BaseErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { GetElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { GetElectricityUsageQueryParams } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";

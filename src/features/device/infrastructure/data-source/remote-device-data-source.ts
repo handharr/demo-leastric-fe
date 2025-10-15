@@ -1,10 +1,10 @@
 import { AxiosError } from "axios";
-import { BaseResponse } from "@/shared/infrastructure/models/base-response";
+import { BaseResponse } from "@/core/insfrastructure/responses/base-response";
 import {
   ApiClient,
   createAuthApiClient,
-} from "@/shared/infrastructure/api/api-client";
-import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
+} from "@/core/insfrastructure/api/api-client";
+import { BaseErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
 import {
   CreateDeviceResponse,
   DeleteDeviceResponse,
@@ -15,7 +15,7 @@ import {
 } from "@/features/device/infrastructure/models/device-response";
 import { CreateDeviceFormData } from "@/features/device/domain/params/data-params";
 import { DeviceDataSource } from "@/features/device/infrastructure/data-source/device-data-source";
-import { Logger } from "@/shared/utils/logger/logger";
+import { Logger } from "@/core/utils/logger/logger";
 import { UpdateDeviceDto } from "@/features/device/infrastructure/params/device-dto";
 
 export class RemoteDeviceDataSource implements DeviceDataSource {

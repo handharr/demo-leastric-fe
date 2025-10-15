@@ -1,17 +1,17 @@
 import { AxiosError } from "axios";
-import { BaseResponse } from "@/shared/infrastructure/models/base-response";
+import { BaseResponse } from "@/core/insfrastructure/responses/base-response";
 import {
   ApiClient,
   createAuthApiClient,
-} from "@/shared/infrastructure/api/api-client";
-import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
+} from "@/core/insfrastructure/api/api-client";
+import { BaseErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
 import {
   GetLocationsWithStatsResponse,
   GetLocationsResponse,
   GetLocationsWithDetailResponse,
 } from "@/features/device/infrastructure/models/locations-response";
 import { LocationDataSource } from "@/features/device/infrastructure/data-source/location-data-source";
-import { Logger } from "@/shared/utils/logger/logger";
+import { Logger } from "@/core/utils/logger/logger";
 
 export class RemoteLocationsDataSource implements LocationDataSource {
   private apiClient: ApiClient;

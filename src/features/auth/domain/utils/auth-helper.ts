@@ -2,7 +2,7 @@ import { UserModel } from "@/shared/domain/entities/user-model";
 import {
   StorageManager,
   STORAGE_KEYS,
-} from "@/shared/utils/helpers/storage-helper";
+} from "@/core/utils/helpers/storage-helper";
 
 /**
  * Authentication helper utilities

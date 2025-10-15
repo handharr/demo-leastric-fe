@@ -2,8 +2,8 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { GetDeviceUseCase } from "@/features/device/domain/use-cases/get-device-use-case";
 import { DeviceModel } from "@/features/device/domain/entities/device-model";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
-import { isErrorModel } from "@/shared/domain/entities/base-error-model";
-import { Logger } from "@/shared/utils/logger/logger";
+import { isErrorModel } from "@/core/domain/entities/base-error-model";
+import { Logger } from "@/core/utils/logger/logger";
 
 interface UseGetDeviceProps {
   getDevicePathParams: GetDevicePathParams;

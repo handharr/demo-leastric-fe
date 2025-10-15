@@ -1,4 +1,4 @@
-import { MqttUsageResponse } from "@/shared/infrastructure/models/shared-response";
+import { MqttUsageResponse } from "@/shared/infrastructure/responses/shared-response";
 
 export interface MqttLogResponse {
   dateTime?: string;

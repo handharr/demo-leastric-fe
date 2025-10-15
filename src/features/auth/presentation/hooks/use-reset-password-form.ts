@@ -5,9 +5,9 @@ import { ResetPasswordUseCase } from "@/features/auth/domain/use-cases/reset-pas
 import { ResetPasswordValidator } from "@/features/auth/presentation/validation/reset-password-validator";
 import { AuthRepositoryImpl } from "@/features/auth/infrastructure/repositories-implementation/auth-repository-impl";
 import { RemoteAuthDataSource } from "@/features/auth/infrastructure/data-source/remote/remote-auth-data-source";
-import { isErrorModel } from "@/shared/domain/entities/base-error-model";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
-import { Logger } from "@/shared/utils/logger/logger";
+import { isErrorModel } from "@/core/domain/entities/base-error-model";
+import { ErrorType } from "@/core/domain/enums/base-enum";
+import { Logger } from "@/core/utils/logger/logger";
 
 export interface UseResetPasswordFormReturn {
   formData: ResetPasswordPageModel;

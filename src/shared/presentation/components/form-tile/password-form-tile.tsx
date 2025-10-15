@@ -4,8 +4,8 @@ import {
   ChangePasswordValidationError,
   PasswordValidationRule,
 } from "@/features/setting/presentation/validator/change-password-validator";
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useState } from "react";
 import Image from "next/image";
 

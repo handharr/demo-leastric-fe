@@ -1,4 +1,4 @@
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import { GetDevicesCurrentMqttLogModel } from "@/features/summary/domain/entities/summary-models";
 import { GetDevicesCurrentMqttLogQueryParams } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";

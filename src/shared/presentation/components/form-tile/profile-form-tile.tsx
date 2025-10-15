@@ -1,5 +1,5 @@
 import { UserModel } from "@/shared/domain/entities/user-model";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 interface ProfileFormTileProps {
   title?: string;

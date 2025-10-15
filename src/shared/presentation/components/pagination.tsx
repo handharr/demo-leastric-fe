@@ -1,4 +1,4 @@
-import { PaginationModel } from "@/shared/domain/entities/models-interface";
+import { PaginationModel } from "@/core/domain/entities/base-model";
 interface PaginationProps {
   model: PaginationModel;
   onPageChange: (page: number) => void;

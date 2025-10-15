@@ -3,9 +3,9 @@ import {
   BaseErrorModel,
   createErrorModel,
   mapErrorResponseToModel,
-} from "@/shared/domain/entities/base-error-model";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
-import { isErrorResponse } from "@/shared/infrastructure/models/base-error-response";
+} from "@/core/domain/entities/base-error-model";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
+import { isErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
 import { GetDevicePathParams } from "@/features/device/domain/params/path-params";
 import {
   DeviceModel,
@@ -17,13 +17,13 @@ import {
   UpdateDeviceFormData,
 } from "@/features/device/domain/params/data-params";
 import { DeviceDataSource } from "@/features/device/infrastructure/data-source/device-data-source";
-import { Logger } from "@/shared/utils/logger/logger";
+import { Logger } from "@/core/utils/logger/logger";
 import { getDeviceType } from "@/features/device/utils/device-helper";
 import {
   mapCreateDeviceFormDataToDto,
   mapUpdateDeviceFormDataToDto,
 } from "@/features/device/domain/mapper/device-params-mapper";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import { GetAllDevicesQueryParams } from "@/features/device/domain/params/query-params";
 import { DeviceType } from "@/shared/domain/enum/enums";
 

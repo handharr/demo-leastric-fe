@@ -3,8 +3,8 @@ import { RefreshTokenResponse } from "@/features/auth/infrastructure/models/logi
 import { ValidateTokenResponse } from "@/features/auth/infrastructure/models/login/validate-token-response";
 import { ResetPasswordResponse } from "@/features/auth/infrastructure/models/reset-password/reset-password-response";
 import { ResetPasswordData } from "@/features/auth/domain/params/data/reset-password-data";
-import { BaseResponse } from "@/shared/infrastructure/models/base-response";
-import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
+import { BaseResponse } from "@/core/insfrastructure/responses/base-response";
+import { BaseErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
 import { UpdatePasswordDto } from "@/features/auth/infrastructure/params/auth-dto";
 import {
   LogoutResponse,

@@ -1,6 +1,6 @@
 import { AxiosError, AxiosResponse } from "axios";
-import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import { Logger } from "@/shared/utils/logger/logger";
+import { BaseErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
+import { Logger } from "@/core/utils/logger/logger";
 
 /**
  * Handles and standardizes error responses from Axios HTTP requests.

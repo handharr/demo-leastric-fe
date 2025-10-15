@@ -2,12 +2,12 @@ import { useState, useCallback } from "react";
 import {
   BaseErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { GetElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { GetElectricityUsageQueryParams } from "@/features/summary/domain/params/query-params";
 import { GetElectricityUsageUseCase } from "@/features/summary/domain/use-cases/get-electricity-usage-use-case";
-import { Logger } from "@/shared/utils/logger/logger";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { Logger } from "@/core/utils/logger/logger";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
 import {
   formatDateToStringLocal,

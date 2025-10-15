@@ -1,6 +1,6 @@
 "use client";
 
-import { Logger } from "@/shared/utils/logger/logger";
+import { Logger } from "@/core/utils/logger/logger";
 
 export const getMqttConfig = () => ({
   brokerUrl:

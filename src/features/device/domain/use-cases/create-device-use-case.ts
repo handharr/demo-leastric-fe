@@ -1,13 +1,13 @@
 import {
   BaseErrorModel,
   createErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { DeviceRepository } from "@/features/device/domain/repositories/device-repository";
 import { CreateDeviceFormData } from "@/features/device/domain/params/data-params";
 import { DeviceModel } from "@/features/device/domain/entities/device-model";
 import { DeviceRepositoryImpl } from "@/features/device/infrastructure/repositories-implementation/device-repository-impl";
 import { RemoteDeviceDataSource } from "@/features/device/infrastructure/data-source/remote-device-data-source";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 export class CreateDeviceUseCase {
   constructor(

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { UpdateUserDetailsUseCase } from "@/shared/domain/use-cases/update-user-details-use-case";
 import { UpdateUserFormData } from "@/shared/domain/params/data-params";
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 
 export function useUpdateUserDetails() {
   const [loading, setLoading] = useState(false);

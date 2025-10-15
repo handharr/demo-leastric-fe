@@ -3,12 +3,12 @@ import { GetAllDevicesUseCase } from "@/features/device/domain/use-cases/get-all
 import {
   BaseErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
-import { Logger } from "@/shared/utils/logger/logger";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+} from "@/core/domain/entities/base-error-model";
+import { Logger } from "@/core/utils/logger/logger";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useCallback, useEffect, useState } from "react";
 import { GetAllDevicesQueryParams } from "@/features/device/domain/params/query-params";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 export interface UseGetHundredDevicesReturn {
   devices: DeviceModel[];

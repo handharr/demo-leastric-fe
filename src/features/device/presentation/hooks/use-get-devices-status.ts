@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import { GetDevicesStatusUseCase } from "@/features/device/domain/use-cases/get-devices-status-use-case";
 import { GetDevicesStatusModel } from "@/features/device/domain/entities/device-model";
-import { isErrorModel } from "@/shared/domain/entities/base-error-model";
-import { Logger } from "@/shared/utils/logger/logger";
+import { isErrorModel } from "@/core/domain/entities/base-error-model";
+import { Logger } from "@/core/utils/logger/logger";
 
 export interface UseGetDevicesStatusReturn {
   devicesStatus: GetDevicesStatusModel | null;

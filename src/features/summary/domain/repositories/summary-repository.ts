@@ -1,4 +1,4 @@
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import {
   GetDevicesCurrentMqttLogModel,
   GetElectricityUsageHistoryModel,

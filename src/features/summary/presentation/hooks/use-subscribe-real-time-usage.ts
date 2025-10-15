@@ -2,9 +2,9 @@ import { useState, useCallback } from "react";
 import {
   BaseErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
-import { Logger } from "@/shared/utils/logger/logger";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+} from "@/core/domain/entities/base-error-model";
+import { Logger } from "@/core/utils/logger/logger";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 import { MqttUsageAggregatedModel } from "@/shared/domain/entities/shared-models";
 import { Observable, Subscription } from "rxjs";
 import { SubscribeRealTimeUsageUseCase } from "@/shared/domain/use-cases/subscribe-real-time-use-case";

@@ -1,10 +1,10 @@
-import { BaseResponse } from "@/shared/infrastructure/models/base-response";
-import { BaseErrorResponse } from "@/shared/infrastructure/models/base-error-response";
-import { Logger } from "@/shared/utils/logger/logger";
+import { BaseResponse } from "@/core/insfrastructure/responses/base-response";
+import { BaseErrorResponse } from "@/core/insfrastructure/responses/base-error-response";
+import { Logger } from "@/core/utils/logger/logger";
 import {
   ApiClient,
   createAuthApiClient,
-} from "@/shared/infrastructure/api/api-client";
+} from "@/core/insfrastructure/api/api-client";
 import {
   GetUsageSummaryResponse,
   GetElectricityUsageResponse,

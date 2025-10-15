@@ -1,4 +1,4 @@
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 export interface BaseErrorResponse {
   statusCode?: number;
   timestamp?: string;

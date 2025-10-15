@@ -7,9 +7,9 @@ import {
   BaseErrorModel,
   createErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 import { mapValidationErrorsToRecord } from "@/shared/utils/helpers/validation-helpers";
-import { ErrorType } from "@/shared/domain/enum/base-enum";
+import { ErrorType } from "@/core/domain/enums/base-enum";
 
 export class ResetPasswordUseCase {
   constructor(private authRepository: AuthRepository) {}

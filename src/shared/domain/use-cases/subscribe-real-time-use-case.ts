@@ -1,13 +1,13 @@
 import { Observable } from "rxjs";
-import { BaseErrorModel } from "@/shared/domain/entities/base-error-model";
+import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import {
   MqttUsageAggregatedModel,
   MqttUsageModel,
 } from "@/shared/domain/entities/shared-models";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";
-import { Logger } from "@/shared/utils/logger/logger";
+import { Logger } from "@/core/utils/logger/logger";
 import { SummaryRepositoryImpl } from "@/features/summary/infrastructure/repositories-implementation/summary-repository-impl";
-import { optionalValue } from "@/shared/utils/wrappers/optional-wrapper";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 export class SubscribeRealTimeUsageUseCase {
   constructor(

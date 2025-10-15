@@ -6,7 +6,7 @@ import {
   BaseErrorModel,
   createErrorModel,
   isErrorModel,
-} from "@/shared/domain/entities/base-error-model";
+} from "@/core/domain/entities/base-error-model";
 
 interface UseUpdatePasswordReturn {
   data: UpdatePasswordModel | null;

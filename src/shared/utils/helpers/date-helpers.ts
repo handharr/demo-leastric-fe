@@ -319,6 +319,36 @@ export function getCurrentMonthDateRangeUntilToday(): DateRange {
 }
 
 /**
+ * Gets the date range for the current month.
+ * Useful for getting month-to-date data including future dates.
+ *
+ * @returns DateRange object for the current month
+ *
+ * @example
+ * ```typescript
+ * const range = getCurrentMonthDateRange();
+ * // Output:
+ * // {
+ * //   startDate: Date("2023-10-01T00:00:00.000"),
+ * //   endDate: Date("2023-10-31T23:59:59.999")
+ * // }
+ * ```
+ */
+export function getCurrentMonthDateRange(): DateRange {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-based (0 = January, 11 = December)
+
+  const startDate = new Date(currentYear, currentMonth, 1, 0, 0, 0, 0);
+  const endDate = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999);
+
+  return {
+    startDate,
+    endDate,
+  };
+}
+
+/**
  * Gets an array of year strings going back 10 years from current year.
  * Returns years in descending order (most recent first).
  *
@@ -657,10 +687,20 @@ export function convertDateToJakartaTimezone(date?: Date): Date {
  * ```
  */
 export function convertDateToUTC(date?: Date): Date {
-  // Get UTC date helpers
   if (!date) {
     date = new Date();
   }
 
-  return new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
+  // Create a new Date object with UTC values matching the local time components
+  return new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+      date.getMilliseconds()
+    )
+  );
 }

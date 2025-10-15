@@ -32,6 +32,13 @@ import {
 import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 import { useGetLocations } from "@/features/device/presentation/hooks/locations/use-get-locations";
+import { useGetGeneratePdfReport } from "@/features/summary/presentation/hooks/use-get-generate-pdf-report";
+import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
+import { GetGeneratePdfReportQueryParams } from "@/features/summary/domain/params/query-params";
+import {
+  convertDateToUTC,
+  getCurrentMonthDateRange,
+} from "@/shared/utils/helpers/date-helpers";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -82,6 +89,30 @@ export default function SummaryPage() {
     error: getLocationsError,
     reset: getLocationsReset,
   } = useGetLocations();
+  const {
+    execute: getPdfReport,
+    error: errorGeneratePdfReport,
+    loading: loadingGeneratePdfReport,
+    reset: resetGeneratePdfReport,
+  } = useGetGeneratePdfReport((data) => {
+    if (data && data.fileUrl) {
+      // Create a temporary link for download
+      const link = document.createElement("a");
+      link.href = data.fileUrl;
+      link.download = data.fileName;
+      link.target = "_blank";
+      link.style.display = "none";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showPopup("PDF report download started!", PopupType.SUCCESS);
+    } else {
+      showPopup("Invalid PDF report URL received.", PopupType.ERROR);
+    }
+    resetGeneratePdfReport?.();
+  });
 
   const locationOptions: FilterOption[] = locations
     ? [
@@ -132,16 +163,26 @@ export default function SummaryPage() {
       );
       getLocationsReset();
     }
+
+    if (errorGeneratePdfReport) {
+      showPopup(
+        `Error generating PDF report: ${errorGeneratePdfReport.message}`,
+        PopupType.ERROR
+      );
+      resetGeneratePdfReport?.();
+    }
   }, [
     errorSummary,
     errorElectricityUsage,
     electricityUsageHistoryError,
     getLocationsError,
+    errorGeneratePdfReport,
     showPopup,
     resetSummary,
     resetElectricityUsage,
     resetElectricityUsageHistory,
     getLocationsReset,
+    resetGeneratePdfReport,
   ]);
 
   useEffect(() => {
@@ -183,7 +224,25 @@ export default function SummaryPage() {
           clearFiltersLabel="Clear Filters"
         />
         <button className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer">
-          Export
+          {loadingGeneratePdfReport ? (
+            <LoadingSpinner size="sm" />
+          ) : (
+            <span
+              onClick={() => {
+                const { startDate, endDate } = getCurrentMonthDateRange();
+                // Trigger PDF generation with current filter values
+                const _startDate = convertDateToUTC(startDate).toISOString();
+                const _endDate = convertDateToUTC(endDate).toISOString();
+                const queryParams: GetGeneratePdfReportQueryParams = {
+                  startDate: _startDate,
+                  endDate: _endDate,
+                };
+                getPdfReport(queryParams);
+              }}
+            >
+              Export PDF
+            </span>
+          )}
         </button>
       </div>
 

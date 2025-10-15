@@ -94,20 +94,50 @@ export default function SummaryPage() {
     error: errorGeneratePdfReport,
     loading: loadingGeneratePdfReport,
     reset: resetGeneratePdfReport,
-  } = useGetGeneratePdfReport((data) => {
+  } = useGetGeneratePdfReport(async (data) => {
     if (data && data.fileUrl) {
-      // Create a temporary link for download
-      const link = document.createElement("a");
-      link.href = data.fileUrl;
-      link.download = data.fileName;
-      link.target = "_blank";
-      link.style.display = "none";
+      try {
+        // Fetch the file as blob
+        const response = await fetch(data.fileUrl, {
+          method: "GET",
+          headers: {
+            Accept: "application/pdf",
+          },
+        });
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      showPopup("PDF report download started!", PopupType.SUCCESS);
+        const blob = await response.blob();
+
+        // Create object URL
+        const url = window.URL.createObjectURL(blob);
+
+        // Create download link
+        const link = document.createElement("a");
+        link.href = url;
+        link.download =
+          data.fileName ||
+          `electricity-report-${new Date().toISOString().split("T")[0]}.pdf`;
+        link.style.display = "none";
+
+        // Add to DOM and click
+        document.body.appendChild(link);
+        link.click();
+
+        // Clean up
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        showPopup("PDF report downloaded successfully!", PopupType.SUCCESS);
+      } catch (error) {
+        console.error("Download error:", error);
+        showPopup(
+          "Failed to download PDF report. Please try again.",
+          PopupType.ERROR
+        );
+      }
     } else {
       showPopup("Invalid PDF report URL received.", PopupType.ERROR);
     }

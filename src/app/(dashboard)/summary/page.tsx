@@ -39,6 +39,7 @@ import {
   convertDateToUTC,
   getCurrentMonthDateRange,
 } from "@/shared/utils/helpers/date-helpers";
+import { pdfDownloadHelper } from "@/core/utils/helpers/file-download-helper";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -97,42 +98,10 @@ export default function SummaryPage() {
   } = useGetGeneratePdfReport(async (data) => {
     if (data && data.fileUrl) {
       try {
-        // Fetch the file as blob
-        const response = await fetch(data.fileUrl, {
-          method: "GET",
-          headers: {
-            Accept: "application/pdf",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const blob = await response.blob();
-
-        // Create object URL
-        const url = window.URL.createObjectURL(blob);
-
-        // Create download link
-        const link = document.createElement("a");
-        link.href = url;
-        link.download =
-          data.fileName ||
-          `electricity-report-${new Date().toISOString().split("T")[0]}.pdf`;
-        link.style.display = "none";
-
-        // Add to DOM and click
-        document.body.appendChild(link);
-        link.click();
-
-        // Clean up
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        await pdfDownloadHelper(data.fileUrl, data.fileName);
 
         showPopup("PDF report downloaded successfully!", PopupType.SUCCESS);
-      } catch (error) {
-        console.error("Download error:", error);
+      } catch {
         showPopup(
           "Failed to download PDF report. Please try again.",
           PopupType.ERROR

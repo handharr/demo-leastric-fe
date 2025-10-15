@@ -27,3 +27,9 @@ export interface GetExportToCsvQueryParams {
 export interface GetDevicesCurrentMqttLogQueryParams {
   location?: string; // e.g., "Building A"
 }
+
+export interface GetGeneratePdfReportQueryParams {
+  startDate?: string;
+  endDate?: string;
+  companyName?: string;
+}

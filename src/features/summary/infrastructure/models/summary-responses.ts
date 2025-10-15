@@ -114,3 +114,9 @@ export interface DeviceCurrentMqttLogResponse {
 export interface GetDevicesCurrentMqttLogResponse {
   devices?: DeviceCurrentMqttLogResponse[];
 }
+
+export interface GetGeneratePdfReportResponse {
+  message?: string;
+  fileUrl?: string;
+  fileName?: string;
+}

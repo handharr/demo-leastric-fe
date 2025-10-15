@@ -13,6 +13,7 @@ import {
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
   GetExportToCsvModel,
+  GetGeneratePdfReportModel,
   GetUsageSummaryModel,
 } from "@/features/summary/domain/entities/summary-models";
 import {
@@ -21,6 +22,7 @@ import {
   GetElectricityUsageHistoryQueryParams,
   GetExportToCsvQueryParams,
   GetDevicesCurrentMqttLogQueryParams,
+  GetGeneratePdfReportQueryParams,
 } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
@@ -540,6 +542,43 @@ export class SummaryRepositoryImpl implements SummaryRepository {
         message:
           result.flash?.message ||
           "Failed to retrieve devices current MQTT log. Please try again.",
+      });
+    }
+  }
+
+  async getGeneratePdfReport({
+    queryParam,
+  }: {
+    queryParam: GetGeneratePdfReportQueryParams;
+  }): Promise<GetGeneratePdfReportModel | BaseErrorModel> {
+    Logger.info("SummaryRepositoryImpl", "getGeneratePdfReport", queryParam);
+    const result = await this.dataSource.getGeneratePdfReport({
+      params: { ...queryParam },
+    });
+
+    if (isErrorResponse(result)) {
+      Logger.error("SummaryRepositoryImpl", "getGeneratePdfReport", result);
+      return mapErrorResponseToModel({ response: result });
+    }
+
+    Logger.info("SummaryRepositoryImpl", "getGeneratePdfReport result", result);
+    if (result.flash?.type === "success") {
+      return {
+        message: optionalValue(result.data?.message).orEmpty(),
+        fileUrl: optionalValue(result.data?.fileUrl).orEmpty(),
+        fileName: optionalValue(result.data?.fileName).orEmpty(),
+      };
+    } else {
+      Logger.error(
+        "SummaryRepositoryImpl",
+        "getGeneratePdfReport - unexpected flash type",
+        result
+      );
+      return createErrorModel({
+        type: ErrorType.UNEXPECTED,
+        message:
+          result.flash?.message ||
+          "Failed to retrieve generate PDF report. Please try again.",
       });
     }
   }

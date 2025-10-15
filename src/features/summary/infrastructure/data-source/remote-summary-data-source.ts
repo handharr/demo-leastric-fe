@@ -10,6 +10,7 @@ import {
   GetElectricityUsageResponse,
   GetExportToCsvResponse,
   GetDevicesCurrentMqttLogResponse,
+  GetGeneratePdfReportResponse,
 } from "@/features/summary/infrastructure/models/summary-responses";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
 import { AxiosError } from "axios";
@@ -144,6 +145,33 @@ export class RemoteSummaryDataSource implements SummaryDataSource {
       return this.apiClient.handleError(
         error as AxiosError<BaseErrorResponse>,
         "Failed to fetch devices current MQTT log. Please try again."
+      );
+    }
+  }
+
+  async getGeneratePdfReport({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<BaseResponse<GetGeneratePdfReportResponse> | BaseErrorResponse> {
+    try {
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
+      return await this.apiClient.get(
+        `v1/readings/generate-pdf-report`,
+        params,
+        {
+          headers,
+        }
+      );
+    } catch (error) {
+      Logger.error("Error generating PDF report", error);
+      return this.apiClient.handleError(
+        error as AxiosError<BaseErrorResponse>,
+        "Failed to generate PDF report. Please try again."
       );
     }
   }

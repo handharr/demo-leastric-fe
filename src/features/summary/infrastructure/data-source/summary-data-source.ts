@@ -5,6 +5,7 @@ import {
   GetElectricityUsageResponse,
   GetExportToCsvResponse,
   GetDevicesCurrentMqttLogResponse,
+  GetGeneratePdfReportResponse,
 } from "@/features/summary/infrastructure/models/summary-responses";
 
 export interface SummaryDataSource {
@@ -35,4 +36,9 @@ export interface SummaryDataSource {
   }): Promise<
     BaseResponse<GetDevicesCurrentMqttLogResponse> | BaseErrorResponse
   >;
+  getGeneratePdfReport({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<BaseResponse<GetGeneratePdfReportResponse> | BaseErrorResponse>;
 }

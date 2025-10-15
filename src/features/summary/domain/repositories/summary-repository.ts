@@ -4,6 +4,7 @@ import {
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
   GetExportToCsvModel,
+  GetGeneratePdfReportModel,
   GetUsageSummaryModel,
 } from "@/features/summary/domain/entities/summary-models";
 import {
@@ -12,6 +13,7 @@ import {
   GetElectricityUsageHistoryQueryParams,
   GetExportToCsvQueryParams,
   GetDevicesCurrentMqttLogQueryParams,
+  GetGeneratePdfReportQueryParams,
 } from "@/features/summary/domain/params/query-params";
 import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
 import { Observable } from "rxjs";
@@ -43,4 +45,9 @@ export interface SummaryRepository {
   }: {
     queryParam: GetDevicesCurrentMqttLogQueryParams;
   }): Promise<GetDevicesCurrentMqttLogModel | BaseErrorModel>;
+  getGeneratePdfReport({
+    queryParam,
+  }: {
+    queryParam: GetGeneratePdfReportQueryParams;
+  }): Promise<GetGeneratePdfReportModel | BaseErrorModel>;
 }

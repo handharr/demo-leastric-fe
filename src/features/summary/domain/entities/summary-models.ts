@@ -146,3 +146,9 @@ export interface DeviceCurrentMqttLogModel {
 export interface GetDevicesCurrentMqttLogModel {
   devices: DeviceCurrentMqttLogModel[];
 }
+
+export interface GetGeneratePdfReportModel {
+  message: string;
+  fileUrl: string;
+  fileName: string;
+}

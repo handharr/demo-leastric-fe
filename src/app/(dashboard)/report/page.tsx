@@ -54,7 +54,6 @@ export default function ReportPage() {
     loading: useGetExportToCsvLoading,
     error: useGetExportToCsvError,
     fetchExportToCsv: fetchExportToCsv,
-    fetchBulkData: fetchExportToCsvBulk,
     reset: resetExportToCsv,
   } = useGetExportToCsv();
 
@@ -119,34 +118,31 @@ export default function ReportPage() {
       showPopup("Please select at least one record to export.", PopupType.INFO);
       return;
     }
-    const paramsArray: GetExportToCsvQueryParams[] = selectedIds
-      .map((period) => {
-        const record = usageHistory.find((item) => item.period === period);
-        if (!record) {
-          showPopup(`Record for period ${period} not found.`, PopupType.ERROR);
-          return null;
-        }
-        const selectedPeriod = optionalValue(new Date(record.period)).orToday();
-        const dateRangeMonth =
-          getStartAndEndDateOfMonthFromDate(selectedPeriod);
-        return {
-          startDate: formatDateToStringUTCWithoutMs(dateRangeMonth.startDate),
-          endDate: formatDateToStringUTCWithoutMs(dateRangeMonth.endDate),
-        };
-      })
-      .filter(
-        (param): param is { startDate: string; endDate: string } =>
-          param !== null
-      );
+    // get the earliest and latest item from selectedIds
+    const selectedIdOnDates = selectedIds.map((id) =>
+      optionalValue(new Date(id)).orToday()
+    );
+    selectedIdOnDates.sort((a, b) => a.getTime() - b.getTime());
+    const earliestDate = selectedIdOnDates[0];
+    const latestDate = selectedIdOnDates[selectedIdOnDates.length - 1];
 
-    fetchExportToCsvBulk(paramsArray);
-  }, [
-    selectedIds,
-    showPopup,
-    usageHistory,
-    useGetExportToCsvLoading,
-    fetchExportToCsvBulk,
-  ]);
+    const startDate = getStartAndEndDateOfMonthFromDate(earliestDate).startDate;
+    const endDate = getStartAndEndDateOfMonthFromDate(latestDate).endDate;
+
+    // Additional safety check: Ensure that startDate is not after endDate
+    if (startDate > endDate) {
+      showPopup(
+        "Calculated start date is after end date. Please check your selection.",
+        PopupType.ERROR
+      );
+    }
+
+    const params: GetExportToCsvQueryParams = {
+      startDate: formatDateToStringUTCWithoutMs(startDate),
+      endDate: formatDateToStringUTCWithoutMs(endDate),
+    };
+    fetchExportToCsv(params);
+  }, [selectedIds, showPopup, useGetExportToCsvLoading, fetchExportToCsv]);
 
   const handleDownloadSingle = useCallback(
     (row: ElectricityUsageModel) => {
@@ -214,7 +210,9 @@ export default function ReportPage() {
           {useGetExportToCsvLoading ? (
             <LoadingSpinner size="sm" />
           ) : (
-            <span>Download</span>
+            <span>
+              Download {selectedIds.length > 0 ? `(${selectedIds.length})` : ""}{" "}
+            </span>
           )}
         </button>
       </div>

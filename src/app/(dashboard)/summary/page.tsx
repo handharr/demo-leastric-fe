@@ -39,7 +39,6 @@ import {
   convertDateToUTC,
   getCurrentMonthDateRange,
 } from "@/shared/utils/helpers/date-helpers";
-import { pdfDownloadHelper } from "@/core/utils/helpers/file-download-helper";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -94,24 +93,9 @@ export default function SummaryPage() {
     execute: getPdfReport,
     error: errorGeneratePdfReport,
     loading: loadingGeneratePdfReport,
+    successMessage: successMessageGeneratePdfReport,
     reset: resetGeneratePdfReport,
-  } = useGetGeneratePdfReport(async (data) => {
-    if (data && data.fileUrl) {
-      try {
-        await pdfDownloadHelper(data.fileUrl, data.fileName);
-
-        showPopup("PDF report downloaded successfully!", PopupType.SUCCESS);
-      } catch {
-        showPopup(
-          "Failed to download PDF report. Please try again.",
-          PopupType.ERROR
-        );
-      }
-    } else {
-      showPopup("Invalid PDF report URL received.", PopupType.ERROR);
-    }
-    resetGeneratePdfReport?.();
-  });
+  } = useGetGeneratePdfReport();
 
   const locationOptions: FilterOption[] = locations
     ? [
@@ -170,12 +154,18 @@ export default function SummaryPage() {
       );
       resetGeneratePdfReport?.();
     }
+
+    if (successMessageGeneratePdfReport) {
+      showPopup(successMessageGeneratePdfReport, PopupType.SUCCESS);
+      resetGeneratePdfReport?.();
+    }
   }, [
     errorSummary,
     errorElectricityUsage,
     electricityUsageHistoryError,
     getLocationsError,
     errorGeneratePdfReport,
+    successMessageGeneratePdfReport,
     showPopup,
     resetSummary,
     resetElectricityUsage,

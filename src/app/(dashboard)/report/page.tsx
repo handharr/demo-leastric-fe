@@ -20,7 +20,10 @@ import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useGetExportToCsv } from "@/features/summary/presentation/hooks/use-get-export-to-csv";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
-import { GetExportToCsvQueryParams } from "@/features/summary/domain/params/query-params";
+import {
+  GetExportToCsvQueryParams,
+  GetGeneratePdfReportQueryParams,
+} from "@/features/summary/domain/params/query-params";
 import {
   formatDateToStringUTCWithoutMs,
   getStartAndEndDateOfMonthFromDate,
@@ -28,6 +31,7 @@ import {
 import { useGetHundredDevices } from "@/features/summary/presentation/hooks/use-get-hundred-devices";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
+import { useGetGeneratePdfReport } from "@/features/summary/presentation/hooks/use-get-generate-pdf-report";
 
 type ExportFormat = "csv" | "pdf";
 
@@ -57,9 +61,17 @@ export default function ReportPage() {
   const {
     loading: useGetExportToCsvLoading,
     error: useGetExportToCsvError,
+    successMessage: useGetExportToCsvSuccessMessage,
     fetchExportToCsv: fetchExportToCsv,
     reset: resetExportToCsv,
   } = useGetExportToCsv();
+  const {
+    execute: getPdfReport,
+    error: errorGeneratePdfReport,
+    loading: loadingGeneratePdfReport,
+    successMessage: successMessageGeneratePdfReport,
+    reset: resetGeneratePdfReport,
+  } = useGetGeneratePdfReport();
 
   useEffect(() => {
     if (useGetElectricityUsageHistoryError) {
@@ -90,14 +102,38 @@ export default function ReportPage() {
       );
       resetHundredDevices();
     }
+
+    if (useGetExportToCsvSuccessMessage) {
+      showPopup(useGetExportToCsvSuccessMessage, PopupType.SUCCESS);
+      resetExportToCsv();
+    }
+
+    if (errorGeneratePdfReport) {
+      showPopup(
+        optionalValue(errorGeneratePdfReport?.message).orDefault(
+          "Failed to generate PDF report"
+        ),
+        PopupType.ERROR
+      );
+      resetGeneratePdfReport?.();
+    }
+
+    if (successMessageGeneratePdfReport) {
+      showPopup(successMessageGeneratePdfReport, PopupType.SUCCESS);
+      resetGeneratePdfReport?.();
+    }
   }, [
     useGetElectricityUsageHistoryError,
     useGetHundredDevicesError,
+    useGetExportToCsvSuccessMessage,
+    useGetExportToCsvError,
+    errorGeneratePdfReport,
+    successMessageGeneratePdfReport,
     showPopup,
     resetUsageHistory,
     resetExportToCsv,
-    useGetExportToCsvError,
     resetHundredDevices,
+    resetGeneratePdfReport,
   ]);
 
   useEffect(() => {
@@ -117,7 +153,7 @@ export default function ReportPage() {
   }, [fetchUsageHistory, activeFilters]);
 
   const handleDownload = useCallback(() => {
-    if (useGetExportToCsvLoading) return;
+    if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
     if (selectedIds.length === 0) {
       showPopup("Please select at least one record to export.", PopupType.INFO);
       return;
@@ -144,27 +180,32 @@ export default function ReportPage() {
 
     if (exportFormat === "csv") {
       const params: GetExportToCsvQueryParams = {
-        startDate: formatDateToStringUTCWithoutMs(startDate),
-        endDate: formatDateToStringUTCWithoutMs(endDate),
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
       };
 
       fetchExportToCsv(params);
     } else {
-      // TODO: Implement PDF export hook/function
-      // fetchExportToPdf(params);
-      showPopup("PDF export is not implemented yet.", PopupType.INFO);
+      const params: GetGeneratePdfReportQueryParams = {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      };
+
+      getPdfReport(params);
     }
   }, [
     selectedIds,
-    showPopup,
-    useGetExportToCsvLoading,
-    fetchExportToCsv,
     exportFormat,
+    useGetExportToCsvLoading,
+    loadingGeneratePdfReport,
+    showPopup,
+    fetchExportToCsv,
+    getPdfReport,
   ]);
 
   const handleDownloadSingle = useCallback(
     (row: ElectricityUsageModel) => {
-      if (useGetExportToCsvLoading) {
+      if (useGetExportToCsvLoading || loadingGeneratePdfReport) {
         showPopup(
           "Please wait until the current export is finished.",
           PopupType.INFO
@@ -173,12 +214,30 @@ export default function ReportPage() {
       }
       const selectedPeriod = optionalValue(new Date(row.period)).orToday();
       const dateRangeMonth = getStartAndEndDateOfMonthFromDate(selectedPeriod);
-      fetchExportToCsv({
-        startDate: dateRangeMonth.startDate.toISOString(),
-        endDate: dateRangeMonth.endDate.toISOString(),
-      });
+
+      if (exportFormat === "pdf") {
+        const params: GetGeneratePdfReportQueryParams = {
+          startDate: formatDateToStringUTCWithoutMs(dateRangeMonth.startDate),
+          endDate: formatDateToStringUTCWithoutMs(dateRangeMonth.endDate),
+        };
+        getPdfReport(params);
+        return;
+      }
+
+      const params: GetExportToCsvQueryParams = {
+        startDate: formatDateToStringUTCWithoutMs(dateRangeMonth.startDate),
+        endDate: formatDateToStringUTCWithoutMs(dateRangeMonth.endDate),
+      };
+      fetchExportToCsv(params);
     },
-    [useGetExportToCsvLoading, fetchExportToCsv, showPopup]
+    [
+      useGetExportToCsvLoading,
+      loadingGeneratePdfReport,
+      exportFormat,
+      getPdfReport,
+      fetchExportToCsv,
+      showPopup,
+    ]
   );
 
   const devicesOptions: FilterOption[] = devices
@@ -221,7 +280,7 @@ export default function ReportPage() {
         />
 
         {/* Export Section */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {/* Export Format Dropdown */}
           <Dropdown
             options={["CSV", "PDF"]}
@@ -229,17 +288,21 @@ export default function ReportPage() {
             onChange={(option) => {
               setExportFormat(option.toLowerCase() as ExportFormat);
             }}
-            disabled={useGetExportToCsvLoading}
-            buttonClassName="px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={useGetExportToCsvLoading || loadingGeneratePdfReport}
+            buttonClassName="px-3 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap"
           />
 
           {/* Export Button */}
           <button
-            disabled={selectedIds.length === 0 || useGetExportToCsvLoading}
-            className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={
+              selectedIds.length === 0 ||
+              useGetExportToCsvLoading ||
+              loadingGeneratePdfReport
+            }
+            className="flex items-center gap-2 px-3 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap"
             onClick={handleDownload}
           >
-            {useGetExportToCsvLoading ? (
+            {useGetExportToCsvLoading || loadingGeneratePdfReport ? (
               <LoadingSpinner size="sm" />
             ) : (
               <span>
@@ -262,10 +325,12 @@ export default function ReportPage() {
       <ReportTable
         data={usageHistory}
         pagination={pagination}
-        isLoading={useGetElectricityUsageHistoryLoading}
+        isLoading={
+          useGetElectricityUsageHistoryLoading || loadingGeneratePdfReport
+        }
         selectedIds={selectedIds}
         handleRowSelect={(id) => {
-          if (useGetExportToCsvLoading) return;
+          if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
           setSelectedIds((prev) =>
             prev.includes(id)
               ? prev.filter((rowId) => rowId !== id)
@@ -273,7 +338,7 @@ export default function ReportPage() {
           );
         }}
         handleSelectAll={() => {
-          if (useGetExportToCsvLoading) return;
+          if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
           setSelectedIds((prev) =>
             prev.length === usageHistory.length
               ? []
@@ -281,7 +346,7 @@ export default function ReportPage() {
           );
         }}
         gotoPage={(page) => {
-          if (useGetExportToCsvLoading) return;
+          if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
           const selectedYear = optionalValue(
             activeFilters.singleSelection?.year
           ).orDefault(new Date().getFullYear().toString());
@@ -298,7 +363,7 @@ export default function ReportPage() {
           });
         }}
         previousPage={() => {
-          if (useGetExportToCsvLoading) return;
+          if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
           const selectedYear = optionalValue(
             activeFilters.singleSelection?.year
           ).orDefault(new Date().getFullYear().toString());
@@ -314,7 +379,7 @@ export default function ReportPage() {
           });
         }}
         nextPage={() => {
-          if (useGetExportToCsvLoading) return;
+          if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
           const selectedYear = optionalValue(
             activeFilters.singleSelection?.year
           ).orDefault(new Date().getFullYear().toString());

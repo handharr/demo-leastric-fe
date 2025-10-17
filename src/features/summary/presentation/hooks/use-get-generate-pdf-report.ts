@@ -3,22 +3,24 @@ import { GetGeneratePdfReportUseCase } from "@/features/summary/domain/use-cases
 import { GetGeneratePdfReportQueryParams } from "@/features/summary/domain/params/query-params";
 import { isErrorModel } from "@/core/domain/entities/base-error-model";
 import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
-import { GetGeneratePdfReportModel } from "@/features/summary/domain/entities/summary-models";
 import { Logger } from "@/core/utils/logger/logger";
 import { ErrorType } from "@/core/domain/enums/base-enum";
+import { pdfDownloadHelper } from "@/core/utils/helpers/file-download-helper";
 
 export interface UseGetGeneratePdfReportReturn {
   execute: (params: GetGeneratePdfReportQueryParams) => void;
   error?: BaseErrorModel;
   loading?: boolean;
+  successMessage?: string;
   reset?: () => void;
 }
 
-export function useGetGeneratePdfReport(
-  onSuccess: (data: GetGeneratePdfReportModel) => void
-): UseGetGeneratePdfReportReturn {
+export function useGetGeneratePdfReport(): UseGetGeneratePdfReportReturn {
   const [error, setError] = useState<BaseErrorModel | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string | undefined>(
+    undefined
+  );
 
   const execute = useCallback(
     async (params: GetGeneratePdfReportQueryParams) => {
@@ -33,7 +35,7 @@ export function useGetGeneratePdfReport(
           Logger.error("useGetGeneratePdfReport - execute:", result);
           setError(result);
         } else {
-          onSuccess(result);
+          await pdfDownloadHelper(result.fileUrl, result.fileName);
         }
       } catch (error) {
         Logger.error("useGetGeneratePdfReport - execute:", error);
@@ -43,13 +45,14 @@ export function useGetGeneratePdfReport(
         });
       }
     },
-    [setError, onSuccess]
+    [setError]
   );
 
   const reset = useCallback(() => {
     setError(undefined);
     setLoading(false);
+    setSuccessMessage(undefined);
   }, []);
 
-  return { execute, error, loading, reset };
+  return { execute, error, loading, successMessage, reset };
 }

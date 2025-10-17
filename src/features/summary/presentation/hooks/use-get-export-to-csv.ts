@@ -11,7 +11,8 @@ import { csvDownloadHelper } from "@/core/utils/helpers/file-download-helper";
 
 export interface UseGetExportToCsvReturn {
   loading: boolean;
-  error: BaseErrorModel | null;
+  error?: BaseErrorModel;
+  successMessage?: string;
   fetchExportToCsv: (params: Partial<GetExportToCsvQueryParams>) => void;
   fetchBulkData: (paramsArray: Partial<GetExportToCsvQueryParams>[]) => void;
   reset: () => void;
@@ -19,14 +20,16 @@ export interface UseGetExportToCsvReturn {
 
 export function useGetExportToCsv(): UseGetExportToCsvReturn {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<BaseErrorModel | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [error, setError] = useState<BaseErrorModel | undefined>(undefined);
+  const [successMessage, setSuccessMessage] = useState<string | undefined>(
+    undefined
+  );
 
   const fetchExportToCsv = async (
     params: Partial<GetExportToCsvQueryParams>
   ) => {
     setLoading(true);
-    setError(null);
+    setError(undefined);
 
     try {
       const useCase = new GetExportToCsvUseCase();
@@ -52,7 +55,7 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
   const fetchBulkData = useCallback(
     async (paramsArray: Partial<GetExportToCsvQueryParams>[]) => {
       setLoading(true);
-      setError(null);
+      setError(undefined);
 
       const results: GetExportToCsvModel[] = [];
       for (const params of paramsArray) {
@@ -81,14 +84,15 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
   );
 
   const reset = () => {
-    setError(null);
+    setError(undefined);
     setLoading(false);
-    setSuccessMessage(null);
+    setSuccessMessage(undefined);
   };
 
   return {
     loading,
     error,
+    successMessage,
     fetchExportToCsv,
     fetchBulkData,
     reset,

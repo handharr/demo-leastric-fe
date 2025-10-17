@@ -9,7 +9,6 @@ import { useCallback, useState } from "react";
 import { GetExportToCsvUseCase } from "@/features/summary/domain/use-cases/get-export-to-csv-use-case";
 
 export interface UseGetExportToCsvReturn {
-  data: GetExportToCsvModel | null;
   bulkData: GetExportToCsvModel[];
   loading: boolean;
   error: BaseErrorModel | null;
@@ -19,7 +18,6 @@ export interface UseGetExportToCsvReturn {
 }
 
 export function useGetExportToCsv(): UseGetExportToCsvReturn {
-  const [data, setData] = useState<GetExportToCsvModel | null>(null);
   const [bulkData, setBulkData] = useState<GetExportToCsvModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<BaseErrorModel | null>(null);
@@ -29,7 +27,6 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
   ) => {
     setLoading(true);
     setError(null);
-    setData(null);
     setBulkData([]);
 
     try {
@@ -42,8 +39,6 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
         setError(result);
         return;
       }
-
-      setData(result);
     } catch (err) {
       const errorModel = createErrorModel(err as Error);
       setError(errorModel);
@@ -56,7 +51,6 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
     async (paramsArray: Partial<GetExportToCsvQueryParams>[]) => {
       setLoading(true);
       setError(null);
-      setData(null);
       setBulkData([]);
 
       const results: GetExportToCsvModel[] = [];
@@ -87,14 +81,12 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
   );
 
   const reset = () => {
-    setData(null);
     setError(null);
     setLoading(false);
     setBulkData([]);
   };
 
   return {
-    data,
     bulkData,
     loading,
     error,

@@ -19,11 +19,7 @@ import { TimePeriod } from "@/shared/domain/enum/enums";
 import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useGetExportToCsv } from "@/features/summary/presentation/hooks/use-get-export-to-csv";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
-import {
-  ElectricityUsageModel,
-  ExportToCsvDownloadModel,
-  GetExportToCsvModel,
-} from "@/features/summary/domain/entities/summary-models";
+import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { Logger } from "@/core/utils/logger/logger";
 import { GetExportToCsvQueryParams } from "@/features/summary/domain/params/query-params";
 import {
@@ -32,44 +28,10 @@ import {
 } from "@/shared/utils/helpers/date-helpers";
 import { useGetHundredDevices } from "@/features/summary/presentation/hooks/use-get-hundred-devices";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
-
-const downloadCsv = (fileUrl: string, fileName: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    try {
-      const link = document.createElement("a");
-      link.href = fileUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
-
-const downloadBulkCsv = async (
-  models: GetExportToCsvModel[]
-): Promise<ExportToCsvDownloadModel> => {
-  const downloadModel: ExportToCsvDownloadModel = {
-    count: 0,
-  };
-
-  for (const model of models) {
-    if (model && model.fileUrl) {
-      try {
-        const fileName = model.fileName || `export_${Date.now()}.csv`;
-        await downloadCsv(model.fileUrl, fileName);
-      } catch (error) {
-        Logger.error("downloadBulkCsv", "Failed to download file", error);
-        continue;
-      }
-      downloadModel.count++;
-    }
-  }
-  return downloadModel;
-};
+import {
+  csvDownloadHelper,
+  downloadBulkCsv,
+} from "@/core/utils/helpers/file-download-helper";
 
 export default function ReportPage() {
   const [activeFilters, setActiveFilters] = useState<ReportFilterState>(
@@ -95,7 +57,6 @@ export default function ReportPage() {
   } = useGetElectricityUsageHistory();
   const { showPopup } = usePopup();
   const {
-    data: singleCsvData,
     bulkData: exportBulkData,
     loading: useGetExportToCsvLoading,
     error: useGetExportToCsvError,
@@ -145,51 +106,50 @@ export default function ReportPage() {
 
   useEffect(() => {
     async function processDownload() {
-      const result = await downloadBulkCsv(exportBulkData);
-      if (result.count > 0) {
-        showPopup(
-          `Successfully downloaded ${result.count} file(s).`,
-          PopupType.SUCCESS
-        );
-      } else {
-        showPopup("No files were downloaded.", PopupType.INFO);
-      }
+      await downloadBulkCsv(
+        exportBulkData.map((item) => ({
+          fileUrl: item.fileUrl,
+          fileName: item.fileName,
+        }))
+      );
+
+      showPopup(
+        `Successfully downloaded ${exportBulkData.length} files.`,
+        PopupType.SUCCESS
+      );
+
       setExporting(false);
       resetExportToCsv();
     }
-    if (exportBulkData.length > 0) {
-      processDownload();
-    }
-  }, [exportBulkData, showPopup, resetExportToCsv]);
-
-  useEffect(() => {
-    async function processSingleDownload() {
-      if (singleCsvData && singleCsvData.fileUrl) {
-        try {
-          const fileName = singleCsvData.fileName || `export_${Date.now()}.csv`;
-          await downloadCsv(singleCsvData.fileUrl, fileName);
+    if (!exportBulkData || exportBulkData.length === 0) return;
+    if (exportBulkData.length === 1) {
+      const fileUrl = exportBulkData[0]?.fileUrl;
+      const fileName = exportBulkData[0]?.fileName;
+      if (!fileUrl || !fileName) {
+        showPopup("No file available for download.", PopupType.INFO);
+        setExporting(false);
+        resetExportToCsv();
+        return;
+      }
+      csvDownloadHelper(fileUrl, fileName)
+        .then(() => {
           showPopup(
             `File ${fileName} downloaded successfully.`,
             PopupType.SUCCESS
           );
-        } catch (error) {
-          Logger.error(
-            "processSingleDownload",
-            "Failed to download file",
-            error
-          );
+        })
+        .catch((error) => {
+          Logger.error("processDownload", "Failed to download file", error);
           showPopup("Failed to download the file.", PopupType.ERROR);
-        }
-      } else {
-        showPopup("No file available for download.", PopupType.INFO);
-      }
-      setExporting(false);
-      resetExportToCsv();
+        })
+        .finally(() => {
+          setExporting(false);
+          resetExportToCsv();
+        });
+    } else {
+      processDownload();
     }
-    if (singleCsvData) {
-      processSingleDownload();
-    }
-  }, [singleCsvData, showPopup, resetExportToCsv]);
+  }, [exportBulkData, showPopup, resetExportToCsv]);
 
   useEffect(() => {
     const selectedYear = optionalValue(

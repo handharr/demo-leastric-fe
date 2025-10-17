@@ -27,6 +27,7 @@ import {
 } from "@/shared/utils/helpers/date-helpers";
 import { useGetHundredDevices } from "@/features/summary/presentation/hooks/use-get-hundred-devices";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
+import { Dropdown } from "@/shared/presentation/components/dropdown";
 
 type ExportFormat = "csv" | "pdf";
 
@@ -222,15 +223,15 @@ export default function ReportPage() {
         {/* Export Section */}
         <div className="flex items-center gap-3">
           {/* Export Format Dropdown */}
-          <select
-            value={exportFormat}
-            onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
-            className="px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer"
+          <Dropdown
+            options={["CSV", "PDF"]}
+            value={exportFormat.toUpperCase()}
+            onChange={(option) => {
+              setExportFormat(option.toLowerCase() as ExportFormat);
+            }}
             disabled={useGetExportToCsvLoading}
-          >
-            <option value="csv">CSV</option>
-            <option value="pdf">PDF</option>
-          </select>
+            buttonClassName="px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+          />
 
           {/* Export Button */}
           <button

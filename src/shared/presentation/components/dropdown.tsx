@@ -6,6 +6,8 @@ interface DropdownProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   className?: string;
+  buttonClassName?: string;
+  disabled?: boolean;
 }
 
 export function Dropdown<T extends string>({
@@ -13,6 +15,8 @@ export function Dropdown<T extends string>({
   value,
   onChange,
   className = "",
+  buttonClassName = "",
+  disabled = false,
 }: DropdownProps<T>) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -36,7 +40,8 @@ export function Dropdown<T extends string>({
     <div className={`relative w-full ${className}`} ref={ref}>
       <button
         type="button"
-        className="cursor-pointer flex gap-[8px] items-center justify-between w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        disabled={disabled}
+        className={`cursor-pointer flex gap-[8px] items-center justify-between w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 hover:bg-gray-50 transition-colors ${buttonClassName}`}
         onClick={() => setOpen((v) => !v)}
       >
         {value}

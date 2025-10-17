@@ -20,7 +20,6 @@ import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useGetExportToCsv } from "@/features/summary/presentation/hooks/use-get-export-to-csv";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
-import { Logger } from "@/core/utils/logger/logger";
 import { GetExportToCsvQueryParams } from "@/features/summary/domain/params/query-params";
 import {
   formatDateToStringUTCWithoutMs,
@@ -28,10 +27,6 @@ import {
 } from "@/shared/utils/helpers/date-helpers";
 import { useGetHundredDevices } from "@/features/summary/presentation/hooks/use-get-hundred-devices";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
-import {
-  csvDownloadHelper,
-  downloadBulkCsv,
-} from "@/core/utils/helpers/file-download-helper";
 
 export default function ReportPage() {
   const [activeFilters, setActiveFilters] = useState<ReportFilterState>(
@@ -43,7 +38,6 @@ export default function ReportPage() {
     reset: resetHundredDevices,
   } = useGetHundredDevices();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [exporting, setExporting] = useState(false);
   const {
     usageHistory,
     loading: useGetElectricityUsageHistoryLoading,
@@ -57,7 +51,6 @@ export default function ReportPage() {
   } = useGetElectricityUsageHistory();
   const { showPopup } = usePopup();
   const {
-    bulkData: exportBulkData,
     loading: useGetExportToCsvLoading,
     error: useGetExportToCsvError,
     fetchExportToCsv: fetchExportToCsv,
@@ -105,53 +98,6 @@ export default function ReportPage() {
   ]);
 
   useEffect(() => {
-    async function processDownload() {
-      await downloadBulkCsv(
-        exportBulkData.map((item) => ({
-          fileUrl: item.fileUrl,
-          fileName: item.fileName,
-        }))
-      );
-
-      showPopup(
-        `Successfully downloaded ${exportBulkData.length} files.`,
-        PopupType.SUCCESS
-      );
-
-      setExporting(false);
-      resetExportToCsv();
-    }
-    if (!exportBulkData || exportBulkData.length === 0) return;
-    if (exportBulkData.length === 1) {
-      const fileUrl = exportBulkData[0]?.fileUrl;
-      const fileName = exportBulkData[0]?.fileName;
-      if (!fileUrl || !fileName) {
-        showPopup("No file available for download.", PopupType.INFO);
-        setExporting(false);
-        resetExportToCsv();
-        return;
-      }
-      csvDownloadHelper(fileUrl, fileName)
-        .then(() => {
-          showPopup(
-            `File ${fileName} downloaded successfully.`,
-            PopupType.SUCCESS
-          );
-        })
-        .catch((error) => {
-          Logger.error("processDownload", "Failed to download file", error);
-          showPopup("Failed to download the file.", PopupType.ERROR);
-        })
-        .finally(() => {
-          setExporting(false);
-          resetExportToCsv();
-        });
-    } else {
-      processDownload();
-    }
-  }, [exportBulkData, showPopup, resetExportToCsv]);
-
-  useEffect(() => {
     const selectedYear = optionalValue(
       activeFilters.singleSelection?.year
     ).orDefault(new Date().getFullYear().toString());
@@ -168,11 +114,9 @@ export default function ReportPage() {
   }, [fetchUsageHistory, activeFilters]);
 
   const handleDownload = useCallback(() => {
-    if (exporting) return;
-    setExporting(true);
+    if (useGetExportToCsvLoading) return;
     if (selectedIds.length === 0) {
       showPopup("Please select at least one record to export.", PopupType.INFO);
-      setExporting(false);
       return;
     }
     const paramsArray: GetExportToCsvQueryParams[] = selectedIds
@@ -196,26 +140,31 @@ export default function ReportPage() {
       );
 
     fetchExportToCsvBulk(paramsArray);
-  }, [selectedIds, showPopup, usageHistory, exporting, fetchExportToCsvBulk]);
+  }, [
+    selectedIds,
+    showPopup,
+    usageHistory,
+    useGetExportToCsvLoading,
+    fetchExportToCsvBulk,
+  ]);
 
   const handleDownloadSingle = useCallback(
     (row: ElectricityUsageModel) => {
-      if (exporting) {
+      if (useGetExportToCsvLoading) {
         showPopup(
           "Please wait until the current export is finished.",
           PopupType.INFO
         );
         return;
       }
-      setExporting(true);
       const selectedPeriod = optionalValue(new Date(row.period)).orToday();
       const dateRangeMonth = getStartAndEndDateOfMonthFromDate(selectedPeriod);
       fetchExportToCsv({
-        startDate: formatDateToStringUTCWithoutMs(dateRangeMonth.startDate),
-        endDate: formatDateToStringUTCWithoutMs(dateRangeMonth.endDate),
+        startDate: dateRangeMonth.startDate.toISOString(),
+        endDate: dateRangeMonth.endDate.toISOString(),
       });
     },
-    [exporting, fetchExportToCsv, showPopup]
+    [useGetExportToCsvLoading, fetchExportToCsv, showPopup]
   );
 
   const devicesOptions: FilterOption[] = devices
@@ -258,9 +207,7 @@ export default function ReportPage() {
         />
         {/* Export Button */}
         <button
-          disabled={
-            selectedIds.length === 0 || exporting || useGetExportToCsvLoading
-          }
+          disabled={selectedIds.length === 0 || useGetExportToCsvLoading}
           className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           onClick={handleDownload}
         >
@@ -286,7 +233,7 @@ export default function ReportPage() {
         isLoading={useGetElectricityUsageHistoryLoading}
         selectedIds={selectedIds}
         handleRowSelect={(id) => {
-          if (exporting) return;
+          if (useGetExportToCsvLoading) return;
           setSelectedIds((prev) =>
             prev.includes(id)
               ? prev.filter((rowId) => rowId !== id)
@@ -294,7 +241,7 @@ export default function ReportPage() {
           );
         }}
         handleSelectAll={() => {
-          if (exporting) return;
+          if (useGetExportToCsvLoading) return;
           setSelectedIds((prev) =>
             prev.length === usageHistory.length
               ? []
@@ -302,7 +249,7 @@ export default function ReportPage() {
           );
         }}
         gotoPage={(page) => {
-          if (exporting) return;
+          if (useGetExportToCsvLoading) return;
           const selectedYear = optionalValue(
             activeFilters.singleSelection?.year
           ).orDefault(new Date().getFullYear().toString());
@@ -319,7 +266,7 @@ export default function ReportPage() {
           });
         }}
         previousPage={() => {
-          if (exporting) return;
+          if (useGetExportToCsvLoading) return;
           const selectedYear = optionalValue(
             activeFilters.singleSelection?.year
           ).orDefault(new Date().getFullYear().toString());
@@ -335,7 +282,7 @@ export default function ReportPage() {
           });
         }}
         nextPage={() => {
-          if (exporting) return;
+          if (useGetExportToCsvLoading) return;
           const selectedYear = optionalValue(
             activeFilters.singleSelection?.year
           ).orDefault(new Date().getFullYear().toString());

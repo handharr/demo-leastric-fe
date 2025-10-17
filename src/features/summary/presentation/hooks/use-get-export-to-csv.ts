@@ -7,9 +7,9 @@ import { GetExportToCsvModel } from "@/features/summary/domain/entities/summary-
 import { GetExportToCsvQueryParams } from "@/features/summary/domain/params/query-params";
 import { useCallback, useState } from "react";
 import { GetExportToCsvUseCase } from "@/features/summary/domain/use-cases/get-export-to-csv-use-case";
+import { csvDownloadHelper } from "@/core/utils/helpers/file-download-helper";
 
 export interface UseGetExportToCsvReturn {
-  bulkData: GetExportToCsvModel[];
   loading: boolean;
   error: BaseErrorModel | null;
   fetchExportToCsv: (params: Partial<GetExportToCsvQueryParams>) => void;
@@ -18,16 +18,15 @@ export interface UseGetExportToCsvReturn {
 }
 
 export function useGetExportToCsv(): UseGetExportToCsvReturn {
-  const [bulkData, setBulkData] = useState<GetExportToCsvModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<BaseErrorModel | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const fetchExportToCsv = async (
     params: Partial<GetExportToCsvQueryParams>
   ) => {
     setLoading(true);
     setError(null);
-    setBulkData([]);
 
     try {
       const useCase = new GetExportToCsvUseCase();
@@ -39,6 +38,9 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
         setError(result);
         return;
       }
+
+      await csvDownloadHelper(result.fileUrl, result.fileName);
+      setSuccessMessage(`File ${result.fileName} downloaded successfully.`);
     } catch (err) {
       const errorModel = createErrorModel(err as Error);
       setError(errorModel);
@@ -51,7 +53,6 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
     async (paramsArray: Partial<GetExportToCsvQueryParams>[]) => {
       setLoading(true);
       setError(null);
-      setBulkData([]);
 
       const results: GetExportToCsvModel[] = [];
       for (const params of paramsArray) {
@@ -74,7 +75,6 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
         }
       }
 
-      setBulkData(results);
       setLoading(false);
     },
     []
@@ -83,11 +83,10 @@ export function useGetExportToCsv(): UseGetExportToCsvReturn {
   const reset = () => {
     setError(null);
     setLoading(false);
-    setBulkData([]);
+    setSuccessMessage(null);
   };
 
   return {
-    bulkData,
     loading,
     error,
     fetchExportToCsv,

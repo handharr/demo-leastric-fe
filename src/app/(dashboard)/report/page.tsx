@@ -28,10 +28,13 @@ import {
 import { useGetHundredDevices } from "@/features/summary/presentation/hooks/use-get-hundred-devices";
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 
+type ExportFormat = "csv" | "pdf";
+
 export default function ReportPage() {
   const [activeFilters, setActiveFilters] = useState<ReportFilterState>(
     reportFilterDefaultValue()
   );
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
   const {
     devices,
     error: useGetHundredDevicesError,
@@ -135,14 +138,28 @@ export default function ReportPage() {
         "Calculated start date is after end date. Please check your selection.",
         PopupType.ERROR
       );
+      return;
     }
 
-    const params: GetExportToCsvQueryParams = {
-      startDate: formatDateToStringUTCWithoutMs(startDate),
-      endDate: formatDateToStringUTCWithoutMs(endDate),
-    };
-    fetchExportToCsv(params);
-  }, [selectedIds, showPopup, useGetExportToCsvLoading, fetchExportToCsv]);
+    if (exportFormat === "csv") {
+      const params: GetExportToCsvQueryParams = {
+        startDate: formatDateToStringUTCWithoutMs(startDate),
+        endDate: formatDateToStringUTCWithoutMs(endDate),
+      };
+
+      fetchExportToCsv(params);
+    } else {
+      // TODO: Implement PDF export hook/function
+      // fetchExportToPdf(params);
+      showPopup("PDF export is not implemented yet.", PopupType.INFO);
+    }
+  }, [
+    selectedIds,
+    showPopup,
+    useGetExportToCsvLoading,
+    fetchExportToCsv,
+    exportFormat,
+  ]);
 
   const handleDownloadSingle = useCallback(
     (row: ElectricityUsageModel) => {
@@ -201,20 +218,36 @@ export default function ReportPage() {
           filterMeta={updatedReportFilterMeta}
           defaultValue={reportFilterDefaultValue()}
         />
-        {/* Export Button */}
-        <button
-          disabled={selectedIds.length === 0 || useGetExportToCsvLoading}
-          className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={handleDownload}
-        >
-          {useGetExportToCsvLoading ? (
-            <LoadingSpinner size="sm" />
-          ) : (
-            <span>
-              Download {selectedIds.length > 0 ? `(${selectedIds.length})` : ""}{" "}
-            </span>
-          )}
-        </button>
+
+        {/* Export Section */}
+        <div className="flex items-center gap-3">
+          {/* Export Format Dropdown */}
+          <select
+            value={exportFormat}
+            onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
+            className="px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer"
+            disabled={useGetExportToCsvLoading}
+          >
+            <option value="csv">CSV</option>
+            <option value="pdf">PDF</option>
+          </select>
+
+          {/* Export Button */}
+          <button
+            disabled={selectedIds.length === 0 || useGetExportToCsvLoading}
+            className="flex items-center gap-2 px-4 py-2.5 border border-leastric-primary text-leastric-primary rounded-lg text-sm hover:bg-green-50 transition-colors font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleDownload}
+          >
+            {useGetExportToCsvLoading ? (
+              <LoadingSpinner size="sm" />
+            ) : (
+              <span>
+                Download {exportFormat.toUpperCase()}{" "}
+                {selectedIds.length > 0 ? `(${selectedIds.length})` : ""}{" "}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Active Filters */}

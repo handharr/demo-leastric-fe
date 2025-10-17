@@ -27,7 +27,7 @@ import {
   usePopup,
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
-import { useGetDevicesCurrentMqttLog } from "../hooks/use-get-devices-current-mqtt-log";
+import { useGetDevicesCurrentMqttLog } from "@/features/summary/presentation/hooks/use-get-devices-current-mqtt-log";
 
 const availableIntervals = [
   getLabelFromRealTimeInterval(RealTimeInterval.Ten),

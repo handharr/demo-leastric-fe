@@ -35,7 +35,7 @@ import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
 import { Observable, of } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 import { WebSocketDataSource } from "@/core/insfrastructure/data-sources/web-socket-data-source";
-import { mapDeviceCurrentMqttLogResponsesToModel } from "../../domain/mapper/summary-mapper";
+import { mapDeviceCurrentMqttLogResponsesToModel } from "@/features/summary/domain/mapper/summary-mapper";
 
 export class SummaryRepositoryImpl implements SummaryRepository {
   constructor(

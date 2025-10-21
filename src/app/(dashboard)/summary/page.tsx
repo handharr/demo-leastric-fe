@@ -289,7 +289,7 @@ export default function SummaryPage() {
           description="Quickly check the status of a devices"
           value=""
         >
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2 flex-1 justify-between">
               <span className="text-sm text-typography-headline">Active</span>
               <span className="inline-flex items-center justify-center w-6 h-6 bg-background-brand-positive-subtle text-leastric-primary text-xs font-medium rounded-full flex-shrink-0">
@@ -301,7 +301,7 @@ export default function SummaryPage() {
                   ).orZero()}
               </span>
             </div>
-            <div className="hidden sm:block h-8 w-px bg-default-border flex-shrink-0" />
+            <div className="h-8 w-px bg-default-border flex-shrink-0" />
             <div className="flex items-center gap-2 flex-1 justify-between">
               <span className="text-sm text-typography-headline">Inactive</span>
               <span className="inline-flex items-center justify-center w-6 h-6 bg-background-critical-subtle text-typography-negative text-xs font-medium rounded-full flex-shrink-0">

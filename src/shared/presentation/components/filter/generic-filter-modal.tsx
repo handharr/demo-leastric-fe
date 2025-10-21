@@ -204,7 +204,9 @@ export function GenericFilterModal<T extends FilterState>({
               "bg-white border border-gray-200 rounded-lg shadow-lg z-50 flex flex-col min-h-[400px] max-h-[50vh]",
               // Mobile: fixed center positioning
               "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90vw]",
-              // Desktop: absolute positioning relative to container
+              // Medium: center but higher up
+              "md:fixed md:top-1/2 md:left-1/2 md:transform md:-translate-x-1/2 md:-translate-y-1/2 md:w-[90vw] md:-mt-10",
+              // Large: absolute positioning relative to container
               "lg:absolute lg:top-full lg:left-0 lg:mt-2 lg:min-w-[800px] lg:max-w-4xl lg:w-auto lg:h-auto lg:max-h-[50vh] lg:transform-none lg:translate-x-0 lg:translate-y-0"
             )}
           >

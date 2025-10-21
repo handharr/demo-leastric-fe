@@ -308,15 +308,6 @@ export function getCurrentMonthDateRangeUntilToday(): DateRange {
     Date.UTC(currentYear, currentMonth, currentDate, 23, 59, 59, 999)
   );
 
-  console.log(
-    "[debugTest] fetchUsageHistoryInternal startDate:",
-    startDate.toISOString()
-  );
-  console.log(
-    "[debugTest] fetchUsageHistoryInternal endDate:",
-    endDate.toISOString()
-  );
-
   return {
     startDate,
     endDate,

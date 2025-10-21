@@ -7,10 +7,7 @@ import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useCallback, useState } from "react";
 import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { TimePeriod } from "@/shared/domain/enum/enums";
-import {
-  formatDateToStringUTCWithoutMs,
-  getDateRangeByTimePeriod,
-} from "@/shared/utils/helpers/date-helpers";
+import { getDateRangeByTimePeriod } from "@/shared/utils/helpers/date-helpers";
 
 export interface UseGetElectricityUsageHistoryReturn {
   usageHistory: ElectricityUsageModel[];
@@ -53,8 +50,8 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
 
       if (!startDate || !endDate) {
         const dateRange = getDateRangeByTimePeriod(TimePeriod.Daily);
-        startDate = formatDateToStringUTCWithoutMs(dateRange.startDate);
-        endDate = formatDateToStringUTCWithoutMs(dateRange.endDate);
+        startDate = dateRange.startDate.toISOString();
+        endDate = dateRange.endDate.toISOString();
       }
 
       const usedParams: GetElectricityUsageHistoryQueryParams = {

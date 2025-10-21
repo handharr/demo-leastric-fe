@@ -224,13 +224,13 @@ export class SummaryRepositoryImpl implements SummaryRepository {
           ),
           period: optionalValue(usage.period).orEmpty(),
           unit: parseEnergyUnit(optionalValue(usage.unit).orEmpty()),
-          avgVoltage: optionalValue(usage.avgVoltage).orDefault(-1),
-          avgVoltageLine: optionalValue(usage.avgVoltageLine).orDefault(-1),
-          avgCurrent: optionalValue(usage.avgCurrent).orDefault(-1),
-          avgRealPower: optionalValue(usage.avgRealPower).orDefault(-1),
-          totalKwh: optionalValue(usage.totalKwh).orDefault(-1),
-          totalEstBilling: optionalValue(usage.totalEstBilling).orDefault(-1),
-          totalCO2Emission: optionalValue(usage.totalCO2Emission).orDefault(-1),
+          avgVoltage: optionalValue(usage.avgVoltage).orZero(),
+          avgVoltageLine: optionalValue(usage.avgVoltageLine).orZero(),
+          avgCurrent: optionalValue(usage.avgCurrent).orZero(),
+          avgRealPower: optionalValue(usage.avgRealPower).orZero(),
+          totalKwh: optionalValue(usage.totalKwh).orZero(),
+          totalEstBilling: optionalValue(usage.totalEstBilling).orZero(),
+          totalCO2Emission: optionalValue(usage.totalCO2Emission).orZero(),
         }));
         Logger.info("SummaryRepositoryImpl", "Mapped usages", mappedUsages);
         return {

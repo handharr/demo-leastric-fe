@@ -50,8 +50,8 @@ export function ShowMoreElectricUsageModalButton() {
   useEffect(() => {
     if (open) {
       fetchUsageHistory({
-        startDate: formatDateToStringUTCWithoutMs(dateRange.startDate),
-        endDate: formatDateToStringUTCWithoutMs(dateRange.endDate),
+        startDate: dateRange.startDate.toISOString(),
+        endDate: dateRange.endDate.toISOString(),
       });
     } else {
       reset();

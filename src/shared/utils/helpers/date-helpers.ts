@@ -165,6 +165,7 @@ export function getStartAndEndDateOfDayFromDate(date: Date): DateRange {
 
 /**
  * Gets date range based on time period type relative to current date.
+ * The date should be in UTC.
  * - Daily: Current month (1st to last day)
  * - Weekly: Current week (Monday to Sunday)
  * - Monthly/Yearly: Current year (January 1st to December 31st)
@@ -200,23 +201,18 @@ export function getStartAndEndDateOfDayFromDate(date: Date): DateRange {
  */
 export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0-based (0 = January, 8 = September)
-  const currentDate = now.getDate();
+  const currentYear = now.getUTCFullYear();
+  const currentMonth = now.getUTCMonth(); // 0-based (0 = January, 8 = September)
+  const currentDate = now.getUTCDate();
 
   switch (timePeriod) {
     case TimePeriod.Daily: {
-      const startDate = new Date(currentYear, currentMonth, 1, 0, 0, 0, 0);
+      const startDate = new Date(
+        Date.UTC(currentYear, currentMonth, 1, 0, 0, 0, 0)
+      );
       const endDate = new Date(
-        currentYear,
-        currentMonth + 1,
-        0,
-        23,
-        59,
-        59,
-        999
+        Date.UTC(currentYear, currentMonth + 1, 0, 23, 59, 59, 999)
       ); // Last day of current month
-
       return {
         startDate: startDate,
         endDate: endDate,
@@ -224,27 +220,31 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
     }
 
     case TimePeriod.Weekly: {
-      const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      const currentDay = now.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
       const daysFromMonday = currentDay === 0 ? 6 : currentDay - 1; // Adjust for Monday start
 
       const startDate = new Date(
-        currentYear,
-        currentMonth,
-        currentDate - daysFromMonday,
-        0,
-        0,
-        0,
-        0
+        Date.UTC(
+          currentYear,
+          currentMonth,
+          currentDate - daysFromMonday,
+          0,
+          0,
+          0,
+          0
+        )
       ); // Monday of current week
 
       const endDate = new Date(
-        currentYear,
-        currentMonth,
-        currentDate - daysFromMonday + 6,
-        23,
-        59,
-        59,
-        999
+        Date.UTC(
+          currentYear,
+          currentMonth,
+          currentDate - daysFromMonday + 6,
+          23,
+          59,
+          59,
+          999
+        )
       ); // Sunday of current week
 
       return {
@@ -255,8 +255,8 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
 
     case TimePeriod.Monthly:
     case TimePeriod.Yearly: {
-      const startDate = new Date(currentYear, 0, 1, 0, 0, 0, 0); // January 1st
-      const endDate = new Date(currentYear, 11, 31, 23, 59, 59, 999); // December 31st
+      const startDate = new Date(Date.UTC(currentYear, 0, 1, 0, 0, 0, 0)); // January 1st
+      const endDate = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59, 999)); // December 31st
 
       return {
         startDate: startDate,
@@ -270,10 +270,10 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
 }
 
 /**
- * Gets date range from the 1st of current month until today.
+ * Gets date range from the 1st of current month until today in UTC.
  * Useful for getting month-to-date data excluding future dates.
  *
- * @returns DateRange object from start of current month to end of today
+ * @returns DateRange object from start of current month to end of today in UTC
  *
  * @example
  * ```typescript
@@ -281,8 +281,8 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
  * const range = getCurrentMonthDateRangeUntilToday();
  * // Output:
  * // {
- * //   startDate: Date("2023-10-01T00:00:00.000"),
- * //   endDate: Date("2023-10-15T23:59:59.999")
+ * //   startDate: Date("2023-10-01T00:00:00.000Z"),
+ * //   endDate: Date("2023-10-15T23:59:59.999Z")
  * // }
  *
  * // On the 1st of the month
@@ -290,26 +290,31 @@ export function getDateRangeByTimePeriod(timePeriod: TimePeriod): DateRange {
  * const range2 = getCurrentMonthDateRangeUntilToday();
  * // Output:
  * // {
- * //   startDate: Date("2023-11-01T00:00:00.000"),
- * //   endDate: Date("2023-11-01T23:59:59.999")
+ * //   startDate: Date("2023-11-01T00:00:00.000Z"),
+ * //   endDate: Date("2023-11-01T23:59:59.999Z")
  * // }
  * ```
  */
 export function getCurrentMonthDateRangeUntilToday(): DateRange {
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0-based (0 = January, 11 = December)
-  const currentDate = now.getDate();
+  const currentYear = now.getUTCFullYear();
+  const currentMonth = now.getUTCMonth(); // 0-based (0 = January, 11 = December)
+  const currentDate = now.getUTCDate();
 
-  const startDate = new Date(currentYear, currentMonth, 1, 0, 0, 0, 0);
+  const startDate = new Date(
+    Date.UTC(currentYear, currentMonth, 1, 0, 0, 0, 0)
+  );
   const endDate = new Date(
-    currentYear,
-    currentMonth,
-    currentDate,
-    23,
-    59,
-    59,
-    999
+    Date.UTC(currentYear, currentMonth, currentDate, 23, 59, 59, 999)
+  );
+
+  console.log(
+    "[debugTest] fetchUsageHistoryInternal startDate:",
+    startDate.toISOString()
+  );
+  console.log(
+    "[debugTest] fetchUsageHistoryInternal endDate:",
+    endDate.toISOString()
   );
 
   return {

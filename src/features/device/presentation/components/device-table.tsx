@@ -63,9 +63,7 @@ export function DeviceTable({
           </tr>
         </thead>
         <tbody>
-          {loading ? (
-            <TableSkeletonLoading />
-          ) : isEmptyData ? (
+          {isEmptyData ? (
             <tr>
               <td colSpan={6} className="p-4 text-center">
                 <EmptyData />

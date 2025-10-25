@@ -55,62 +55,65 @@ export const useGetElectricityUsage = ({
   const [loading, setLoading] = useState<boolean>(false);
 
   // Helper function to prepare query parameters
-  const prepareQueryParams = (
-    params: GetElectricityUsageQueryParams
-  ): GetElectricityUsageQueryParams => {
-    const { period = TimePeriod.Monthly, startDate, endDate } = params;
+  const prepareQueryParams = useCallback(
+    (
+      params: GetElectricityUsageQueryParams
+    ): GetElectricityUsageQueryParams => {
+      const { period = TimePeriod.Monthly, startDate, endDate } = params;
 
-    let _startDate = startDate;
-    let _endDate = endDate;
-    let location: string | undefined = activeLocationFilter;
-    const defaultValue = defaultLocation as string;
+      let _startDate = startDate;
+      let _endDate = endDate;
+      let location: string | undefined = activeLocationFilter;
+      const defaultValue = defaultLocation as string;
 
-    if (
-      location?.toLowerCase() ===
-      optionalValue(defaultValue).orEmpty().toLowerCase()
-    ) {
-      location = undefined;
-    }
+      if (
+        location?.toLowerCase() ===
+        optionalValue(defaultValue).orEmpty().toLowerCase()
+      ) {
+        location = undefined;
+      }
 
-    // Calculate date range if not provided
-    if (!startDate || !endDate) {
+      // Calculate date range if not provided
+      if (!startDate || !endDate) {
+        try {
+          const { startDate: start, endDate: end } = getDateRangeByTimePeriod(
+            period as TimePeriod
+          );
+          _startDate = formatDateToStringLocal(start);
+          _endDate = formatDateToStringLocal(end);
+        } catch (dateError) {
+          Logger.warn(
+            "useGetElectricityUsage",
+            "Date range calculation failed, proceeding without date range:",
+            period,
+            dateError
+          );
+        }
+      }
+
+      // Normalize period to lowercase string
+      let normalizedPeriod: string;
       try {
-        const { startDate: start, endDate: end } = getDateRangeByTimePeriod(
-          period as TimePeriod
-        );
-        _startDate = formatDateToStringLocal(start);
-        _endDate = formatDateToStringLocal(end);
-      } catch (dateError) {
+        normalizedPeriod = (period as TimePeriod).toLowerCase();
+      } catch (castError) {
         Logger.warn(
           "useGetElectricityUsage",
-          "Date range calculation failed, proceeding without date range:",
+          "Period casting failed, using default:",
           period,
-          dateError
+          castError
         );
+        normalizedPeriod = TimePeriod.Monthly.toLowerCase();
       }
-    }
 
-    // Normalize period to lowercase string
-    let normalizedPeriod: string;
-    try {
-      normalizedPeriod = (period as TimePeriod).toLowerCase();
-    } catch (castError) {
-      Logger.warn(
-        "useGetElectricityUsage",
-        "Period casting failed, using default:",
-        period,
-        castError
-      );
-      normalizedPeriod = TimePeriod.Monthly.toLowerCase();
-    }
-
-    return {
-      period: normalizedPeriod,
-      startDate: _startDate,
-      endDate: _endDate,
-      location,
-    };
-  };
+      return {
+        period: normalizedPeriod,
+        startDate: _startDate,
+        endDate: _endDate,
+        location,
+      };
+    },
+    [activeLocationFilter, defaultLocation]
+  );
 
   // Generic fetch function
   const fetchElectricityUsageData = useCallback(
@@ -162,7 +165,7 @@ export const useGetElectricityUsage = ({
         setLoading(false);
       }
     },
-    []
+    [prepareQueryParams]
   );
 
   const fetchElectricityUsage = useCallback(

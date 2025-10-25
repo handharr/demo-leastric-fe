@@ -49,6 +49,7 @@ const MENU_ITEMS = (): SidebarMenuItemProps[] => {
     },
   ];
 
+  console.log(process.env.NEXT_PUBLIC_IS_ADMIN);
   const isAdmin = process.env.NEXT_PUBLIC_IS_ADMIN === "TRUE";
   if (!isAdmin) {
     // Filter out "User Management" for non-admin users

@@ -56,7 +56,10 @@ export default function ReportPage() {
     goToPage,
     fetchUsageHistory,
     reset: resetUsageHistory,
-  } = useGetElectricityUsageHistory();
+  } = useGetElectricityUsageHistory({
+    activeLocationFilter: undefined,
+    defaultLocation: undefined,
+  });
   const { showPopup } = usePopup();
   const {
     loading: useGetExportToCsvLoading,

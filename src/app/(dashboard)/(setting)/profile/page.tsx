@@ -27,9 +27,17 @@ export default function ProfilePage() {
     success,
     resetState,
   } = useUpdateUserDetails();
-  const [fullName, setFullName] = useState(userDetails?.name || "");
-  const [email, setEmail] = useState(userDetails?.email || "");
-  const [phone, setPhone] = useState(userDetails?.phoneNumber || "");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  useEffect(() => {
+    if (userDetails) {
+      setFullName(userDetails.name || "");
+      setEmail(userDetails.email || "");
+      setPhone(userDetails.phoneNumber || "");
+    }
+  }, [userDetails]);
 
   useEffect(() => {
     if (success) {
@@ -37,9 +45,7 @@ export default function ProfilePage() {
       fetchUserDetails();
       resetState();
     }
-  }, [success, fetchUserDetails, resetState]);
 
-  useEffect(() => {
     if (updateError) {
       showPopup(updateError.message, PopupType.ERROR);
       resetState();
@@ -49,7 +55,15 @@ export default function ProfilePage() {
       showPopup(error.message, PopupType.ERROR);
       resetUserDetails();
     }
-  }, [updateError, showPopup, resetState, error, resetUserDetails]);
+  }, [
+    success,
+    fetchUserDetails,
+    resetState,
+    updateError,
+    showPopup,
+    error,
+    resetUserDetails,
+  ]);
 
   if (loading) {
     return <LoadingSpinner size="md" className="h-40" />;

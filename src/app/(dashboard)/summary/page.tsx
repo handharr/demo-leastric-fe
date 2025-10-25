@@ -69,7 +69,10 @@ export default function SummaryPage() {
     data: usageSummary,
     error: errorSummary,
     reset: resetSummary,
-  } = useGetUsageSummary();
+  } = useGetUsageSummary({
+    defaultLocation: filterMeta.location.defaultValue,
+    activeLocationFilter: activeFilters.singleSelection.location,
+  });
   const {
     data: electricityUsage,
     comparedData: electricityComparedUsage,
@@ -78,7 +81,10 @@ export default function SummaryPage() {
     fetchElectricityUsage,
     fetchComparedElectricityUsage,
     reset: resetElectricityUsage,
-  } = useGetElectricityUsage();
+  } = useGetElectricityUsage({
+    defaultLocation: filterMeta.location.defaultValue,
+    activeLocationFilter: activeFilters.singleSelection.location,
+  });
   const {
     usageHistory: electricityUsageHistory,
     loading: electricityUsageHistoryLoading,

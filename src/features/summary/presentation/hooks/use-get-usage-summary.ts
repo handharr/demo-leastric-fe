@@ -8,6 +8,7 @@ import { GetUsageSummaryQueryParams } from "@/features/summary/domain/params/que
 import { GetUsageSummaryUseCase } from "@/features/summary/domain/use-cases/get-usage-summary-use-case";
 import { Logger } from "@/core/utils/logger/logger";
 import { ErrorType } from "@/core/domain/enums/base-enum";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 interface UseGetUsageSummaryReturn {
   data: GetUsageSummaryModel | null;
@@ -16,7 +17,15 @@ interface UseGetUsageSummaryReturn {
   reset: () => void;
 }
 
-export const useGetUsageSummary = (): UseGetUsageSummaryReturn => {
+interface UseGetElectricityUsageProps {
+  defaultLocation?: string | string[];
+  activeLocationFilter?: string;
+}
+
+export const useGetUsageSummary = ({
+  defaultLocation,
+  activeLocationFilter,
+}: UseGetElectricityUsageProps): UseGetUsageSummaryReturn => {
   const [data, setData] = useState<GetUsageSummaryModel | null>(null);
   const [error, setError] = useState<BaseErrorModel | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -27,12 +36,23 @@ export const useGetUsageSummary = (): UseGetUsageSummaryReturn => {
       year: number = new Date().getFullYear()
     ) => {
       try {
+        let location: string | undefined = activeLocationFilter;
+        const defaultValue = defaultLocation as string;
+
+        if (
+          location?.toLowerCase() ===
+          optionalValue(defaultValue).orEmpty().toLowerCase()
+        ) {
+          location = undefined;
+        }
+
         setLoading(true);
         setError(null);
         const getUsageSummaryUseCase = new GetUsageSummaryUseCase();
         const queryParam: GetUsageSummaryQueryParams = {
           month,
           year,
+          location,
         };
         const result = await getUsageSummaryUseCase.execute(queryParam);
 
@@ -63,7 +83,7 @@ export const useGetUsageSummary = (): UseGetUsageSummaryReturn => {
         setLoading(false);
       }
     },
-    []
+    [activeLocationFilter, defaultLocation]
   );
 
   const reset = useCallback(() => {

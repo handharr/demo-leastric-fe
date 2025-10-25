@@ -8,11 +8,12 @@ import { GetElectricityUsageQueryParams } from "@/features/summary/domain/params
 import { GetElectricityUsageUseCase } from "@/features/summary/domain/use-cases/get-electricity-usage-use-case";
 import { Logger } from "@/core/utils/logger/logger";
 import { ErrorType } from "@/core/domain/enums/base-enum";
-import { EnergyUnit, TimePeriod } from "@/shared/domain/enum/enums";
+import { TimePeriod } from "@/shared/domain/enum/enums";
 import {
   formatDateToStringLocal,
   getDateRangeByTimePeriod,
 } from "@/shared/utils/helpers/date-helpers";
+import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 
 interface UseGetElectricityUsageReturn {
   data: GetElectricityUsageModel | null;
@@ -24,6 +25,11 @@ interface UseGetElectricityUsageReturn {
     params: GetElectricityUsageQueryParams
   ) => void;
   reset: () => void;
+}
+
+interface UseGetElectricityUsageProps {
+  defaultLocation?: string | string[];
+  activeLocationFilter?: string;
 }
 
 const subMonths = (date: Date, months: number): Date => {
@@ -38,7 +44,10 @@ const subYears = (date: Date, years: number): Date => {
   return result;
 };
 
-export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
+export const useGetElectricityUsage = ({
+  defaultLocation,
+  activeLocationFilter,
+}: UseGetElectricityUsageProps): UseGetElectricityUsageReturn => {
   const [data, setData] = useState<GetElectricityUsageModel | null>(null);
   const [comparedData, setComparedData] =
     useState<GetElectricityUsageModel | null>(null);
@@ -49,15 +58,19 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
   const prepareQueryParams = (
     params: GetElectricityUsageQueryParams
   ): GetElectricityUsageQueryParams => {
-    const {
-      period = TimePeriod.Monthly,
-      unit = EnergyUnit.KWH,
-      startDate,
-      endDate,
-    } = params;
+    const { period = TimePeriod.Monthly, startDate, endDate } = params;
 
     let _startDate = startDate;
     let _endDate = endDate;
+    let location: string | undefined = activeLocationFilter;
+    const defaultValue = defaultLocation as string;
+
+    if (
+      location?.toLowerCase() ===
+      optionalValue(defaultValue).orEmpty().toLowerCase()
+    ) {
+      location = undefined;
+    }
 
     // Calculate date range if not provided
     if (!startDate || !endDate) {
@@ -93,9 +106,9 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
 
     return {
       period: normalizedPeriod,
-      unit,
       startDate: _startDate,
       endDate: _endDate,
+      location,
     };
   };
 
@@ -114,7 +127,7 @@ export const useGetElectricityUsage = (): UseGetElectricityUsageReturn => {
         Logger.info(
           "useGetElectricityUsage",
           "Fetching electricity usage with params:",
-          { period: params.period, unit: params.unit }
+          { period: params.period }
         );
 
         const getElectricityUsageUseCase = new GetElectricityUsageUseCase();

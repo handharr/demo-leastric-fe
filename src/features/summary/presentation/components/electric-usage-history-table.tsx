@@ -13,12 +13,14 @@ interface ElectricUsageHistoryTableProps {
   data: PeriodValueModel[];
   className?: string;
   loading?: boolean;
+  activeLocationFilter?: string;
 }
 
 export function ElectricUsageHistoryTable({
   data,
   className,
   loading = false,
+  activeLocationFilter,
 }: ElectricUsageHistoryTableProps) {
   const TableContent = ({ isLoading }: { isLoading: boolean }) => {
     return (
@@ -88,7 +90,11 @@ export function ElectricUsageHistoryTable({
     <TilePrimary
       title="Electricity Usage History"
       description="Overview of electricity consumption trends."
-      topRightContent={<ShowMoreElectricUsageModalButton />}
+      topRightContent={
+        <ShowMoreElectricUsageModalButton
+          activeLocationFilter={activeLocationFilter}
+        />
+      }
       className={className || ""}
     >
       <div className="overflow-x-auto">

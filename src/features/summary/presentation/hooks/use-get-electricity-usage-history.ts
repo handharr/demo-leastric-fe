@@ -26,7 +26,15 @@ export interface UseGetElectricityUsageHistoryReturn {
   reset: () => void;
 }
 
-export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryReturn {
+interface FetchUsageHistoryParams {
+  activeLocationFilter?: string;
+  defaultLocation?: string | string[];
+}
+
+export function useGetElectricityUsageHistory({
+  activeLocationFilter,
+  defaultLocation = undefined,
+}: FetchUsageHistoryParams): UseGetElectricityUsageHistoryReturn {
   const [usageHistory, setUsageHistory] = useState<ElectricityUsageModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +55,15 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
       let endDate = params.endDate;
       const period = params.period || TimePeriod.Daily;
       const size = optionalValue(params.size).orDefault(10);
+      let location: string | undefined = activeLocationFilter;
+      const defaultValue = defaultLocation as string;
+
+      if (
+        location?.toLowerCase() ===
+        optionalValue(defaultValue).orEmpty().toLowerCase()
+      ) {
+        location = undefined;
+      }
 
       if (!startDate || !endDate) {
         const dateRange = getDateRangeByTimePeriod(TimePeriod.Daily);
@@ -60,6 +77,8 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
         endDate,
         period: period.toLocaleLowerCase(),
         size,
+        sortOrder: "DESC",
+        location,
       };
 
       try {
@@ -84,7 +103,7 @@ export function useGetElectricityUsageHistory(): UseGetElectricityUsageHistoryRe
         setLoading(false);
       }
     },
-    []
+    [activeLocationFilter, defaultLocation]
   );
 
   const fetchUsageHistory = useCallback(

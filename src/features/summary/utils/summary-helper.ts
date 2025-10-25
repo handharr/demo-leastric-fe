@@ -41,7 +41,8 @@ import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
  * ```
  */
 export function aggregateElectricityUsageByPeriod(
-  usageData: ElectricityUsageModel[]
+  usageData: ElectricityUsageModel[],
+  sort?: "ASC" | "DESC"
 ): PeriodValueModel[] {
   if (!usageData || usageData.length === 0) {
     return [];
@@ -105,8 +106,13 @@ export function aggregateElectricityUsageByPeriod(
     });
   });
 
-  // Sort by period (assuming date string format can be sorted lexicographically)
-  return result.sort((a, b) => a.period.localeCompare(b.period));
+  if (sort === "ASC") {
+    return result.sort((a, b) => a.period.localeCompare(b.period));
+  } else if (sort === "DESC") {
+    return result.sort((a, b) => b.period.localeCompare(a.period));
+  }
+
+  return result;
 }
 
 /**

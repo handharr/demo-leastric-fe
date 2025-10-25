@@ -38,7 +38,9 @@ import { GetGeneratePdfReportQueryParams } from "@/features/summary/domain/param
 import {
   convertDateToUTC,
   getCurrentMonthDateRange,
+  getCurrentMonthDateRangeUntilToday,
 } from "@/shared/utils/helpers/date-helpers";
+import { summaryFilterMeta as filterMeta } from "@/features/summary/presentation/components/summary-filter-modal";
 
 const availableTimePeriods = [
   TimePeriod.Daily,
@@ -83,7 +85,10 @@ export default function SummaryPage() {
     error: electricityUsageHistoryError,
     fetchUsageHistory: fetchElectricityUsageHistory,
     reset: resetElectricityUsageHistory,
-  } = useGetElectricityUsageHistory();
+  } = useGetElectricityUsageHistory({
+    activeLocationFilter: activeFilters.singleSelection.location,
+    defaultLocation: filterMeta.location.defaultValue,
+  });
   const {
     data: locations,
     error: getLocationsError,
@@ -190,7 +195,13 @@ export default function SummaryPage() {
   ]);
 
   useEffect(() => {
-    fetchElectricityUsageHistory({ page: 1 });
+    const dateRange = getCurrentMonthDateRangeUntilToday();
+
+    fetchElectricityUsageHistory({
+      page: 1,
+      startDate: dateRange.startDate.toISOString(),
+      endDate: dateRange.endDate.toISOString(),
+    });
   }, [fetchElectricityUsageHistory]);
 
   return (
@@ -278,7 +289,7 @@ export default function SummaryPage() {
               optionalValue(
                 usageSummary?.threePhase?.totalCO2Emission
               ).orZero(),
-            3
+            2
           )}
           unit="kg CO₂e/kWh"
         />
@@ -357,6 +368,7 @@ export default function SummaryPage() {
           data={aggregateElectricityUsageByPeriod(electricityUsageHistory)}
           className=""
           loading={electricityUsageHistoryLoading}
+          activeLocationFilter={activeFilters.singleSelection.location}
         />
       </div>
     </div>

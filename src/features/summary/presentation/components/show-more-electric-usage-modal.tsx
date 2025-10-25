@@ -16,8 +16,15 @@ import {
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
 import { formatNumberIndonesian } from "@/shared/utils/helpers/number-helpers";
+import { summaryFilterMeta } from "@/features/summary/presentation/components/summary-filter-modal";
 
-export function ShowMoreElectricUsageModalButton() {
+export interface ShowMoreElectricUsageModalButtonProps {
+  activeLocationFilter?: string;
+}
+
+export function ShowMoreElectricUsageModalButton({
+  activeLocationFilter,
+}: ShowMoreElectricUsageModalButtonProps) {
   const [open, setOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange>(
     getCurrentMonthDateRangeUntilToday()
@@ -33,7 +40,10 @@ export function ShowMoreElectricUsageModalButton() {
     goToPage,
     fetchUsageHistory,
     reset,
-  } = useGetElectricityUsageHistory();
+  } = useGetElectricityUsageHistory({
+    activeLocationFilter,
+    defaultLocation: summaryFilterMeta.location.defaultValue,
+  });
 
   const data = aggregateElectricityUsageByPeriod(electricityUsageHistory);
 

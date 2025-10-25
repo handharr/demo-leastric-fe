@@ -33,8 +33,6 @@ export function roundToMaxNDecimals(
   return parseFloat(value.toFixed(maxDecimals));
 }
 
-// ...existing code...
-
 /**
  * Formats a number as currency with 2 decimal places
  * @param value - The number to format
@@ -105,8 +103,6 @@ export function formatCurrencyWithSymbol(
   return `${currencySymbol}${formattedNumber}`;
 }
 
-// ...existing code...
-
 /**
  * Formats a number as Indonesian Rupiah (IDR)
  * Rupiah typically doesn't use decimal places
@@ -143,7 +139,10 @@ export function formatRupiahWithSymbol(
  * @param value - The number to format
  */
 export function formatRupiahNumber(value: number): string {
-  return new Intl.NumberFormat("id-ID").format(Math.round(value));
+  return new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value);
 }
 
 /**

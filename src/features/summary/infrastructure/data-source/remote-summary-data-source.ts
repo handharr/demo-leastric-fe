@@ -11,6 +11,7 @@ import {
   GetExportToCsvResponse,
   GetDevicesCurrentMqttLogResponse,
   GetGeneratePdfReportResponse,
+  GetAvaliablePDFReportsResponse,
 } from "@/features/summary/infrastructure/models/summary-responses";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
 import { AxiosError } from "axios";
@@ -172,6 +173,35 @@ export class RemoteSummaryDataSource implements SummaryDataSource {
       return this.apiClient.handleError(
         error as AxiosError<BaseErrorResponse>,
         "Failed to generate PDF report. Please try again."
+      );
+    }
+  }
+
+  async getAvaliablePDFReports({
+    params,
+  }: {
+    params: Record<string, unknown>;
+  }): Promise<
+    BaseResponse<GetAvaliablePDFReportsResponse> | BaseErrorResponse
+  > {
+    try {
+      const headers = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      };
+      return await this.apiClient.get(
+        `v1/readings/available-pdf-reports`,
+        params,
+        {
+          headers,
+        }
+      );
+    } catch (error) {
+      Logger.error("Error fetching available PDF reports", error);
+      return this.apiClient.handleError(
+        error as AxiosError<BaseErrorResponse>,
+        "Failed to fetch available PDF reports. Please try again."
       );
     }
   }

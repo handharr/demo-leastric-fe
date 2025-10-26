@@ -36,3 +36,11 @@ export interface GetGeneratePdfReportQueryParams {
   endDate?: string;
   companyName?: string;
 }
+
+export interface GetAvaliablePDFReportsQueryParams {
+  page?: number; // Page number for pagination
+  size?: number; // Number of items per page
+  deviceId?: string; // e.g., "device123"
+  location?: string; // e.g., "Building A"
+  year?: number; // e.g., 2023
+}

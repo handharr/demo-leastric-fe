@@ -1,5 +1,6 @@
 import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import {
+  GetAvaliablePDFReportsModel,
   GetDevicesCurrentMqttLogModel,
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
@@ -14,6 +15,7 @@ import {
   GetExportToCsvQueryParams,
   GetDevicesCurrentMqttLogQueryParams,
   GetGeneratePdfReportQueryParams,
+  GetAvaliablePDFReportsQueryParams,
 } from "@/features/summary/domain/params/query-params";
 import { MqttUsageModel } from "@/shared/domain/entities/shared-models";
 import { Observable } from "rxjs";
@@ -50,4 +52,9 @@ export interface SummaryRepository {
   }: {
     queryParam: GetGeneratePdfReportQueryParams;
   }): Promise<GetGeneratePdfReportModel | BaseErrorModel>;
+  getAvaliablePDFReports({
+    queryParam,
+  }: {
+    queryParam: GetAvaliablePDFReportsQueryParams;
+  }): Promise<GetAvaliablePDFReportsModel | BaseErrorModel>;
 }

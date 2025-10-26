@@ -9,6 +9,7 @@ import { Logger } from "@/core/utils/logger/logger";
 import { ErrorType } from "@/core/domain/enums/base-enum";
 import {
   DeviceCurrentMqttLogModel,
+  GetAvaliablePDFReportsModel,
   GetDevicesCurrentMqttLogModel,
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
@@ -23,6 +24,7 @@ import {
   GetExportToCsvQueryParams,
   GetDevicesCurrentMqttLogQueryParams,
   GetGeneratePdfReportQueryParams,
+  GetAvaliablePDFReportsQueryParams,
 } from "@/features/summary/domain/params/query-params";
 import { SummaryRepository } from "@/features/summary/domain/repositories/summary-repository";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
@@ -579,6 +581,91 @@ export class SummaryRepositoryImpl implements SummaryRepository {
         message:
           result.flash?.message ||
           "Failed to retrieve generate PDF report. Please try again.",
+      });
+    }
+  }
+
+  async getAvaliablePDFReports({
+    queryParam,
+  }: {
+    queryParam: GetAvaliablePDFReportsQueryParams;
+  }): Promise<GetAvaliablePDFReportsModel | BaseErrorModel> {
+    Logger.info("SummaryRepositoryImpl", "getAvaliablePDFReports", queryParam);
+    const result = await this.dataSource.getAvaliablePDFReports({
+      params: { ...queryParam },
+    });
+
+    if (isErrorResponse(result)) {
+      Logger.error("SummaryRepositoryImpl", "getAvaliablePDFReports", result);
+      return mapErrorResponseToModel({ response: result });
+    }
+
+    Logger.info(
+      "SummaryRepositoryImpl",
+      "getAvaliablePDFReports result",
+      result
+    );
+    if (result.flash?.type === "success") {
+      try {
+        Logger.info(
+          "SummaryRepositoryImpl",
+          "Success getAvaliablePDFReports - mapping reports"
+        );
+        return {
+          firstDataDate: optionalValue(result.data?.firstDataDate).orEmpty(),
+          lastDataDate: optionalValue(result.data?.lastDataDate).orEmpty(),
+          totalMonthsAvailable: optionalValue(
+            result.data?.totalMonthsAvailable
+          ).orZero(),
+          totalYearsAvailable: optionalValue(
+            result.data?.totalYearsAvailable
+          ).orZero(),
+          availablePeriods: {
+            yearly: optionalValue(
+              result.data?.availablePeriods?.yearly
+            ).orEmptyArray(),
+            monthly: {
+              periods: optionalValue(
+                result.data?.availablePeriods?.monthly?.periods
+              ).orEmptyArray(),
+              total: optionalValue(
+                result.data?.availablePeriods?.monthly?.total
+              ).orZero(),
+            },
+          },
+          pagination: {
+            page: optionalValue(result.meta?.page).orZero(),
+            itemCount: optionalValue(result.meta?.itemCount).orZero(),
+            pageCount: optionalValue(result.meta?.pageCount).orZero(),
+            hasPreviousPage: optionalValue(
+              result.meta?.hasPreviousPage
+            ).orFalse(),
+            hasNextPage: optionalValue(result.meta?.hasNextPage).orFalse(),
+            size: optionalValue(result.meta?.size).orZero(),
+          },
+        };
+      } catch (error) {
+        Logger.error(
+          "SummaryRepositoryImpl",
+          "getAvaliablePDFReports - parsing error",
+          error
+        );
+        return createErrorModel({
+          type: ErrorType.UNEXPECTED,
+          message: "Failed to parse available PDF reports data.",
+        });
+      }
+    } else {
+      Logger.error(
+        "SummaryRepositoryImpl",
+        "getAvaliablePDFReports - unexpected flash type",
+        result
+      );
+      return createErrorModel({
+        type: ErrorType.UNEXPECTED,
+        message:
+          result.flash?.message ||
+          "Failed to retrieve available PDF reports. Please try again.",
       });
     }
   }

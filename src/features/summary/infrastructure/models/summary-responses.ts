@@ -120,3 +120,17 @@ export interface GetGeneratePdfReportResponse {
   fileUrl?: string;
   fileName?: string;
 }
+
+export interface GetAvaliablePDFReportsResponse {
+  firstDataDate?: string; // ISO 8601 format
+  lastDataDate?: string; // ISO 8601 format
+  totalMonthsAvailable?: number;
+  totalYearsAvailable?: number;
+  availablePeriods?: {
+    yearly?: string[];
+    monthly?: {
+      periods?: string[]; // e.g., "2023-01", "2023-02"
+      total?: number;
+    };
+  };
+}

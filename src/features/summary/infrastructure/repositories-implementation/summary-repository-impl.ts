@@ -9,7 +9,7 @@ import { Logger } from "@/core/utils/logger/logger";
 import { ErrorType } from "@/core/domain/enums/base-enum";
 import {
   DeviceCurrentMqttLogModel,
-  GetAvaliablePDFReportsModel,
+  GetAvailablePDFReportsModel,
   GetDevicesCurrentMqttLogModel,
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
@@ -589,7 +589,7 @@ export class SummaryRepositoryImpl implements SummaryRepository {
     queryParam,
   }: {
     queryParam: GetAvaliablePDFReportsQueryParams;
-  }): Promise<GetAvaliablePDFReportsModel | BaseErrorModel> {
+  }): Promise<GetAvailablePDFReportsModel | BaseErrorModel> {
     Logger.info("SummaryRepositoryImpl", "getAvaliablePDFReports", queryParam);
     const result = await this.dataSource.getAvaliablePDFReports({
       params: { ...queryParam },

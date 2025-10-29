@@ -121,7 +121,7 @@ export interface GetGeneratePdfReportResponse {
   fileName?: string;
 }
 
-export interface GetAvaliablePDFReportsResponse {
+export interface GetAvailablePDFReportsResponse {
   firstDataDate?: string; // ISO 8601 format
   lastDataDate?: string; // ISO 8601 format
   totalMonthsAvailable?: number;

@@ -11,7 +11,7 @@ import {
   GetExportToCsvResponse,
   GetDevicesCurrentMqttLogResponse,
   GetGeneratePdfReportResponse,
-  GetAvaliablePDFReportsResponse,
+  GetAvailablePDFReportsResponse,
 } from "@/features/summary/infrastructure/models/summary-responses";
 import { SummaryDataSource } from "@/features/summary/infrastructure/data-source/summary-data-source";
 import { AxiosError } from "axios";
@@ -182,7 +182,7 @@ export class RemoteSummaryDataSource implements SummaryDataSource {
   }: {
     params: Record<string, unknown>;
   }): Promise<
-    BaseResponse<GetAvaliablePDFReportsResponse> | BaseErrorResponse
+    BaseResponse<GetAvailablePDFReportsResponse> | BaseErrorResponse
   > {
     try {
       const headers = {

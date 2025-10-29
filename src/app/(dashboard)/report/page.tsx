@@ -32,6 +32,7 @@ import { useGetHundredDevices } from "@/features/summary/presentation/hooks/use-
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
 import { useGetGeneratePdfReport } from "@/features/summary/presentation/hooks/use-get-generate-pdf-report";
+// import { useGetAvailablePdfReports } from "@/features/summary/presentation/hooks/use-get-available-pdf-reports";
 
 type ExportFormat = "csv" | "pdf";
 
@@ -60,6 +61,17 @@ export default function ReportPage() {
     activeLocationFilter: undefined,
     defaultLocation: undefined,
   });
+  // const {
+  //   data: reportData,
+  //   loading: useGetReportDataLoading,
+  //   error: useGetReportDataError,
+  //   fetchReportData,
+  //   reset: resetReportData,
+  // } = useGetAvailablePdfReports({
+  //   location: activeFilters.singleSelection?.location,
+  //   deviceId: ,
+  // });
+
   const { showPopup } = usePopup();
   const {
     loading: useGetExportToCsvLoading,

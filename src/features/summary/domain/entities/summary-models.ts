@@ -153,7 +153,7 @@ export interface GetGeneratePdfReportModel {
   fileName: string;
 }
 
-export interface GetAvaliablePDFReportsModel {
+export interface GetAvailablePDFReportsModel {
   firstDataDate: string; // ISO 8601 format
   lastDataDate: string; // ISO 8601 format
   totalMonthsAvailable: number;

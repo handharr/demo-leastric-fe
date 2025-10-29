@@ -31,7 +31,6 @@ export const handleMultiSelect = <T extends FilterState>({
   id,
   currentFilter,
   filterMeta,
-  options,
 }: {
   filterKey: string;
   id: string;
@@ -50,19 +49,17 @@ export const handleMultiSelect = <T extends FilterState>({
       newSelectedIds = [selectedAllId || ""];
     }
   } else {
+    // Remove "all" if it's selected
+    if (newSelectedIds.includes(selectedAllId || "")) {
+      newSelectedIds = newSelectedIds.filter(
+        (selectedId) => selectedId !== selectedAllId
+      );
+    }
     // Toggle individual selection
     if (newSelectedIds.includes(id)) {
       newSelectedIds = newSelectedIds.filter((selectedId) => selectedId !== id);
     } else {
       newSelectedIds = [...newSelectedIds, id];
-    }
-
-    // Ensure "all" is not selected if not all individual options are selected
-    if (!(newSelectedIds.length === options.length - 1)) {
-      // Ensure "all" is not selected if not all individual options are selected
-      newSelectedIds = newSelectedIds.filter(
-        (selectedId) => selectedId !== selectedAllId
-      );
     }
   }
   return {

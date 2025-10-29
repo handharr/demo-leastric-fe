@@ -1,6 +1,6 @@
 import { BaseErrorModel } from "@/core/domain/entities/base-error-model";
 import {
-  GetAvaliablePDFReportsModel,
+  GetAvailablePDFReportsModel,
   GetDevicesCurrentMqttLogModel,
   GetElectricityUsageHistoryModel,
   GetElectricityUsageModel,
@@ -56,5 +56,5 @@ export interface SummaryRepository {
     queryParam,
   }: {
     queryParam: GetAvaliablePDFReportsQueryParams;
-  }): Promise<GetAvaliablePDFReportsModel | BaseErrorModel>;
+  }): Promise<GetAvailablePDFReportsModel | BaseErrorModel>;
 }

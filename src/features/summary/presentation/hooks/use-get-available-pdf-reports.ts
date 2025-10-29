@@ -21,11 +21,13 @@ interface UseGetAvailablePdfReportsReturn {
 interface UseGetAvailablePdfReportsProps {
   location?: string;
   deviceId?: string;
+  year?: number;
 }
 
 export function useGetAvailablePdfReports({
   location,
   deviceId,
+  year,
 }: UseGetAvailablePdfReportsProps): UseGetAvailablePdfReportsReturn {
   const [data, setData] = useState<GetAvailablePDFReportsModel | null>(null);
   const [error, setError] = useState<BaseErrorModel | null>(null);
@@ -49,6 +51,7 @@ export function useGetAvailablePdfReports({
         size: pagination.size,
         location: location,
         deviceId: deviceId,
+        year: year,
       };
       const result = await getAvailablePdfReportsUseCase.execute(queryParam);
 

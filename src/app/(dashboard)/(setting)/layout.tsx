@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
@@ -81,6 +82,7 @@ export default function SettingLayout({
   const [activeIndex, setActiveIndex] = useState(0);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const {
     isLoading: isLoggingOut,
@@ -129,6 +131,41 @@ export default function SettingLayout({
       clearError();
     }
   }, [logoutError, showPopup, clearError]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Logout Dialog Component
+  const LogoutDialog = () => (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60">
+      <div className="bg-white rounded-2xl p-8 min-w-[350px] shadow-lg flex flex-col items-center">
+        <div className="text-xl font-semibold mb-6 text-gray-800 text-center">
+          Are you sure you want to Logout?
+        </div>
+        <div className="flex gap-4 w-full">
+          <button
+            className="flex-1 border border-gray-300 rounded-xl py-3 text-lg font-medium text-gray-700 hover:bg-gray-100 transition cursor-pointer"
+            onClick={handleCancelLogout}
+          >
+            Cancel
+          </button>
+          <button
+            className="flex-1 bg-[#2a6335] rounded-xl py-3 text-lg font-medium text-white hover:bg-[#215027] transition cursor-pointer"
+            onClick={handleLogout}
+          >
+            {isLoggingOut ? (
+              <div className="flex justify-center">
+                <LoadingSpinner size="md" className="h-40 w-40" />
+              </div>
+            ) : (
+              "Logout"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-[16px]">
@@ -214,36 +251,10 @@ export default function SettingLayout({
         </main>
       </div>
 
-      {/* Logout Dialog */}
-      {showLogoutDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-white rounded-2xl p-8 min-w-[350px] shadow-lg flex flex-col items-center">
-            <div className="text-xl font-semibold mb-6 text-gray-800 text-center">
-              Are you sure you want to Logout?
-            </div>
-            <div className="flex gap-4 w-full">
-              <button
-                className="flex-1 border border-gray-300 rounded-xl py-3 text-lg font-medium text-gray-700 hover:bg-gray-100 transition"
-                onClick={handleCancelLogout}
-              >
-                Cancel
-              </button>
-              <button
-                className="flex-1 bg-[#2a6335] rounded-xl py-3 text-lg font-medium text-white hover:bg-[#215027] transition"
-                onClick={handleLogout}
-              >
-                {isLoggingOut ? (
-                  <div className="flex justify-center">
-                    <LoadingSpinner size="md" className="h-40 w-40" />
-                  </div>
-                ) : (
-                  "Logout"
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Portal the logout dialog to document.body */}
+      {showLogoutDialog &&
+        mounted &&
+        createPortal(<LogoutDialog />, document.body)}
     </div>
   );
 }

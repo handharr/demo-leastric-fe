@@ -210,10 +210,6 @@ export function GenericFilterModal<T extends FilterState>({
               "lg:absolute lg:top-full lg:left-0 lg:mt-1 lg:min-w-[800px] lg:max-w-4xl lg:w-auto lg:h-auto lg:max-h-[50vh]",
               "lg:transform-none lg:translate-x-0 lg:translate-y-0 lg:z-[60]"
             )}
-            style={{
-              // Ensure proper stacking context
-              position: "fixed",
-            }}
           >
             <div className="flex flex-1 overflow-hidden">
               {/* Left sidebar */}

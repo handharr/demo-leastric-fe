@@ -9,17 +9,13 @@ import {
   ReportFilterState,
 } from "@/features/setting/presentation/components/report-filter-modal";
 import { useCallback, useEffect, useState } from "react";
-import { useGetElectricityUsageHistory } from "@/features/summary/presentation/hooks/use-get-electricity-usage-history";
-import { getStartAndEndDateFormattedUTCWithoutMsFromYear } from "@/features/summary/utils/summary-helper";
 import {
   usePopup,
   PopupType,
 } from "@/shared/presentation/hooks/top-popup-context";
-import { TimePeriod } from "@/shared/domain/enum/enums";
 import { optionalValue } from "@/core/utils/wrappers/optional-wrapper";
 import { useGetExportToCsv } from "@/features/summary/presentation/hooks/use-get-export-to-csv";
 import LoadingSpinner from "@/shared/presentation/components/loading/loading-spinner";
-import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import {
   GetExportToCsvQueryParams,
   GetGeneratePdfReportQueryParams,
@@ -32,7 +28,8 @@ import { useGetHundredDevices } from "@/features/summary/presentation/hooks/use-
 import { FilterOption } from "@/shared/presentation/types/filter-ui";
 import { Dropdown } from "@/shared/presentation/components/dropdown";
 import { useGetGeneratePdfReport } from "@/features/summary/presentation/hooks/use-get-generate-pdf-report";
-// import { useGetAvailablePdfReports } from "@/features/summary/presentation/hooks/use-get-available-pdf-reports";
+import { arrayStringToDelimitedString } from "@/core/utils/helpers/string-helper";
+import { useGetAvailablePdfReports } from "@/features/summary/presentation/hooks/use-get-available-pdf-reports";
 
 type ExportFormat = "csv" | "pdf";
 
@@ -48,29 +45,30 @@ export default function ReportPage() {
   } = useGetHundredDevices();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const {
-    usageHistory,
-    loading: useGetElectricityUsageHistoryLoading,
-    error: useGetElectricityUsageHistoryError,
-    pagination,
+    data: reportData,
+    loading: useGetReportDataLoading,
+    error: useGetReportDataError,
+    fetch: fetchReportData,
+    reset: resetReportData,
     nextPage,
     previousPage,
     goToPage,
-    fetchUsageHistory,
-    reset: resetUsageHistory,
-  } = useGetElectricityUsageHistory({
-    activeLocationFilter: undefined,
-    defaultLocation: undefined,
+  } = useGetAvailablePdfReports({
+    location: undefined,
+    deviceId: arrayStringToDelimitedString({
+      array: optionalValue(
+        activeFilters.multiSelection?.devices
+      ).orEmptyArray(),
+      delimiter: ",",
+      excludeValues: reportFilterMeta.devices.defaultValue as string[],
+    }),
+    year: parseInt(
+      optionalValue(activeFilters.singleSelection?.year).orDefault(
+        new Date().getUTCFullYear().toString()
+      ),
+      10
+    ),
   });
-  // const {
-  //   data: reportData,
-  //   loading: useGetReportDataLoading,
-  //   error: useGetReportDataError,
-  //   fetchReportData,
-  //   reset: resetReportData,
-  // } = useGetAvailablePdfReports({
-  //   location: activeFilters.singleSelection?.location,
-  //   deviceId: ,
-  // });
 
   const { showPopup } = usePopup();
   const {
@@ -89,15 +87,6 @@ export default function ReportPage() {
   } = useGetGeneratePdfReport();
 
   useEffect(() => {
-    if (useGetElectricityUsageHistoryError) {
-      showPopup(
-        useGetElectricityUsageHistoryError ||
-          "Failed to fetch electricity usage history",
-        PopupType.ERROR
-      );
-      resetUsageHistory();
-    }
-
     if (useGetExportToCsvError) {
       showPopup(
         optionalValue(useGetExportToCsvError?.message).orDefault(
@@ -137,35 +126,33 @@ export default function ReportPage() {
       showPopup(successMessageGeneratePdfReport, PopupType.SUCCESS);
       resetGeneratePdfReport?.();
     }
+
+    if (useGetReportDataError) {
+      showPopup(
+        optionalValue(useGetReportDataError?.message).orDefault(
+          "Failed to fetch report data"
+        ),
+        PopupType.ERROR
+      );
+      resetReportData();
+    }
   }, [
-    useGetElectricityUsageHistoryError,
     useGetHundredDevicesError,
     useGetExportToCsvSuccessMessage,
     useGetExportToCsvError,
     errorGeneratePdfReport,
     successMessageGeneratePdfReport,
+    useGetReportDataError,
     showPopup,
-    resetUsageHistory,
     resetExportToCsv,
     resetHundredDevices,
     resetGeneratePdfReport,
+    resetReportData,
   ]);
 
   useEffect(() => {
-    const selectedYear = optionalValue(
-      activeFilters.singleSelection?.year
-    ).orDefault(new Date().getFullYear().toString());
-    const dateRangeFromYear = getStartAndEndDateFormattedUTCWithoutMsFromYear(
-      parseInt(selectedYear, 10)
-    );
-    fetchUsageHistory({
-      page: 1,
-      startDate: dateRangeFromYear.startDate,
-      endDate: dateRangeFromYear.endDate,
-      period: TimePeriod.Monthly,
-      size: 10,
-    });
-  }, [fetchUsageHistory, activeFilters]);
+    fetchReportData();
+  }, [fetchReportData, activeFilters]);
 
   const handleDownload = useCallback(() => {
     if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
@@ -219,7 +206,7 @@ export default function ReportPage() {
   ]);
 
   const handleDownloadSingle = useCallback(
-    (row: ElectricityUsageModel) => {
+    (row: string) => {
       if (useGetExportToCsvLoading || loadingGeneratePdfReport) {
         showPopup(
           "Please wait until the current export is finished.",
@@ -227,7 +214,7 @@ export default function ReportPage() {
         );
         return;
       }
-      const selectedPeriod = optionalValue(new Date(row.period)).orToday();
+      const selectedPeriod = optionalValue(new Date(row)).orToday();
       const dateRangeMonth = getStartAndEndDateOfMonthFromDate(selectedPeriod);
 
       if (exportFormat === "pdf") {
@@ -338,11 +325,18 @@ export default function ReportPage() {
 
       {/* Report Table */}
       <ReportTable
-        data={usageHistory}
-        pagination={pagination}
-        isLoading={
-          useGetElectricityUsageHistoryLoading || loadingGeneratePdfReport
-        }
+        reportData={optionalValue(
+          reportData?.availablePeriods.monthly.periods
+        ).orEmptyArray()}
+        pagination={optionalValue(reportData?.pagination).orDefault({
+          page: 1,
+          itemCount: 0,
+          pageCount: 0,
+          hasPreviousPage: false,
+          hasNextPage: false,
+          size: 10,
+        })}
+        isLoading={loadingGeneratePdfReport || useGetReportDataLoading}
         selectedIds={selectedIds}
         handleRowSelect={(id) => {
           if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
@@ -355,59 +349,27 @@ export default function ReportPage() {
         handleSelectAll={() => {
           if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
           setSelectedIds((prev) =>
-            prev.length === usageHistory.length
+            prev.length ===
+            optionalValue(
+              reportData?.availablePeriods.monthly.periods.length
+            ).orZero()
               ? []
-              : usageHistory.map((row) => row.period)
+              : optionalValue(reportData?.availablePeriods.monthly.periods)
+                  .orEmptyArray()
+                  .map((row) => row)
           );
         }}
         gotoPage={(page) => {
           if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
-          const selectedYear = optionalValue(
-            activeFilters.singleSelection?.year
-          ).orDefault(new Date().getFullYear().toString());
-          const dateRangeFromYear =
-            getStartAndEndDateFormattedUTCWithoutMsFromYear(
-              parseInt(selectedYear, 10)
-            );
-          goToPage({
-            page,
-            startDate: dateRangeFromYear.startDate,
-            endDate: dateRangeFromYear.endDate,
-            period: TimePeriod.Monthly,
-            size: 10,
-          });
+          goToPage(page);
         }}
         previousPage={() => {
           if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
-          const selectedYear = optionalValue(
-            activeFilters.singleSelection?.year
-          ).orDefault(new Date().getFullYear().toString());
-          const dateRangeFromYear =
-            getStartAndEndDateFormattedUTCWithoutMsFromYear(
-              parseInt(selectedYear, 10)
-            );
-          previousPage({
-            startDate: dateRangeFromYear.startDate,
-            endDate: dateRangeFromYear.endDate,
-            period: TimePeriod.Monthly,
-            size: 10,
-          });
+          previousPage();
         }}
         nextPage={() => {
           if (useGetExportToCsvLoading || loadingGeneratePdfReport) return;
-          const selectedYear = optionalValue(
-            activeFilters.singleSelection?.year
-          ).orDefault(new Date().getFullYear().toString());
-          const dateRangeFromYear =
-            getStartAndEndDateFormattedUTCWithoutMsFromYear(
-              parseInt(selectedYear, 10)
-            );
-          nextPage({
-            startDate: dateRangeFromYear.startDate,
-            endDate: dateRangeFromYear.endDate,
-            period: TimePeriod.Monthly,
-            size: 10,
-          });
+          nextPage();
         }}
         onDownloadSingle={handleDownloadSingle}
       />

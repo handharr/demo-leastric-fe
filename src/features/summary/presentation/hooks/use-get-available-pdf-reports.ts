@@ -11,11 +11,11 @@ interface UseGetAvailablePdfReportsReturn {
   data: GetAvailablePDFReportsModel | null;
   error: BaseErrorModel | null;
   loading: boolean;
-  fetch: (location: string) => Promise<void>;
+  fetch: () => Promise<void>;
   reset: () => void;
-  nextPage?: () => void;
-  previousPage?: () => void;
-  goToPage?: (page: number) => void;
+  nextPage: () => void;
+  previousPage: () => void;
+  goToPage: (page: number) => void;
 }
 
 interface UseGetAvailablePdfReportsProps {
@@ -73,6 +73,7 @@ export function useGetAvailablePdfReports({
           hasNextPage: result.pagination.hasNextPage,
         }));
         setData(result);
+        console.log("[debugTest] setData result", result);
       }
     } catch (err) {
       Logger.error(
@@ -88,7 +89,7 @@ export function useGetAvailablePdfReports({
     } finally {
       setLoading(false);
     }
-  }, [location, deviceId, pagination.page, pagination.size]);
+  }, [location, deviceId, pagination.page, pagination.size, year]);
 
   const reset = useCallback(() => {
     setData(null);

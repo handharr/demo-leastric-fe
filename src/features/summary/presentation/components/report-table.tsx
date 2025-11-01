@@ -1,13 +1,11 @@
 import { Pagination } from "@/shared/presentation/components/pagination";
 import Image from "next/image";
-import { ElectricityUsageModel } from "@/features/summary/domain/entities/summary-models";
 import { PaginationModel } from "@/core/domain/entities/base-model";
 import { TableSkeletonLoading } from "@/shared/presentation/components/loading/table-skeleton-loading";
-import { aggregateElectricityUsageByPeriod } from "@/features/summary/utils/summary-helper";
 import { EmptyData } from "@/shared/presentation/components/empty-data";
 
 interface ReportTableProps {
-  data: ElectricityUsageModel[];
+  reportData: string[];
   pagination: PaginationModel;
   isLoading?: boolean;
   selectedIds: string[];
@@ -16,11 +14,11 @@ interface ReportTableProps {
   gotoPage?: (page: number) => void;
   previousPage?: () => void;
   nextPage?: () => void;
-  onDownloadSingle?: (id: ElectricityUsageModel) => void;
+  onDownloadSingle?: (id: string) => void;
 }
 
 export function ReportTable({
-  data,
+  reportData,
   pagination,
   isLoading = false,
   selectedIds = [],
@@ -31,29 +29,27 @@ export function ReportTable({
   nextPage,
   onDownloadSingle,
 }: ReportTableProps) {
-  const isAllSelected = selectedIds.length === data.length && data.length > 0;
-  const mappedData = aggregateElectricityUsageByPeriod(data);
-  const isEmptyData = mappedData.length === 0 && !isLoading;
+  const isAllSelected =
+    selectedIds.length === reportData.length && reportData.length > 0;
+  const isEmptyData = reportData.length === 0 && !isLoading;
 
   const tableContent = isLoading ? (
     <TableSkeletonLoading colCount={4} />
   ) : (
-    mappedData.map((row, index) => (
+    reportData.map((row, index) => (
       <tr key={index} className="hover:bg-gray-50">
         <td className="px-4 py-3">
           <button
-            onClick={() => handleRowSelect?.(row.period)}
+            onClick={() => handleRowSelect?.(row)}
             className="flex items-center justify-center cursor-pointer w-5 h-5 focus:outline-none rounded"
           >
             <Image
               src={
-                selectedIds.includes(row.period)
+                selectedIds.includes(row)
                   ? "/resources/icons/checkbox/checkbox-default-selected.svg"
                   : "/resources/icons/checkbox/checkbox-default.svg"
               }
-              alt={
-                selectedIds.includes(row.period) ? "Unselect row" : "Select row"
-              }
+              alt={selectedIds.includes(row) ? "Unselect row" : "Select row"}
               width={20}
               height={20}
               className="w-[20px] h-[20px]"
@@ -61,21 +57,21 @@ export function ReportTable({
           </button>
         </td>
         <td className="px-4 py-3 text-sm text-gray-900">
-          {/* Month from YYYY-MM-DD */}
-          {new Date(row.period).toLocaleString("default", {
+          {/* Month from YYYY-MM */}
+          {new Date(row).toLocaleString("default", {
             month: "long",
           })}
         </td>
         <td className="px-4 py-3 text-sm text-gray-900">
-          {/* Year from YYYY-MM-DD */}
-          {new Date(row.period).getFullYear()}
+          {/* Year from YYYY-MM */}
+          {new Date(row).getUTCFullYear()}
         </td>
         <td className="px-4 py-3">
           <button
             className="text-gray-400 hover:text-gray-600 cursor-pointer"
             onClick={() => {
               if (onDownloadSingle) {
-                const rowData = data.find((item) => item.period === row.period);
+                const rowData = reportData.find((item) => item === row);
                 if (rowData) {
                   onDownloadSingle(rowData);
                 }
